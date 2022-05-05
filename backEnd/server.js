@@ -12,6 +12,7 @@ const fileUpload = require('express-fileupload');
 const mongoSanitize = require('express-mongo-sanitize');
 const xssClean = require('xss-clean/lib/xss').clean
 const rateLimit = require('express-rate-limit');
+const requestIp = require('request-ip');
 dotenv.config()
 
 const setup = require('./setup.js');
@@ -118,12 +119,17 @@ function checkAdminAuth(req, res, next) {
     });
 }
 
+app.use(requestIp.mw());
+
 const apiLimiterLow = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     message: { state: 'error', message: 'Rate limit exceeded, wait a couple minutes.' },
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    keyGenerator: (req, res) => {
+        return req.clientIp // IP address from requestIp.mw(), as opposed to req.ip
+    }
 })
 
 const apiLimiterHigh = rateLimit({
@@ -132,6 +138,10 @@ const apiLimiterHigh = rateLimit({
     message: { state: 'error', message: 'Rate limit exceeded, wait a couple minutes.' },
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    keyGenerator: (req, res) => {
+        console.log(req.clientIp);
+        return req.clientIp // IP address from requestIp.mw(), as opposed to req.ip
+    }
 })
 
 app.post('/api/login', apiLimiterHigh, (req, res) => {
