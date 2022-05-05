@@ -80,5 +80,5 @@ exports.run = async(bot, message, args) => {
 
 exports.info = {
     name: "submit",
-    description: "Submit a challenge Flag. (Use in DMs) \nUsage: ?submit challenge flag"
+    description: "Submit a challenge Flag. (Use in DMs) \nUsage: ?submit challenge_name flag"
 }
