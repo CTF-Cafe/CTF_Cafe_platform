@@ -13,8 +13,9 @@ var teamSchema = new Schema({
     },
     users: {
         "bsonType": "array",
-        "items": { "type": "string" },
-        "minItems": 0,
+        "items": {
+            "type": "string"
+        },
         "maxItems": 4,
         "uniqueItems": true,
         "required": true,
