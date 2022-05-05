@@ -20,7 +20,7 @@ exports.run = async(bot, message, args) => {
 
             let userTeamCheck;
             if (ObjectId.isValid(checkUser.teamId)) {
-                userTeamCheck = await teams.findOneById(checkUser.teamId);
+                userTeamCheck = await teams.findById(checkUser.teamId);
             }
 
             if (userTeamCheck) {
