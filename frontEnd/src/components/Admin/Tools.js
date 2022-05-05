@@ -79,17 +79,16 @@ function Tools(props) {
       };
     }
 
-    if(index < 10) {
-        index = "00" + index.toString();
+    if (index < 10) {
+      index = "00" + index.toString();
     } else if (index < 100) {
-        index = "0" + index.toString()
+      index = "0" + index.toString();
     }
 
-
-    if(teamLength < 10) {
-        teamLength = "00" + teamLength.toString();
+    if (teamLength < 10) {
+      teamLength = "00" + teamLength.toString();
     } else if (index < 100) {
-        teamLength = "0" + teamLength.toString()
+      teamLength = "0" + teamLength.toString();
     }
 
     //   CTF Name
@@ -116,6 +115,32 @@ function Tools(props) {
     anchor.href = canvas.toDataURL("image/png");
     anchor.download = "IMAGE.PNG";
     anchor.click();
+  };
+
+  const sendGlobalMessage = () => {
+    const globalMessage = document.getElementById("global_message").value;
+
+    axios
+      .post(process.env.REACT_APP_SERVER_URI + "/api/admin/sendGlobalMessage", {
+        globalMessage: globalMessage
+      })
+      .then((response) => {
+        if (response.data.state == "sessionError") {
+          globalData.alert.error("Session expired!");
+          globalData.setUserData({});
+          globalData.setLoggedIn(false);
+          globalData.navigate("/", { replace: true });
+        } else {
+          if(response.data.state == "success") {
+            globalData.alert.success("Message sent!");
+          } else {
+            globalData.alert.error(response.data.message);
+          }
+        }
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
   };
 
   return (
@@ -166,6 +191,24 @@ function Tools(props) {
                 type="button"
                 onClick={() => {
                   downloadCert();
+                }}
+              >
+                Run
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>Send Global Message</td>
+            <td>
+              <input type="text" id="global_message" />
+            </td>
+            <td>
+              <button
+                id="submit_p2"
+                className="btn btn-outline-danger"
+                type="button"
+                onClick={() => {
+                  sendGlobalMessage();
                 }}
               >
                 Run
