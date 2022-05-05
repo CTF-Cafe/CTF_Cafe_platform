@@ -1,6 +1,3 @@
-const http = require('http');
-const cron = require('node-cron');
-
 module.exports = {
     name: 'ready',
     once: true,
