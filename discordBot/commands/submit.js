@@ -5,7 +5,10 @@ const { MessageEmbed } = require('discord.js');
 const ObjectId = require('mongoose').Types.ObjectId;
 
 exports.run = async(bot, message, args) => {
-    if (!(message.guild === null)) return message.reply("This command only works in dms!");
+    if (!(message.guild === null)) {
+        message.reply("This command only works in dms!");
+        return message.delete();
+    }
     if (!args[0]) return message.reply('You must provide a challenge name (replace spaces with _)');
     if (!args[1]) return message.reply('You must provide a flag');
 

@@ -3,7 +3,10 @@ const { MessageEmbed } = require('discord.js');
 const crypto = require("crypto");
 
 exports.run = async(bot, message, args) => {
-    if (!(message.guild === null)) return message.reply("This command only works in dms!");
+    if (!(message.guild === null)) {
+        message.reply("This command only works in dms!");
+        return message.delete();
+    }
     if (!args[0]) return message.reply('You must provide a username');
     if (!args[1]) return message.reply('You must provide a password');
 
