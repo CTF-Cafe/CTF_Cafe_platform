@@ -10,7 +10,7 @@ bot.commands = new Collection();
 const mongoose = require('mongoose');
 const db = mongoose.connection;
 
-mongoose.connect('mongodb://raxo:' + process.env.MONGODB_PASSWORD + '@159.223.209.120:27017/ctfDB?authSource=admin', { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(process.ENV.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 db.once("open", async function() {
     console.log("Database Connected successfully");
