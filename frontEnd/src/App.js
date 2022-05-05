@@ -68,8 +68,8 @@ function App() {
           globalData.setLoggedIn(false);
           globalData.navigate("/", { replace: true });
         } else {
-          if (res.data.message && res.data.state === 'success') {
-            alert.info("Admin Message: " + res.data.message, {
+          if (response.data.message && response.data.state === 'success') {
+            alert.info("Admin Message: " + response.data.message, {
               timeout: 5000,
             });
           }
