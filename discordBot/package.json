@@ -5,7 +5,8 @@
         "dotenv": "^14.2.0",
         "fs": "^0.0.1-security",
         "mongoose": "^6.1.8",
-        "random-reddit": "^2.0.3"
+        "random-reddit": "^2.0.3",
+        "uuid": "^8.3.2"
     },
     "name": "discord-bot",
     "version": "1.0.0",
