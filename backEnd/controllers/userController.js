@@ -62,6 +62,7 @@ exports.login = async function(req, res) {
         const user = await users.findOne({ username: username });
 
         if (user) {
+            console.log(user);
             if (user.password === password) {
                 const newKey = v4();
 
