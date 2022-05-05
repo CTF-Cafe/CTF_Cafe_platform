@@ -12,10 +12,13 @@ var teamSchema = new Schema({
         required: true
     },
     users: {
-        type: Array,
+        bsonType: ["array"],
+        items: {
+            bsonType: ["object"]
+        },
+        minItems: 0,
         maxItems: 4,
-        uniqueItems: true,
-        required: true,
+        description: "must be a array of objects and max is 4"
     },
 
 });
