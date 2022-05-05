@@ -11,11 +11,11 @@ var teamSchema = new Schema({
         type: String,
         required: true
     },
-    users: {
-        type: Array,
-        validate: [teamLimit, '{PATH} exceeds the team limit of 4']
-        required: true
-    },
+    users: [{
+        type: String,
+        validate: [teamLimit, '{PATH} exceeds the team limit of 4'],
+        required: true,
+    }],
 
 });
 
