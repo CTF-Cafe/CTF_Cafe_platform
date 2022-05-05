@@ -20,7 +20,7 @@ exports.run = async(bot, message, args) => {
 
             const teamEmbed = new MessageEmbed()
                 .setColor('#ff0000')
-                .setTitle('EZ CTF | Team')
+                .setTitle(`EZ CTF | ${userTeam.name} Team`)
                 .setTimestamp()
                 .setFooter({ text: 'Raxo#0468' });
 
