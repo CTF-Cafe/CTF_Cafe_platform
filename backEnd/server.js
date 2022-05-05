@@ -216,7 +216,7 @@ app.get('/api/getRules', (req, res) => {
     userController.getRules(req, res);
 });
 
-app.get('/api/getGlobalMessage', checkSession, async(req, res) => {
+app.get('/api/getGlobalMessage', checkAuth, async(req, res) => {
     const globalMessage = await ctfConfig.findOne({ name: 'globalMessage' });
     let message;
 
