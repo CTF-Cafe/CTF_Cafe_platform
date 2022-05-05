@@ -244,7 +244,7 @@ app.get('/api/getGlobalMessage', async(req, res) => {
             if (globalMessage.value.message && globalMessage.value.seenBy) {
                 if (globalMessage.value.message.length > 0) {
                     if (!globalMessage.value.seenBy.includes(req.session.username)) {
-                        await ctfConfig.updateOne({ name: 'globalMessage' }, { $push: { seenBy: req.session.username } });
+                        await ctfConfig.updateOne({ name: 'globalMessage' }, { $push: { 'value.seenBy': req.session.username } });
                         message = globalMessage.value.message;
                     }
                 }
