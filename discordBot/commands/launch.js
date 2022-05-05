@@ -19,7 +19,7 @@ exports.run = async(bot, message, args) => {
             "Info: \n```" + challenge.info.replace(/\\n/g, `\n`) + "```\nHints: \n" + challenge.hints.map((hint, index) => `|| ${hint} ||`) + (challenge.file.length > 0 ? `\n\nFile: \n${process.env.SERVER_URI + 'api/assets/' + challenge.file}` : ''))
 
         if (challenge.file.length > 0) {
-            message.guild.channels.cache.get(args[0]).send({ embeds: [scoreboardEmbed], files: ['../backEnd/assets/' + challenge.file] });
+            message.guild.channels.cache.get(args[0]).send({ embeds: [scoreboardEmbed], files: ['./assets/' + challenge.file] });
             scoreboardEmbed = new MessageEmbed()
                 .setColor('#ff0000')
                 .setTitle('EZ CTF | Challenges')
