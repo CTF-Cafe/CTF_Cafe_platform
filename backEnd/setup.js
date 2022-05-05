@@ -44,7 +44,10 @@ exports.setupDB = async function() {
     if (!globalMessageConfig) {
         await ctfConfig.create({
             name: 'globalMessage',
-            value: ''
+            value: {
+                message: '',
+                seenBy: []
+            }
         });
     }
 
