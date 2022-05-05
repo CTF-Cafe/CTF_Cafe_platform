@@ -7,13 +7,13 @@ const { v4 } = require('uuid');
 
 exports.run = async(bot, message, args) => {
     if (!(message.guild === null)) return message.reply("This command only works in dms!");
-    if (!args[0]) return message.reply('You must provide a team_name!');
+    if (!args[0]) return message.reply('You must provide an invite code!');
 
-    const teamName = args[0].trim();
+    const inviteCode = args[0].trim();
 
-    const teamCheck = await teams.findOne({ name: teamName });
+    const teamCheck = await teams.findOne({ inviteCode: inviteCode });
 
-    if (!teamCheck) {
+    if (teamCheck) {
         let checkUser = await users.findOne({ discordId: message.author.id });
 
         if (checkUser) {
@@ -24,13 +24,17 @@ exports.run = async(bot, message, args) => {
             }
 
             if (userTeamCheck) {
-                await teams.create({ name: teamName, inviteCode: v4(), users: [{ username: checkUser.username, score: checkUser.score, solved: checkUser.solved }] }).then(async function(team) {
-                    await users.findOneAndUpdate({ username: checkUser.username }, { teamId: team.id }, { returnOriginal: false }).then(async function(user) {
-                        message.reply(`Registered team!`);
+                if (teamCheck.users.length < 4) {
+                    await teams.findOneAndUpdate({ inviteCode: inviteCode }, { $push: { users: { username: checkUser.username, score: checkUser.score, solved: checkUser.solved } } }, { returnOriginal: false }).then(async function(team) {
+                        await users.findOneAndUpdate({ username: checkUser.username }, { teamId: team.id }, { returnOriginal: false }).then(async function(user) {
+                            res.send({ state: 'success', message: 'Joined team!', user: user, team: team });
+                        });
+                    }).catch(error => {
+                        res.send({ state: 'error', message: error.messsage });
                     });
-                }).catch(function(err) {
-                    message.reply(`Team creation failed!`);
-                });
+                } else {
+                    res.send({ state: 'error', message: 'Team is full!' });
+                }
             } else {
                 message.reply(`Already in a team!`);
             }
@@ -39,7 +43,7 @@ exports.run = async(bot, message, args) => {
             message.reply("Your discord is not linked to any account!");
         }
     } else {
-        message.reply("Team name already in use!");
+        message.reply("Team does not exist!");
     }
 }
 
