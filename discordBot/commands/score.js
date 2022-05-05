@@ -10,7 +10,7 @@ exports.run = async(bot, message, args) => {
     let checkUser = await users.findOne({ discordId: message.author.id });
 
     if (checkUser) {
-        message.reply("Your score: " + checkUser.score + "\n\nChallenges Solves: \n" + checkUser.solved.map((s) => s.challenge.name + ' | '));
+        message.reply("Your score: " + checkUser.score + "\n\nChallenges Solved: \n" + checkUser.solved.map((s) => s.challenge.name + ' | '));
     } else {
         message.reply("Your discord is not linked to any account!");
     }
