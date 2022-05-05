@@ -58,6 +58,29 @@ function App() {
       });
   };
 
+  const getGlobalMessage = () => {
+    axios
+      .get(process.env.REACT_APP_SERVER_URI + "/api/getGlobalMessage")
+      .then((response) => {
+        if (response.data.state == "sessionError") {
+          globalData.alert.error("Session expired!");
+          globalData.setUserData({});
+          globalData.setLoggedIn(false);
+          globalData.navigate("/", { replace: true });
+        } else {
+          if (res.data.message && res.data.state === 'success') {
+            alert.info("Admin Message: " + res.data.message, {
+              timeout: 5000,
+            });
+          }
+        }
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+  };
+
+
   useLayoutEffect(() => {
     const root = document.documentElement;
     axios
@@ -86,6 +109,7 @@ function App() {
         console.error(err);
       });
     getRules();
+    getGlobalMessage();
   }, []);
 
   useEffect(() => {
@@ -98,12 +122,6 @@ function App() {
 
             if (res.data.team) {
               res.data.user.team = res.data.team;
-            }
-
-            if (res.data.message) {
-              alert.info("Admin Message: " + res.data.message, {
-                timeout: 5000,
-              });
             }
 
             setUserData(res.data.user);
