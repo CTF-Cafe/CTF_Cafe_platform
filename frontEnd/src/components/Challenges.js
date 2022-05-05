@@ -140,6 +140,7 @@ function Challenges(props) {
         }
       })
       .catch((err) => {
+        globalData.alert.error(err.message);
         console.log(err.message);
       });
   };
