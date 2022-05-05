@@ -10,7 +10,7 @@ bot.commands = new Collection();
 const mongoose = require('mongoose');
 const db = mongoose.connection;
 
-mongoose.connect(process.ENV.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 db.once("open", async function() {
     console.log("Database Connected successfully");
