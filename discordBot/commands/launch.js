@@ -19,7 +19,7 @@ exports.run = async(bot, message, args) => {
             "Info: \n```" + challenge.info.replace(/\\n/g, `\n`) + "```\nHints: \n" + challenge.hints.map((hint, index) => `|| ${hint} ||`) + (challenge.file.length > 0 ? `\n\nFile: \n${process.env.SERVER_URI + 'api/assets/' + challenge.file}` : ''))
 
         if (challenge.file.length > 0) {
-            await message.guild.channels.cache.get(args[0]).send({ embeds: [scoreboardEmbed] }).then(() => {
+            await message.guild.channels.cache.get(args[0]).send({ embeds: [scoreboardEmbed] }).then(async() => {
                 await message.guild.channels.cache.get(args[0]).send({
                     files: ['./assets/' + challenge.file]
                 })
