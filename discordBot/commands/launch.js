@@ -2,6 +2,7 @@ const challenges = require('./models/challengeModel');
 const { MessageEmbed } = require('discord.js');
 
 exports.run = async(bot, message, args) => {
+    if (!message.member) return message.reply("You are not an admin!");
     if (!message.member.permissions.has("ADMINISTRATOR")) return message.reply("You are not an admin!");
     if (!args[0]) return message.reply('You must provide a channel id!');
 
