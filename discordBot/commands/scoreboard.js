@@ -46,5 +46,5 @@ exports.run = async(bot, message, args) => {
 
 exports.info = {
     name: "scoreboard",
-    description: "Get live scoreboard",
+    description: "Get live scoreboard. `Usage: ?scoreboard users|teams`",
 }
