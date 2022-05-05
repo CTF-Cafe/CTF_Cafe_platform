@@ -9,6 +9,7 @@ const challenges = require('../models/challengeModel');
 // Login anti bruteforce
 
 const { RateLimiterRedis } = require('rate-limiter-flexible');
+const redis = require('redis');
 const redisClient = redis.createClient({
     enable_offline_queue: false,
 });

@@ -26,6 +26,7 @@
         "path": "^0.12.7",
         "rate-limiter-flexible": "^2.3.7",
         "react-cookie": "^4.1.1",
+        "redis": "^4.1.0",
         "uuidv4": "^6.2.13",
         "xss-clean": "^0.1.1"
     }
