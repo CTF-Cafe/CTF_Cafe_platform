@@ -23,7 +23,7 @@ exports.run = async(bot, message, args) => {
                 userTeamCheck = await teams.findById(checkUser.teamId);
             }
 
-            if (userTeamCheck) {
+            if (!userTeamCheck) {
                 if (teamCheck.users.length < 4) {
                     await teams.findOneAndUpdate({ inviteCode: inviteCode }, { $push: { users: { username: checkUser.username, score: checkUser.score, solved: checkUser.solved } } }, { returnOriginal: false }).then(async function(team) {
                         await users.findOneAndUpdate({ username: checkUser.username }, { teamId: team.id }, { returnOriginal: false }).then(async function(user) {
