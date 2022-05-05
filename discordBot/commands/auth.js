@@ -26,5 +26,5 @@ exports.run = async(bot, message, args) => {
 
 exports.info = {
     name: "auth",
-    description: "Authenticate your Discord with your CTF account. (Use in DM) `Usage: ?auth username password`"
+    description: "Authenticate your Discord with your CTF account. (Use in DM) \nUsage: ?auth username password"
 }
