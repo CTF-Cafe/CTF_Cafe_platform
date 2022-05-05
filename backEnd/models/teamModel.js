@@ -13,9 +13,14 @@ var teamSchema = new Schema({
     },
     users: {
         type: Array,
+        validate: [teamLimit, '{PATH} exceeds the team limit of 4']
         required: true
     },
 
 });
+
+function teamLimit(val) {
+    return val.length <= 4;
+}
 
 module.exports = mongoose.model('Teams', teamSchema);
