@@ -57,7 +57,7 @@ exports.login = async function(req, res) {
 
     if (retrySecs > 0) {
         res.set('Retry-After', String(retrySecs));
-        res.status(429).send({ state: 'error', message: 'Too Many Requests' });
+        res.send({ state: 'error', message: 'Too Many Requests' });
     } else {
         const user = await users.findOne({ username: username });
 
@@ -94,7 +94,7 @@ exports.login = async function(req, res) {
                         throw rlRejected;
                     } else {
                         res.set('Retry-After', String(Math.round(rlRejected.msBeforeNext / 1000)) || 1);
-                        res.status(429).send({ state: 'error', message: 'Too Many Requests' });
+                        res.send({ state: 'error', message: 'Too Many Requests' });
                     }
                 }
             }

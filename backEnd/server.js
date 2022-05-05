@@ -125,7 +125,7 @@ app.post('/api/login', async(req, res) => {
     try {
         await userController.login(req, res);
     } catch (err) {
-        res.status(429).send({ state: 'error', message: 'Too Many Requests' });
+        res.send({ state: 'error', message: 'Too Many Requests' });
     }
 });
 
