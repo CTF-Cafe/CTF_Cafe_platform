@@ -4,8 +4,10 @@ const crypto = require("crypto");
 
 exports.run = async(bot, message, args) => {
     if (!(message.guild === null)) {
-        message.reply("This command only works in dms!");
-        return message.delete();
+        message.reply("This command only works in dms!").then(() => {
+            message.delete()
+        });
+        return
     }
     if (!args[0]) return message.reply('You must provide a username');
     if (!args[1]) return message.reply('You must provide a password');

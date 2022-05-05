@@ -6,8 +6,10 @@ const ObjectId = require('mongoose').Types.ObjectId;
 
 exports.run = async(bot, message, args) => {
     if (!(message.guild === null)) {
-        message.reply("This command only works in dms!");
-        return message.delete();
+        message.reply("This command only works in dms!").then(() => {
+            message.delete()
+        });
+        return
     }
     if (!args[0]) return message.reply('You must provide a challenge name (replace spaces with _)');
     if (!args[1]) return message.reply('You must provide a flag');
