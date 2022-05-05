@@ -13,7 +13,7 @@ import Admin from "./components//Admin/Admin.js";
 import Team from "./components/Team.js";
 import User from "./components/User.js";
 import { useState, useEffect, useLayoutEffect } from "react";
-import { useAlert } from "react-alert";
+import { useAlert, positions } from "react-alert";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -71,6 +71,7 @@ function App() {
           if (response.data.message && response.data.state === 'success') {
             alert.info("Admin Message: " + response.data.message, {
               timeout: 5000,
+              position: positions.TOP_CENTER
             });
           }
         }
