@@ -255,9 +255,11 @@ exports.deleteUser = async function(req, res) {
                     users: { username: user.username },
                 }
             }, { returnOriginal: false }).then(async function(team) {
-                if (team.users) {
-                    if (team.users.length <= 0) {
-                        await teams.findByIdAndRemove(user.teamId);
+                if (team) {
+                    if (team.users) {
+                        if (team.users.length <= 0) {
+                            await teams.findByIdAndRemove(user.teamId);
+                        }
                     }
                 }
             });
