@@ -277,6 +277,10 @@ app.post('/api/admin/saveTheme', checkAdminAuth, (req, res) => {
     adminController.saveTheme(req, res);
 });
 
+app.post('/api/admin/sendGlobalMessage', checkAdminAuth, (req, res) => {
+    adminController.sendGlobalMessage(req, res);
+});
+
 app.use('/api/assets', express.static('assets'));
 
 process.on('uncaughtException', function(err) {

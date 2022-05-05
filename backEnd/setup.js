@@ -39,6 +39,15 @@ exports.setupDB = async function() {
         });
     }
 
+    const globalMessageConfig = await ctfConfig.findOne({ name: 'globalMessage' });
+
+    if (!globalMessageConfig) {
+        await ctfConfig.create({
+            name: 'globalMessage',
+            value: ''
+        });
+    }
+
     const currentTheme = await theme.findOne({});
     if (!currentTheme) {
         await theme.create({

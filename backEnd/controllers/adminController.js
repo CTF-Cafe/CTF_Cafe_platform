@@ -323,3 +323,14 @@ exports.saveTheme = async function(req, res) {
         res.send({ state: 'error', message: 'No theme found!' })
     }
 }
+
+exports.sendGlobalMessage = async function(req, res) {
+    const currentGlobalMessage = await ctfConfig.findOne({ name: 'globalMessage' });
+
+    if (currentGlobalMessage) {
+        await ctfConfig.findOneAndUpdate({ name: 'globalMessage' }, { value: req.body.globalMessage });
+        res.send({ state: 'success' });
+    } else {
+        res.send({ state: 'error', message: 'Global message document not found!' })
+    }
+}
