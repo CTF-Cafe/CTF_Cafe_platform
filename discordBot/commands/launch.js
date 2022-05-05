@@ -7,15 +7,26 @@ exports.run = async(bot, message, args) => {
 
     const allChallenges = await challenges.find();
 
-    const scoreboardEmbed = new MessageEmbed()
+    let scoreboardEmbed = new MessageEmbed()
         .setColor('#ff0000')
         .setTitle('EZ CTF | Challenges')
         .setTimestamp()
         .setFooter({ text: 'Raxo#0468' });
 
-    allChallenges.map((challenge, index) => scoreboardEmbed.addField(
-        `${challenge.name.trim()} | ${challenge.points} | ${challenge.level == 0 ? 'Easy' : challenge.level == 1 ? 'Medium' : challenge.level == 2 ? 'Hard' : 'Ninja'} | ${challenge.category}`,
-        "Info: \n```" + challenge.info.replace(/\\n/g, `\n`) + "```\nHints: \n" + challenge.hints.map((hint, index) => `|| ${hint} ||`) + (challenge.file.length > 0 ? `\n\nFile: \n${process.env.SERVER_URI + 'api/assets/' + challenge.file}` : '')));
+    allChallenges.map((challenge, index) => {
+        scoreboardEmbed.addField(
+            `${challenge.name.trim()} | ${challenge.points} | ${challenge.level == 0 ? 'Easy' : challenge.level == 1 ? 'Medium' : challenge.level == 2 ? 'Hard' : 'Ninja'} | ${challenge.category}`,
+            "Info: \n```" + challenge.info.replace(/\\n/g, `\n`) + "```\nHints: \n" + challenge.hints.map((hint, index) => `|| ${hint} ||`) + (challenge.file.length > 0 ? `\n\nFile: \n${process.env.SERVER_URI + 'api/assets/' + challenge.file}` : ''))
+
+        if (challenge.file.length > 0) {
+            message.guild.channels.cache.get(args[0]).send({ embeds: [scoreboardEmbed], files: ['../backEnd/assets/' + challenge.file] });
+            scoreboardEmbed = new MessageEmbed()
+                .setColor('#ff0000')
+                .setTitle('EZ CTF | Challenges')
+                .setTimestamp()
+                .setFooter({ text: 'Raxo#0468' });
+        }
+    });
 
     message.guild.channels.cache.get(args[0]).send({ embeds: [scoreboardEmbed] });
 }
