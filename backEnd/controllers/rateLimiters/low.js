@@ -1,13 +1,5 @@
 const { RateLimiterMongo } = require('rate-limiter-flexible');
-
-let mongoConn
-
-// For mongoose version > 5
-try {
-    mongoConn = await mongoose.connect(process.env.MONGODB_CONNSTRING, { useNewUrlParser: true, useUnifiedTopology: true });
-} catch (error) {
-    handleError(error);
-}
+const mongoConn = require('../../server.js').db;
 
 let maxPoints = 50;
 

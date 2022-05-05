@@ -31,6 +31,8 @@ db.once("open", async function() {
     setup.setupDB();
 });
 
+exports.db = db;
+
 // Trust Proxy to be able to read X-Forwaded-For (user ips)
 app.set('trust proxy', true)
 
