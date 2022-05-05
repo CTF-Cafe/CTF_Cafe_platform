@@ -9,7 +9,7 @@ exports.run = async(bot, message, args) => {
     if (!args[0]) return message.reply('You must provide a challenge name (replace spaces with _)');
     if (!args[1]) return message.reply('You must provide a flag');
 
-    const challengeName = args[0].replace('_', ' ');.trim();
+    const challengeName = args[0].replace('_', ' ').trim();
     const challengeFlag = args[1].trim();
 
     const challengeCheck = await challenges.findOne({ name: challengeName });
