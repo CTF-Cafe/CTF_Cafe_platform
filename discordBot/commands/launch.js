@@ -21,6 +21,6 @@ exports.run = async(bot, message, args) => {
 }
 
 exports.info = {
-    name: "planc",
+    name: "launch",
     description: "Very Secret, only for Admins"
 }
