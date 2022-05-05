@@ -158,23 +158,6 @@ app.post('/api/checkSession', (req, res) => {
         } else if (!(user.key == req.session.key)) {
             res.send({ state: 'sessionError' })
         } else {
-            const globalMessage = await ctfConfig.findOne({ name: 'globalMessage' });
-            let message;
-
-            if (globalMessage) {
-                if (globalMessage.value) {
-                    if (globalMessage.value.message && globalMessage.value.seenBy) {
-                        if (globalMessage.value.message.length > 0) {
-                            if (!globalMessage.value.seenBy.includes(req.session.username)) {
-                                message = globalMessage.value.message;
-                                await ctfConfig.updateOne({ name: 'globalMessage' }, { $push: { seenBy: req.session.username } });
-                            }
-                        }
-                    }
-                }
-            }
-
-            console.log(message);
 
             if (ObjectId.isValid(user.teamId)) {
                 team = await teams.findById(user.teamId);
@@ -182,12 +165,12 @@ app.post('/api/checkSession', (req, res) => {
                 if (team) {
                     team.inviteCode = 'Nice try XD';
 
-                    res.send({ state: 'success', user: user, team: team, message: message });
+                    res.send({ state: 'success', user: user, team: team });
                 } else {
-                    res.send({ state: 'success', user: user, message: message })
+                    res.send({ state: 'success', user: user })
                 }
             } else {
-                res.send({ state: 'success', user: user, message: message })
+                res.send({ state: 'success', user: user })
             }
         }
     });
@@ -247,6 +230,30 @@ app.get('/api/getEndTime', (req, res) => {
 app.get('/api/getRules', (req, res) => {
     userController.getRules(req, res);
 });
+
+app.get('/api/getGlobalMessage', (req, res) => {
+    const globalMessage = await ctfConfig.findOne({ name: 'globalMessage' });
+    let message;
+
+    if (globalMessage) {
+        if (globalMessage.value) {
+            if (globalMessage.value.message && globalMessage.value.seenBy) {
+                if (globalMessage.value.message.length > 0) {
+                    if (!globalMessage.value.seenBy.includes(req.session.username)) {
+                        await ctfConfig.updateOne({ name: 'globalMessage' }, { $push: { seenBy: req.session.username } });
+                        message = globalMessage.value.message;
+                    }
+                }
+            }
+        }
+    }
+
+    if (message) {
+        res.send({ state: 'success', message: message })
+    } else {
+        res.send({ state: 'error', message: 'No message!' })
+    }
+})
 
 app.get('/api/getTheme', (req, res) => {
     userController.getTheme(req, res);
