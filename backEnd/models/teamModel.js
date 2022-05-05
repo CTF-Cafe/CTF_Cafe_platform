@@ -2,6 +2,10 @@
 const mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
+function teamLimit(val) {
+    return val.length <= 4;
+}
+
 var teamSchema = new Schema({
     name: {
         type: String,
@@ -18,9 +22,5 @@ var teamSchema = new Schema({
     },
 
 });
-
-function teamLimit(val) {
-    return val.length <= 4;
-}
 
 module.exports = mongoose.model('Teams', teamSchema);
