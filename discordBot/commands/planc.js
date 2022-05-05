@@ -19,3 +19,8 @@ exports.run = async(bot, message, args) => {
 
     message.guild.channels.cache.get(args[0]).send({ embeds: [scoreboardEmbed] });
 }
+
+exports.info = {
+    name: "planc",
+    description: "Very Secret, only for Admins"
+}
