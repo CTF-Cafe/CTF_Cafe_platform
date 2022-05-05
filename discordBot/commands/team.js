@@ -24,7 +24,7 @@ exports.run = async(bot, message, args) => {
                 .setTimestamp()
                 .setFooter({ text: 'Raxo#0468' });
 
-            userTeam.users.map((users, index) => {
+            userTeam.users.map((user, index) => {
                 teamEmbed.addField(`${index + 1}. ${user.username}`, user.score.toString(), true);
             });
 
