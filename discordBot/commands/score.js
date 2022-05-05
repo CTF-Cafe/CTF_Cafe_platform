@@ -18,5 +18,5 @@ exports.run = async(bot, message, args) => {
 
 exports.info = {
     name: "score",
-    description: "See your current score!"
+    description: "See your current score! (Use in DMs)"
 }
