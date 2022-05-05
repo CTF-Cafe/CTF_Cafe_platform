@@ -40,25 +40,29 @@ exports.register = async function(req, res) {
     const startTime = await ctfConfig.findOne({ name: 'startTime' });
 
     if (parseInt(startTime.value) - (Math.floor((new Date()).getTime() / 1000)) >= 0) {
-        if (username.length > 32) {
-            res.send({ state: 'error', message: 'Username is to long!' });
-        } else {
-            const userExists = await users.findOne({ username: username });
-
-            if (!userExists) {
-                const newKey = v4();
-
-                await users.create({ username: username, password: password, key: newKey.toString(), isAdmin: false }).then(async function(user) {
-
-                    req.session.username = username;
-                    req.session.key = newKey;
-                    res.send({ state: 'success', message: 'Registered!', user: user });
-                }).catch(function(err) {
-                    res.send({ state: 'error', message: 'User creation failed!' });
-                });
+        if (username.length >= 4) {
+            if (username.length > 32) {
+                res.send({ state: 'error', message: 'Username is to long!' });
             } else {
-                res.send({ state: 'error', message: 'User name Exists!' });
+                const userExists = await users.findOne({ username: username });
+
+                if (!userExists) {
+                    const newKey = v4();
+
+                    await users.create({ username: username, password: password, key: newKey.toString(), isAdmin: false }).then(async function(user) {
+
+                        req.session.username = username;
+                        req.session.key = newKey;
+                        res.send({ state: 'success', message: 'Registered!', user: user });
+                    }).catch(function(err) {
+                        res.send({ state: 'error', message: 'User creation failed!' });
+                    });
+                } else {
+                    res.send({ state: 'error', message: 'User name Exists!' });
+                }
             }
+        } else {
+            res.send({ state: 'error', message: 'Username is to short! 4 Characters minimum!' });
         }
     } else {
         res.send({ state: 'error', message: 'Registrations are closed!' });
