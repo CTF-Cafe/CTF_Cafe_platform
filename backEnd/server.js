@@ -136,6 +136,21 @@ app.post('/api/checkSession', (req, res) => {
         } else if (!(user.key == req.session.key)) {
             res.send({ state: 'sessionError' })
         } else {
+            const globalMessage = await ctfConfig.findOne({ name: 'globalMessage' });
+            let message;
+
+            if (globalMessage) {
+                if (globalMessage.value) {
+                    if (globalMessage.value.message && globalMessage.value.seenBy) {
+                        if (globalMessage.value.message.length > 0) {
+                            if (!globalMessage.value.seenBy.includes(req.session.username)) {
+                                message = globalMessage.value.message;
+                                await ctfConfig.updateOne({ name: 'globalMessage' }, { $push: { seenBy: req.session.username } });
+                            }
+                        }
+                    }
+                }
+            }
 
             if (ObjectId.isValid(user.teamId)) {
                 team = await teams.findById(user.teamId);
@@ -143,12 +158,12 @@ app.post('/api/checkSession', (req, res) => {
                 if (team) {
                     team.inviteCode = 'Nice try XD';
 
-                    res.send({ state: 'success', user: user, team: team });
+                    res.send({ state: 'success', user: user, team: team, message: message });
                 } else {
-                    res.send({ state: 'success', user: user })
+                    res.send({ state: 'success', user: user, message: message })
                 }
             } else {
-                res.send({ state: 'success', user: user })
+                res.send({ state: 'success', user: user, message: message })
             }
         }
     });

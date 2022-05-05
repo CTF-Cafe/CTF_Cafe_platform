@@ -328,7 +328,7 @@ exports.sendGlobalMessage = async function(req, res) {
     const currentGlobalMessage = await ctfConfig.findOne({ name: 'globalMessage' });
 
     if (currentGlobalMessage) {
-        await ctfConfig.findOneAndUpdate({ name: 'globalMessage' }, { value: req.body.globalMessage });
+        await ctfConfig.findOneAndUpdate({ name: 'globalMessage' }, { value: { message: req.body.globalMessag, seenBy: [] } });
         res.send({ state: 'success' });
     } else {
         res.send({ state: 'error', message: 'Global message document not found!' })

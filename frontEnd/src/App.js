@@ -100,6 +100,12 @@ function App() {
               res.data.user.team = res.data.team;
             }
 
+            if (res.data.message) {
+              alert.info("Admin Message: " + res.data.message, {
+                timeout: 5000,
+              });
+            }
+
             setUserData(res.data.user);
             setLoggedIn(true);
           }
