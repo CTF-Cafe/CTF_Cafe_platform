@@ -1,11 +1,11 @@
 const { RateLimiterMongo } = require('rate-limiter-flexible');
-const mongoConn = require('../../server.js').db;
+const serverExports = require('../../server.js');
 
 exports.setup = function() {
     let maxPoints = 50;
 
     const opts = {
-        storeClient: mongoConn,
+        storeClient: serverExports.db,
         keyPrefix: 'low_limit',
         points: maxPoints,
         duration: 60 * 60 * 3, // Store number for three hours since first fail
