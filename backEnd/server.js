@@ -121,13 +121,8 @@ function checkAdminAuth(req, res, next) {
     });
 }
 
-app.post('/api/login', async(req, res) => {
-    try {
-        await userController.login(req, res);
-    } catch (err) {
-        console.log(err);
-        res.send({ state: 'error', message: 'Too Many Requests' });
-    }
+app.post('/api/login', (req, res) => {
+    userController.login(req, res);
 });
 
 app.get('/api/logout', (req, res) => {
