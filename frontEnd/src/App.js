@@ -62,25 +62,17 @@ function App() {
     axios
       .get(process.env.REACT_APP_SERVER_URI + "/api/getGlobalMessage")
       .then((response) => {
-        if (response.data.state == "sessionError") {
-          globalData.alert.error("Session expired!");
-          globalData.setUserData({});
-          globalData.setLoggedIn(false);
-          globalData.navigate("/", { replace: true });
-        } else {
-          if (response.data.message && response.data.state === 'success') {
-            alert.info("Admin Message: " + response.data.message, {
-              timeout: 5000,
-              position: positions.TOP_CENTER
-            });
-          }
+        if (response.data.message && response.data.state === "success") {
+          alert.info("Admin Message: " + response.data.message, {
+            timeout: 5000,
+            position: positions.TOP_CENTER,
+          });
         }
       })
       .catch((err) => {
         console.log(err.message);
       });
   };
-
 
   useLayoutEffect(() => {
     const root = document.documentElement;
