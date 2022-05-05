@@ -11,15 +11,12 @@ const MongoStore = require('connect-mongo')(session);
 const fileUpload = require('express-fileupload');
 const mongoSanitize = require('express-mongo-sanitize');
 const xssClean = require('xss-clean/lib/xss').clean;
-
 dotenv.config()
-
 const setup = require('./setup.js');
 const userController = require('./controllers/userController.js');
 const challengesController = require('./controllers/challengesController.js');
 const adminController = require('./controllers/adminController.js');
 const teamController = require('./controllers/teamController.js');
-const rateLimitierLow = require('./controllers/rateLimiters/low.js');
 const users = require('./models/userModel.js');
 const teams = require('./models/teamModel.js');
 const ctfConfig = require('./models/ctfConfigModel.js');
@@ -29,8 +26,6 @@ mongoose.connect(process.env.MONGODB_CONNSTRING, { useNewUrlParser: true, useUni
 
 db.once("open", async function() {
     console.log("Database Connected successfully");
-    exports.db = db;
-    rateLimitierLow.setup();
     setup.setupDB();
 });
 
