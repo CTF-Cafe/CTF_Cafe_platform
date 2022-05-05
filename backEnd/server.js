@@ -10,9 +10,8 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const fileUpload = require('express-fileupload');
 const mongoSanitize = require('express-mongo-sanitize');
-const xssClean = require('xss-clean/lib/xss').clean
-const rateLimit = require('express-rate-limit');
-const requestIp = require('request-ip');
+const xssClean = require('xss-clean/lib/xss').clean;
+
 dotenv.config()
 
 const setup = require('./setup.js');
@@ -31,6 +30,9 @@ db.once("open", async function() {
     console.log("Database Connected successfully");
     setup.setupDB();
 });
+
+// Trust Proxy to be able to read X-Forwaded-For (user ips)
+app.set('trust proxy', true)
 
 // Body-parser middleware
 app.use(bodyparser.urlencoded({ extended: false }));
@@ -119,39 +121,19 @@ function checkAdminAuth(req, res, next) {
     });
 }
 
-app.use(requestIp.mw());
-
-const apiLimiterLow = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
-    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-    message: { state: 'error', message: 'Rate limit exceeded, wait a couple minutes.' },
-    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-    keyGenerator: (req, res) => {
-        return req.clientIp // IP address from requestIp.mw(), as opposed to req.ip
+app.post('/api/login', async(req, res) => {
+    try {
+        await userController.login(req, res);
+    } catch (err) {
+        res.status(429).send({ state: 'error', message: 'Too Many Requests' });
     }
-})
-
-const apiLimiterHigh = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 25, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
-    message: { state: 'error', message: 'Rate limit exceeded, wait a couple minutes.' },
-    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-    keyGenerator: (req, res) => {
-        return req.clientIp // IP address from requestIp.mw(), as opposed to req.ip
-    }
-})
-
-app.post('/api/login', apiLimiterHigh, (req, res) => {
-    userController.login(req, res);
 });
 
 app.get('/api/logout', (req, res) => {
     userController.logout(req, res);
 });
 
-app.post('/api/register', apiLimiterHigh, (req, res) => {
+app.post('/api/register', (req, res) => {
     userController.register(req, res);
 });
 
@@ -202,7 +184,7 @@ app.post('/api/getUserTeam', checkAuth, (req, res) => {
 });
 
 
-app.post('/api/submitFlag', apiLimiterLow, checkAuth, (req, res) => {
+app.post('/api/submitFlag', checkAuth, (req, res) => {
     challengesController.submitFlag(req, res);
 });
 
