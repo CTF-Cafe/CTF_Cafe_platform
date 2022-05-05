@@ -24,9 +24,10 @@ exports.run = async(bot, message, args) => {
             }
 
             if (userTeamCheck) {
-                await teams.create({ name: teamName, inviteCode: v4(), users: [{ username: checkUser.username, score: checkUser.score, solved: checkUser.solved }] }).then(async function(team) {
+                const inviteCode = v4();
+                await teams.create({ name: teamName, inviteCode: inviteCode, users: [{ username: checkUser.username, score: checkUser.score, solved: checkUser.solved }] }).then(async function(team) {
                     await users.findOneAndUpdate({ username: checkUser.username }, { teamId: team.id }, { returnOriginal: false }).then(async function(user) {
-                        message.reply(`Registered team!`);
+                        message.reply(`Registered team! Here is the invite code: ${inviteCode}`);
                     });
                 }).catch(function(err) {
                     message.reply(`Team creation failed!`);
