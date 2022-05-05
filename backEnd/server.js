@@ -11,6 +11,7 @@ const MongoStore = require('connect-mongo')(session);
 const fileUpload = require('express-fileupload');
 const mongoSanitize = require('express-mongo-sanitize');
 const xssClean = require('xss-clean/lib/xss').clean
+const rateLimit = require('express-rate-limit');
 dotenv.config()
 
 const setup = require('./setup.js');
@@ -116,6 +117,27 @@ function checkAdminAuth(req, res, next) {
         }
     });
 }
+
+const apiLimiterLow = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    message: { state: 'error', message: 'Rate limit exceeded, wait a couple minutes.' },
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+})
+
+const apiLimiterHigh = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 25, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+    message: { state: 'error', message: 'Rate limit exceeded, wait a couple minutes.' },
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+})
+
+// Apply the rate limiting middleware to API calls only
+app.use('/api/submitFlag', apiLimiterLow)
+app.use('/api/login', apiLimiterHigh)
+app.use('/api/register', apiLimiterHigh)
 
 app.post('/api/login', (req, res) => {
     userController.login(req, res);
