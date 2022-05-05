@@ -174,6 +174,8 @@ app.post('/api/checkSession', (req, res) => {
                 }
             }
 
+            console.log(message);
+
             if (ObjectId.isValid(user.teamId)) {
                 team = await teams.findById(user.teamId);
 
