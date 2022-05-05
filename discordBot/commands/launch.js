@@ -16,9 +16,9 @@ exports.run = async(bot, message, args) => {
 
     for (let i = 0; i < allChallenges.length; i++) {
         const challenge = allChallenges[i];
-        scoreboardEmbed.addField(
+        await scoreboardEmbed.addField(
             `${challenge.name.trim()} | ${challenge.points} | ${challenge.level == 0 ? 'Easy' : challenge.level == 1 ? 'Medium' : challenge.level == 2 ? 'Hard' : 'Ninja'} | ${challenge.category}`,
-            "Info: \n```" + challenge.info.replace(/\\n/g, `\n`) + "```\nHints: \n" + challenge.hints.map((hint, index) => `|| ${hint} ||`) + (challenge.file.length > 0 ? `\n\nFile: \n${process.env.SERVER_URI + 'api/assets/' + challenge.file}` : ''))
+            "Info: \n```" + challenge.info.replace(/\\n/g, `\n`) + "```\nHints: \n" + challenge.hints.map((hint, index) => `|| ${hint} ||`) + (challenge.file.length > 0 ? `\n\nFile below:` : ''))
 
         if (challenge.file.length > 0) {
             await message.guild.channels.cache.get(args[0]).send({ embeds: [scoreboardEmbed] }).then(async() => {
