@@ -239,8 +239,6 @@ app.get('/api/getGlobalMessage', async(req, res) => {
     const globalMessage = await ctfConfig.findOne({ name: 'globalMessage' });
     let message;
 
-    console.log(globalMessage);
-
     if (globalMessage) {
         if (globalMessage.value) {
             if (globalMessage.value.message && globalMessage.value.seenBy) {
