@@ -62,8 +62,8 @@ function App() {
     axios
       .get(process.env.REACT_APP_SERVER_URI + "/api/getGlobalMessage")
       .then((response) => {
-        if (res.data.message && res.data.state == "success") {
-          alert.info("Admin Message: " + res.data.message, {
+        if (reponse.data.message && reponse.data.state == "success") {
+          alert.info("Admin Message: " + reponse.data.message, {
             timeout: 5000,
             position: positions.TOP_CENTER,
           });
