@@ -134,12 +134,7 @@ const apiLimiterHigh = rateLimit({
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 })
 
-// Apply the rate limiting middleware to API calls only
-app.use('/api/submitFlag', apiLimiterLow)
-app.use('/api/login', apiLimiterHigh)
-app.use('/api/register', apiLimiterHigh)
-
-app.post('/api/login', (req, res) => {
+app.post('/api/login', apiLimiterHigh, (req, res) => {
     userController.login(req, res);
 });
 
@@ -147,7 +142,7 @@ app.get('/api/logout', (req, res) => {
     userController.logout(req, res);
 });
 
-app.post('/api/register', (req, res) => {
+app.post('/api/register', apiLimiterHigh, (req, res) => {
     userController.register(req, res);
 });
 
@@ -198,7 +193,7 @@ app.post('/api/getUserTeam', checkAuth, (req, res) => {
 });
 
 
-app.post('/api/submitFlag', checkAuth, (req, res) => {
+app.post('/api/submitFlag', apiLimiterLow, checkAuth, (req, res) => {
     challengesController.submitFlag(req, res);
 });
 
