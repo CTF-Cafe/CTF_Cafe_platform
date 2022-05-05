@@ -28,6 +28,7 @@
         "react-router-dom": "^6.2.2",
         "react-scripts": "5.0.0",
         "recharts": "^2.1.9",
+        "serve": "^13.0.2",
         "web-vitals": "^2.1.4"
     },
     "scripts": {
