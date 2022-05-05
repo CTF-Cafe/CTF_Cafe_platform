@@ -13,8 +13,9 @@ var teamSchema = new Schema({
     },
     users: {
         type: Array,
-        required: true
-            // validate: [teamLimit, '{PATH} exceeds the team limit of 4'],
+        required: true,
+        maxItems: 4,
+        description: 'Team is full!'
     },
 
 });

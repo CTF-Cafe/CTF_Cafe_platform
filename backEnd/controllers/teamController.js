@@ -73,6 +73,8 @@ exports.joinTeam = async function(req, res) {
                     await users.findOneAndUpdate({ username: req.session.username }, { teamId: team.id }, { returnOriginal: false }).then(async function(user) {
                         res.send({ state: 'success', message: 'Joined team!', user: user, team: team });
                     });
+                }).catch(error => {
+                    res.send({ state: 'error', message: error.messsage });
                 });
             } else {
                 res.send({ state: 'error', message: 'Team is full!' });
