@@ -1,5 +1,6 @@
 const { MessageEmbed } = require('discord.js');
 const users = require('./models/userModel');
+const teams = require('./models/teamModel');
 
 exports.run = async(bot, message, args) => {
     if (!args[0]) return message.reply('Please specify (users/teams) as the first argument.');
