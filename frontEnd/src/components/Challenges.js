@@ -206,6 +206,10 @@ function Challenges(props) {
                               ? "card category_osint"
                               : challenge.category == "steganography"
                               ? "card category_steg"
+                              : challenge.category == "pwn"
+                              ? "card category_pwning"
+                              :challenge.category == "forensics"
+                              ? "card category_forensics"
                               : "card category_misc"
                           }
                         >
