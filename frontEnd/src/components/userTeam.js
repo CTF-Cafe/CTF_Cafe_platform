@@ -5,7 +5,7 @@ import copy from "copy-to-clipboard";
 import AppContext from "./Data/AppContext";
 import Navbar from "./Global/Navbar.js";
 
-function userTeam(props) {
+function UserTeam(props) {
   const globalData = useContext(AppContext);
 
   const getTeam = () => {
@@ -262,4 +262,4 @@ function userTeam(props) {
   );
 }
 
-export default userTeam;
+export default UserTeam;

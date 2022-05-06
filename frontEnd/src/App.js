@@ -11,7 +11,7 @@ import Register from "./components/Register.js";
 import Challenges from "./components/Challenges.js";
 import Admin from "./components//Admin/Admin.js";
 import Team from "./components/Team.js";
-import userTeam from "./components/userTeam.js";
+import UserTeam from "./components/UserTeam.js";
 import User from "./components/User.js";
 import { useState, useEffect, useLayoutEffect } from "react";
 import { useAlert, positions } from "react-alert";
@@ -145,7 +145,7 @@ function App() {
               <>
                 <Route path="/challenges" element={<Challenges />} />
                 <Route path="/logout" element={<Logout />} />
-                <Route path="/userteam" element={<userTeam />} />
+                <Route path="/userteam" element={<UserTeam />} />
               </>
             ) : (
               <>
