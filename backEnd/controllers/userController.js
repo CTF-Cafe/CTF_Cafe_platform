@@ -42,27 +42,31 @@ exports.register = async function(req, res) {
     if (parseInt(startTime.value) - (Math.floor((new Date()).getTime() / 1000)) >= 0) {
         if (username.length >= 4) {
             if (username.length > 32) {
-                res.send({ state: 'error', message: 'Username is to long!' });
+                res.send({ state: 'error', message: 'Username is to long! 32 characters maximum!' });
             } else {
-                const userExists = await users.findOne({ username: username });
-
-                if (!userExists) {
-                    const newKey = v4();
-
-                    await users.create({ username: username, password: password, key: newKey.toString(), isAdmin: false }).then(async function(user) {
-
-                        req.session.username = username;
-                        req.session.key = newKey;
-                        res.send({ state: 'success', message: 'Registered!', user: user });
-                    }).catch(function(err) {
-                        res.send({ state: 'error', message: 'User creation failed!' });
-                    });
+                if (req.body.password.trim().length < 8) {
+                    res.send({ state: 'error', message: 'Password is to short 8 characters minimum!!' });
                 } else {
-                    res.send({ state: 'error', message: 'User name Exists!' });
+                    const userExists = await users.findOne({ username: username });
+
+                    if (!userExists) {
+                        const newKey = v4();
+
+                        await users.create({ username: username, password: password, key: newKey.toString(), isAdmin: false }).then(async function(user) {
+
+                            req.session.username = username;
+                            req.session.key = newKey;
+                            res.send({ state: 'success', message: 'Registered!', user: user });
+                        }).catch(function(err) {
+                            res.send({ state: 'error', message: 'User creation failed!' });
+                        });
+                    } else {
+                        res.send({ state: 'error', message: 'User name Exists!' });
+                    }
                 }
             }
         } else {
-            res.send({ state: 'error', message: 'Username is to short! 4 Characters minimum!' });
+            res.send({ state: 'error', message: 'Username is to short! 4 characters minimum!' });
         }
     } else {
         res.send({ state: 'error', message: 'Registrations are closed!' });
