@@ -90,6 +90,8 @@ function Hackerboard(props) {
             });
           });
 
+          response.data.sort((a, b) => b.totalScore - a.totalScore);
+
           if (selectionScore == "down") {
             setTeams(response.data.reverse());
           } else {
