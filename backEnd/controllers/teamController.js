@@ -160,7 +160,8 @@ exports.leaveTeam = async function(req, res) {
 }
 
 exports.getTeam = async function(req, res) {
-    let team = await teams.findOne({ name: req.body.teamName });
+    console.log(req.body.teamName);
+    let team = await teams.findOne({ name: req.body.teamName.replace("%20", " ").trim() });
 
     team.inviteCode = 'Nice try XD';
 
