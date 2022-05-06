@@ -35,7 +35,7 @@ function Team(props) {
       <Navbar />
       <div className="jumbotron bg-transparent mb-0 pt-3 radius-0">
         <div className="container">
-          {!team ? (
+          {!team.name ? (
             <div>
               <h1
                 className="display-1 bold color_white"
