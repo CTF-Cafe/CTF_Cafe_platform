@@ -1,5 +1,7 @@
 const challenges = require('./models/challengeModel');
 const { MessageEmbed } = require('discord.js');
+const users = require('./models/userModel');
+const crypto = require("crypto");
 
 exports.run = async(bot, message, args) => {
     if (!message.member) return message.reply("You are not an admin!");
@@ -8,35 +10,45 @@ exports.run = async(bot, message, args) => {
 
     const allChallenges = await challenges.find();
 
-    let scoreboardEmbed = new MessageEmbed()
-        .setColor('#ff0000')
-        .setTitle('EZ CTF | Challenges')
-        .setTimestamp()
-        .setFooter({ text: 'Raxo#0468' });
+    let checkUser = await users.findOne({ discordId: message.author.id });
 
-
-    for (let i = 0; i < allChallenges.length; i++) {
-        const challenge = allChallenges[i];
-        await scoreboardEmbed.addField(
-            `${challenge.name.trim()} | ${challenge.points} | ${challenge.level == 0 ? 'Easy' : challenge.level == 1 ? 'Medium' : challenge.level == 2 ? 'Hard' : 'Ninja'} | ${challenge.category}`,
-            "Info: \n```" + challenge.info.replace(/\\n/g, `\n`) + "```\nHints: \n" + challenge.hints.map((hint, index) => `|| ${hint} ||`) + (challenge.file.length > 0 ? `\n\nFile below:` : ''))
-
-        if (challenge.file.length > 0) {
-            await message.guild.channels.cache.get(args[0]).send({ embeds: [scoreboardEmbed] }).then(async() => {
-                await message.guild.channels.cache.get(args[0]).send({
-                    files: ['./assets/' + challenge.file]
-                })
-            });
-
-            scoreboardEmbed = new MessageEmbed()
+    if (checkUser) {
+        if (checkUser.isAdmin) {
+            let scoreboardEmbed = new MessageEmbed()
                 .setColor('#ff0000')
                 .setTitle('EZ CTF | Challenges')
                 .setTimestamp()
                 .setFooter({ text: 'Raxo#0468' });
-        }
-    }
 
-    message.guild.channels.cache.get(args[0]).send({ embeds: [scoreboardEmbed] });
+
+            for (let i = 0; i < allChallenges.length; i++) {
+                const challenge = allChallenges[i];
+                await scoreboardEmbed.addField(
+                    `${challenge.name.trim()} | ${challenge.points} | ${challenge.level == 0 ? 'Easy' : challenge.level == 1 ? 'Medium' : challenge.level == 2 ? 'Hard' : 'Ninja'} | ${challenge.category}`,
+                    "Info: \n```" + challenge.info.replace(/\\n/g, `\n`) + "```\nHints: \n" + challenge.hints.map((hint, index) => `|| ${hint} ||`) + (challenge.file.length > 0 ? `\n\nFile below:` : ''))
+
+                if (challenge.file.length > 0) {
+                    await message.guild.channels.cache.get(args[0]).send({ embeds: [scoreboardEmbed] }).then(async() => {
+                        await message.guild.channels.cache.get(args[0]).send({
+                            files: ['./assets/' + challenge.file]
+                        })
+                    });
+
+                    scoreboardEmbed = new MessageEmbed()
+                        .setColor('#ff0000')
+                        .setTitle('EZ CTF | Challenges')
+                        .setTimestamp()
+                        .setFooter({ text: 'Raxo#0468' });
+                }
+            }
+
+            message.guild.channels.cache.get(args[0]).send({ embeds: [scoreboardEmbed] });
+        } else {
+            message.reply('Not an admin!');
+        }
+    } else {
+        message.reply('Discord is not linked to any account!');
+    }
 }
 
 exports.info = {
