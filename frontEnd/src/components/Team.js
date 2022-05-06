@@ -120,7 +120,7 @@ function Team(props) {
           globalData.setLoggedIn(false);
           globalData.navigate("/", { replace: true });
         } else if (response.data.state == "success") {
-          globalData.userData.teamId = 'none';
+          globalData.userData.teamId = "none";
           globalData.userData.team = undefined;
           globalData.setUserData(globalData.userData);
           globalData.navigate("/", { replace: true });
@@ -240,7 +240,14 @@ function Team(props) {
                         <th scope="row" style={{ textAlign: "center" }}>
                           {index}
                         </th>
-                        <td> {user.username} </td> <td> {user.score} </td>
+                        <td>
+                          <Link to={`/user/${user.username}`}>
+                            <a className="p-3 text-decoration-none text-light bold">
+                              {user.username}
+                            </a>
+                          </Link>
+                        </td>
+                        <td> {user.score} </td>
                         <td> {user.solved.length} </td>
                       </tr>
                     );

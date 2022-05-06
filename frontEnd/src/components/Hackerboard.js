@@ -324,13 +324,18 @@ function Hackerboard(props) {
                               {(
                                 selectionScore == "up"
                                   ? index + (page - 1) * 100 == 0
-                                  : index * -1 + (page - 1) * 100 + users.length == 0
+                                  : index * -1 +
+                                      (page - 1) * 100 +
+                                      users.length ==
+                                    0
                               ) ? (
                                 <img src={goldMask} style={{ width: "50px" }} />
                               ) : (
                                   selectionScore == "up"
                                     ? index + (page - 1) * 100 == 1
-                                    : index * -1 + (page - 1) * 100 + users.length ==
+                                    : index * -1 +
+                                        (page - 1) * 100 +
+                                        users.length ==
                                       1
                                 ) ? (
                                 <img
@@ -340,7 +345,9 @@ function Hackerboard(props) {
                               ) : (
                                   selectionScore == "up"
                                     ? index + (page - 1) * 100 == 2
-                                    : index * -1 + (page - 1) * 100 + users.length ==
+                                    : index * -1 +
+                                        (page - 1) * 100 +
+                                        users.length ==
                                       2
                                 ) ? (
                                 <img
@@ -354,7 +361,11 @@ function Hackerboard(props) {
                               )}
                             </th>
                             <td style={{ textAlign: "left" }}>
-                              {user.username}
+                              <Link to={`/user/${user.username}`}>
+                                <a className="p-3 text-decoration-none text-light bold">
+                                  {user.username}
+                                </a>
+                              </Link>
                             </td>
                             <td> {user.solved.length} </td>
                             <td> {user.score} </td>
@@ -371,13 +382,18 @@ function Hackerboard(props) {
                               {(
                                 selectionScore == "up"
                                   ? index + (page - 1) * 100 == 0
-                                  : index * -1 + (page - 1) * 100 + teams.length == 0
+                                  : index * -1 +
+                                      (page - 1) * 100 +
+                                      teams.length ==
+                                    0
                               ) ? (
                                 <img src={goldMask} style={{ width: "50px" }} />
                               ) : (
                                   selectionScore == "up"
                                     ? index + (page - 1) * 100 == 1
-                                    : index * -1 + (page - 1) * 100 + teams.length ==
+                                    : index * -1 +
+                                        (page - 1) * 100 +
+                                        teams.length ==
                                       1
                                 ) ? (
                                 <img
@@ -387,7 +403,9 @@ function Hackerboard(props) {
                               ) : (
                                   selectionScore == "up"
                                     ? index + (page - 1) * 100 == 2
-                                    : index * -1 + (page - 1) * 100 + teams.length ==
+                                    : index * -1 +
+                                        (page - 1) * 100 +
+                                        teams.length ==
                                       2
                                 ) ? (
                                 <img
