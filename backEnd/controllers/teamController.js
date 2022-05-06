@@ -158,3 +158,11 @@ exports.leaveTeam = async function(req, res) {
         res.send({ state: 'error', message: 'You are not in a team!' });
     }
 }
+
+exports.getTeam = async function(req, res) {
+    let team = await teams.findOne({ name: req.body.teamName });
+
+    team.inviteCode = 'Nice try XD';
+
+    res.send(team);
+}

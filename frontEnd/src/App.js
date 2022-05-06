@@ -136,6 +136,7 @@ function App() {
             <Route path="/rules" element={<Rules />} />
             <Route path="/hackerboard" element={<Hackerboard />} />
             <Route path="/user/*" element={<User />} />
+            <Route path="/team/*" element={<Team />} />
             {userData.isAdmin && loggedIn ? (
               <Route path="/admin/*" element={<Admin />} />
             ) : null}
@@ -143,7 +144,7 @@ function App() {
               <>
                 <Route path="/challenges" element={<Challenges />} />
                 <Route path="/logout" element={<Logout />} />
-                <Route path="/team" element={<Team />} />
+                <Route path="/userteam" element={<userTeam />} />
               </>
             ) : (
               <>

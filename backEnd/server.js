@@ -194,6 +194,9 @@ app.post('/api/getUser', (req, res) => {
     userController.getUser(req, res);
 });
 
+app.post('/api/getTeam', (req, res) => {
+    teamController.getTeam(req, res);
+});
 
 app.post('/api/getTeams', (req, res) => {
     teamController.getTeams(req, res);

@@ -418,7 +418,13 @@ function Hackerboard(props) {
                                 index * -1 + (page - 1) * 100 + teams.length
                               )}
                             </th>
-                            <td style={{ textAlign: "left" }}> {team.name} </td>
+                            <td style={{ textAlign: "left" }}>
+                              <Link to={`/team/${team.name}`}>
+                                <a className="p-3 text-decoration-none text-light bold">
+                                  {team.name}
+                                </a>
+                              </Link>
+                            </td>
                             <td> {team.totalSolved} </td>
                             <td> {team.totalScore} </td>
                           </tr>

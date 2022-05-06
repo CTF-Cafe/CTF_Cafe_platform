@@ -20,7 +20,6 @@ function User(props) {
       })
       .then((response) => {
         if (response.data.state != "error") {
-          console.log(response.data);
           setUser(response.data);
 
           if (response.data.solved.length > 0) {
@@ -153,7 +152,7 @@ function User(props) {
                   </div>
                 </>
               ) : (
-                <h3 style={{textAlign: 'center'}}>No Challenges Solved!</h3>
+                <h3 style={{ textAlign: "center" }}>No Challenges Solved!</h3>
               )}
             </div>
           ) : (

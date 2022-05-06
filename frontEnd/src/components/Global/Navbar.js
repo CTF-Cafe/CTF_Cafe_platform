@@ -66,7 +66,7 @@ function Navbar() {
                       Challenges
                     </a>
                   </Link>
-                  <Link to={`/team`}>
+                  <Link to={`/userteam`}>
                     <a className="p-3 text-decoration-none text-light bold">
                       Team
                     </a>
