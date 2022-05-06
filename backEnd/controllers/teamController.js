@@ -104,7 +104,7 @@ exports.getTeams = async function(req, res) {
 
             let allTeams = [];
             try {
-                allTeams = await teams..aggregate([{
+                allTeams = await teams.aggregate([{
                     "$project": {
                         "name": 1,
                         "users": 1,
