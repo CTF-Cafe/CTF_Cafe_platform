@@ -109,11 +109,16 @@ exports.getUsers = async function(req, res) {
 exports.getUser = async function(req, res) {
     let user = await users.findOne({ username: req.body.username });
 
-    user.password = 'Nice try XD';
-    user.key = 'Nice try XD';
-    user.isAdmin = false;
 
-    res.send(user);
+    if (user) {
+        user.password = 'Nice try XD';
+        user.key = 'Nice try XD';
+        user.isAdmin = false;
+
+        res.send(user);
+    } else {
+        res.send({ state: 'error', message: 'User not found' })
+    }
 
 }
 
