@@ -104,10 +104,18 @@ exports.getTeams = async function(req, res) {
 
             let allTeams = [];
             try {
-                allTeams = await teams.find().sort({ 'users.score': -1, _id: 1 }).skip((page - 1) * 100).limit(100);
+
+                allTeams = await teams.aggregate([{},
+                    { $group: { _id: "$_id", name: "$name", users: "$users", totalScore: { $sum: "$users.score" } } },
+                    { $sort: { totalScore: -1 } }
+                ], {
+                    allowDiskUse: true
+                }).skip((page - 1) * 100).limit(100);
             } catch (err) {
-                allTeams = await teams.find().sort({ 'users.score': -1, _id: 1 });
+                allTeams = await teams.find({}).sort({ 'users.score': -1, _id: 1 });
             }
+
+            console.log(allTeams);
 
             await allTeams.forEach(team => {
                 team.inviteCode = 'Nice try XD';
