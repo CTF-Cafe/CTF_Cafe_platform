@@ -5,7 +5,7 @@ import AppContext from "./Data/AppContext";
 import Navbar from "./Global/Navbar.js";
 import PieChart from "./Charts/PieChart.js";
 
-function User(props) {
+function Team(props) {
   const globalData = useContext(AppContext);
   const location = useLocation();
   const selectedTeam = location.pathname.replace("/team/", "");
