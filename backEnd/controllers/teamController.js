@@ -104,7 +104,23 @@ exports.getTeams = async function(req, res) {
 
             let allTeams = [];
             try {
-                allTeams = await teams.find({}).sort({ 'users.score': -1, _id: 1 }).skip((page - 1) * 100).limit(100);
+                allTeams = await teams..aggregate([{
+                    "$project": {
+                        "name": 1,
+                        "users": 1,
+                        "totalScore": {
+                            "$sum": "$users.score"
+                        }
+                    }
+                }, {
+                    '$sort': {
+                        'totalScore': -1
+                    }
+                }]).skip((page - 1) * 100).limit(100);
+
+                console.log(allTeams);
+
+                // allTeams = await teams.find({}).sort({ 'users.score': -1, _id: 1 }).skip((page - 1) * 100).limit(100);
             } catch (err) {
                 allTeams = await teams.find({}).sort({ 'users.score': -1, _id: 1 });
             }
