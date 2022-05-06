@@ -27,6 +27,7 @@ exports.register = async function(req, res) {
                         res.send({ state: 'success', message: 'Registered team!', user: user, team: team });
                     });
                 }).catch(function(err) {
+                    console.log(err.message);
                     res.send({ state: 'error', message: 'Team creation failed!' });
                 });
             } else {
