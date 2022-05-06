@@ -174,7 +174,7 @@ exports.leaveTeam = async function(req, res) {
 }
 
 exports.getTeam = async function(req, res) {
-    let team = await teams.findOne({ name: req.body.teamName.replace(/%20/g, " ").trim() });
+    let team = await teams.findOne({ name: decodeURIComponent(req.body.teamName.trim()) });
 
     if (team) {
         team.inviteCode = 'Nice try XD';
