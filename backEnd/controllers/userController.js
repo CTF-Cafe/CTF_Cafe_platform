@@ -107,7 +107,7 @@ exports.getUsers = async function(req, res) {
 }
 
 exports.getUser = async function(req, res) {
-    let user = await users.findOne({ username: req.body.username });
+    let user = await users.findOne({ username: req.body.username.replace(/%20/g, " ").trim() });
 
 
     if (user) {
