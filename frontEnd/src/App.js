@@ -11,6 +11,7 @@ import Register from "./components/Register.js";
 import Challenges from "./components/Challenges.js";
 import Admin from "./components//Admin/Admin.js";
 import Team from "./components/Team.js";
+import userTeam from "./components/userTeam.js";
 import User from "./components/User.js";
 import { useState, useEffect, useLayoutEffect } from "react";
 import { useAlert, positions } from "react-alert";
