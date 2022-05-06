@@ -118,9 +118,6 @@ exports.getTeams = async function(req, res) {
                     }
                 }]).skip((page - 1) * 100).limit(100);
 
-                console.log(allTeams);
-
-                // allTeams = await teams.find({}).sort({ 'users.score': -1, _id: 1 }).skip((page - 1) * 100).limit(100);
             } catch (err) {
                 allTeams = await teams.find({}).sort({ 'users.score': -1, _id: 1 });
             }
