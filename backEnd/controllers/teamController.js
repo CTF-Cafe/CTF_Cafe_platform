@@ -115,8 +115,6 @@ exports.getTeams = async function(req, res) {
                 allTeams = await teams.find({}).sort({ 'users.score': -1, _id: 1 });
             }
 
-            console.log(allTeams);
-
             await allTeams.forEach(team => {
                 team.inviteCode = 'Nice try XD';
             });
