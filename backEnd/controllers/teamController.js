@@ -111,15 +111,15 @@ exports.getTeams = async function(req, res) {
                             "_id": "$_id",
                             "totalScore": {
                                 "$sum": {
-                                    "$users.score",
+                                    "$users.score"
                                 }
                             },
                             "users": {
-                                "$users",
-                            },
+                                "$users"
+                            }
                         },
-                        { "$sort": { "total": -1 } },
-                    },
+                        { "$sort": { "totalScore": -1 } },
+                    }
                 ], {
                     allowDiskUse: true
                 }).skip((page - 1) * 100).limit(100);
