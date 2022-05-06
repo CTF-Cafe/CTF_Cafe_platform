@@ -112,7 +112,13 @@ exports.getTeams = async function(req, res) {
                             "totalScore": {
                                 "$sum": "$users.score"
                             },
-                            "users": "$users"
+                            "users": {
+                                "$push": {
+                                    "username": "$user.username",
+                                    "solved": "$user.solved",
+                                    "score": "$user.score"
+                                }
+                            }
                         }
                     },
                     { "$sort": { "totalScore": -1 } },
