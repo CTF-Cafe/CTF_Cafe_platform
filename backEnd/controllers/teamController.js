@@ -104,7 +104,6 @@ exports.getTeams = async function(req, res) {
 
             let allTeams = [];
             try {
-
                 allTeams = await teams.aggregate([{},
                     { $group: { _id: "$_id", name: "$name", users: "$users", totalScore: { $sum: "$users.score" } } },
                     { $sort: { totalScore: -1 } }
@@ -112,6 +111,7 @@ exports.getTeams = async function(req, res) {
                     allowDiskUse: true
                 }).skip((page - 1) * 100).limit(100);
             } catch (err) {
+                console.log(err.message);
                 allTeams = await teams.find({}).sort({ 'users.score': -1, _id: 1 });
             }
 
