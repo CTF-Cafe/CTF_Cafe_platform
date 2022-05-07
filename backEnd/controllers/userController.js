@@ -145,6 +145,12 @@ exports.getTheme = async function(req, res) {
     }
 }
 
+function max(input) {
+    if (toString.call(input) !== "[object Array]")
+        return false;
+    return Math.max.apply(null, input);
+}
+
 exports.getScoreboard = async function(req, res) {
     let allTeams = await teams.aggregate([{
         "$project": {
