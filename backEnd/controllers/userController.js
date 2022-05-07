@@ -146,27 +146,23 @@ exports.getTheme = async function(req, res) {
 }
 
 exports.getScoreboard = async function(req, res) {
-    let allTeams = await teams.find();
-
-    allTeams.forEach((team) => {
-        team.users.forEach((user) => {
-            if (team.totalScore) {
-                team.totalScore += user.score;
-            } else {
-                team.totalScore = user.score;
+    let allTeams = await teams.aggregate([{
+        "$project": {
+            "name": 1,
+            "users": 1,
+            "totalScore": {
+                "$sum": "$users.score"
+            },
+            "lastTime": {
+                "$sum": "$users.$solved.timeStamp"
             }
-        });
-    });
-
-    allTeams.sort((a, b) => {
-        if (a.totalScore < b.totalScore) {
-            return 1;
         }
-
-        if (a.totalScore > b.totalScore) {
-            return -1;
+    }, {
+        '$sort': {
+            'totalScore': -1,
+            'lastTime': -1
         }
-    });
+    }]);
 
     let finalData = {
         standings: []
