@@ -18,7 +18,19 @@ exports.run = async(bot, message, args) => {
 
         message.reply({ embeds: [scoreboardEmbed] });
     } else if (args[0] === 'teams') {
-        const top = await teams.find().sort({ 'users.score': -1, _id: 1 }).limit(24);
+        const top = await teams.aggregate([{
+            "$project": {
+                "name": 1,
+                "users": 1,
+                "totalScore": {
+                    "$sum": "$users.score"
+                }
+            }
+        }, {
+            '$sort': {
+                'totalScore': -1
+            }
+        }]).limit(24);
 
         const scoreboardEmbed = new MessageEmbed()
             .setColor('#ff0000')
