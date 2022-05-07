@@ -152,7 +152,7 @@ exports.getScoreboard = async function(req, res) {
             "users": 1,
             "timestamps": {
                 $map: {
-                    input: { "$users.solved" },
+                    input: "$users.solved",
                     as: "timestamp",
                     in: "$$solve.timestamp"
                 }
