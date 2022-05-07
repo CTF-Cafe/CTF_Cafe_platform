@@ -150,9 +150,6 @@ exports.getScoreboard = async function(req, res) {
         "$project": {
             "name": 1,
             "users": 1,
-            "totalScore": {
-                "$sum": "$users.score"
-            },
             "lastTimes": {
                 $map: {
                     input: "$users",
@@ -161,7 +158,10 @@ exports.getScoreboard = async function(req, res) {
                         timestamp: $$users.solved.timestamp
                     }
                 }
-            }
+            },
+            "totalScore": {
+                "$sum": "$users.score"
+            },
         }
     }, {
         '$sort': {
