@@ -150,27 +150,24 @@ exports.getScoreboard = async function(req, res) {
         "$project": {
             "name": 1,
             "users": 1,
-            "lastTimes": {
-                $map: {
-                    input: "$users",
-                    as: "timestamp",
-                    in: {
-                        timestamp: $$users.solved.timestamp
-                    }
-                }
-            },
             "totalScore": {
                 "$sum": "$users.score"
+            },
+            "userSolves": {
+                "$push": "$users.solved"
             },
         }
     }, {
         '$sort': {
             'totalScore': -1,
-            'lastTimes': -1
         }
     }]);
 
     console.log(allTeams[0].users, allTeams[0].lastTime, allTeams[1].users, allTeams[1].lastTime)
+
+    allTeams.sort((a, b) => {
+
+    });
 
     let finalData = {
         standings: []
