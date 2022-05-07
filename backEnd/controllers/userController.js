@@ -183,8 +183,6 @@ exports.getScoreboard = async function(req, res) {
         }
     });
 
-    console.log(allTeams[0], allTeams[1])
-
     let finalData = {
         standings: []
     }

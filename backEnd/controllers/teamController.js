@@ -108,6 +108,7 @@ exports.getTeams = async function(req, res) {
                     "$project": {
                         "name": 1,
                         "users": 1,
+                        "timestamps": "$users.solved.timestamp",
                         "totalScore": {
                             "$sum": "$users.score"
                         }
@@ -117,6 +118,26 @@ exports.getTeams = async function(req, res) {
                         'totalScore': -1
                     }
                 }]).skip((page - 1) * 100).limit(100);
+
+                allTeams.forEach(team => {
+                    let maxTimestamp = 0;
+
+                    team.timestamps.forEach(timestamp => {
+                        if (max(timestamp) > maxTimestamp) {
+                            maxTimestamp = max(timestamp)
+                        }
+                    });
+
+                    team.maxTimestamp = maxTimestamp;
+                })
+
+                allTeams.sort((a, b) => {
+                    if (b.totalScore - a.totalScore == 0) {
+                        return a.maxTimestamp - b.maxTimestamp;
+                    } else {
+                        return b.totalScore - a.totalScore;
+                    }
+                });
 
             } catch (err) {
                 allTeams = await teams.find({}).sort({ 'users.score': -1, _id: 1 });
