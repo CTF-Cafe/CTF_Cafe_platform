@@ -161,7 +161,7 @@ exports.getScoreboard = async function(req, res) {
         }
     }]);
 
-    console.log(allTeams[0].users, allTeams[0].userSolves, allTeams[1].users, allTeams[1].userSolves)
+    console.log(allTeams[0], allTeams[1])
 
     allTeams.sort((a, b) => {
 
