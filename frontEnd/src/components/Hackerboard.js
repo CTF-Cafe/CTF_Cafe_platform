@@ -146,6 +146,7 @@ function Hackerboard(props) {
 
     ctx.drawImage(document.querySelector("#certImg"), 0, 0);
 
+    console.log(globalData.userData.team);
     var team = teams.find((obj) => {
       return obj.name === globalData.userData.team.name;
     });
@@ -242,7 +243,7 @@ function Hackerboard(props) {
               <p className="text-grey lead text-spacey text-center hackerFont">
                 Where the world 's greatest get ranked!
               </p>
-
+              {globalData.userData.team ? (
                 <button
                   className="btn btn-outline-danger btn-shadow"
                   onClick={() => {
@@ -252,6 +253,7 @@ function Hackerboard(props) {
                 >
                   Download Certificate
                 </button>
+              ) : null}
             </div>
           </div>
           <div className="row mt-5  justify-content-center">
