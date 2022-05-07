@@ -148,8 +148,11 @@ function Hackerboard(props) {
 
     console.log(globalData.userData.team);
     var team = teams.find((obj) => {
-      console.log(obj);
-      return obj.name === globalData.userData.team.name;
+      if (obj) {
+        return obj.name === globalData.userData.team.name;
+      } else {
+        return false;
+      }
     });
 
     var index = teams.indexOf(team) + 1;
