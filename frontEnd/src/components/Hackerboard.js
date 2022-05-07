@@ -243,7 +243,6 @@ function Hackerboard(props) {
                 Where the world 's greatest get ranked!
               </p>
 
-              {new Date(endTime + "000") < now ? (
                 <button
                   className="btn btn-outline-danger btn-shadow"
                   onClick={() => {
@@ -253,7 +252,6 @@ function Hackerboard(props) {
                 >
                   Download Certificate
                 </button>
-              ) : null}
             </div>
           </div>
           <div className="row mt-5  justify-content-center">
