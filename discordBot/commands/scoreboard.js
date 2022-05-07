@@ -24,6 +24,9 @@ exports.run = async(bot, message, args) => {
                 "users": 1,
                 "totalScore": {
                     "$sum": "$users.score"
+                },
+                "totalTimes": {
+                    "$sum": "$users.solved"
                 }
             }
         }, {
@@ -39,14 +42,6 @@ exports.run = async(bot, message, args) => {
             .setFooter({ text: 'Raxo#0468' });
 
         top.map((team, index) => {
-            team.users.forEach((user) => {
-                if (team.totalScore) {
-                    team.totalScore += user.score;
-                } else {
-                    team.totalScore = user.score;
-                }
-            });
-
             scoreboardEmbed.addField(`${index + 1}. ${team.name}`, team.totalScore.toString(), true);
         });
 
