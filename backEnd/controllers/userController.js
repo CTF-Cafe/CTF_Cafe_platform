@@ -177,7 +177,7 @@ exports.getScoreboard = async function(req, res) {
 
     allTeams.sort((a, b) => {
         if (b.totalScore - a.totalScore == 0) {
-            return b.maxTimestamp - a.maxTimestamp;
+            return b.maxTimestamp + a.maxTimestamp;
         } else {
             return b.totalScore - a.totalScore;
         }
