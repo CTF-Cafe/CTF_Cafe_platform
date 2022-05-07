@@ -88,6 +88,13 @@ exports.joinTeam = async function(req, res) {
     }
 }
 
+
+function max(input) {
+    if (toString.call(input) !== "[object Array]")
+        return false;
+    return Math.max.apply(null, input);
+}
+
 exports.getTeams = async function(req, res) {
     let page = (req.body.page);
 
@@ -112,10 +119,6 @@ exports.getTeams = async function(req, res) {
                         "totalScore": {
                             "$sum": "$users.score"
                         }
-                    }
-                }, {
-                    '$sort': {
-                        'totalScore': -1
                     }
                 }]).skip((page - 1) * 100).limit(100);
 
