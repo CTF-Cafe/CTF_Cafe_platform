@@ -161,6 +161,20 @@ exports.getScoreboard = async function(req, res) {
         },
     }]);
 
+    allTeams.forEach(team => {
+        let maxTimestamp = 0;
+
+        team.timestamps.forEach(timestamp => {
+            if (max(timestamp) > maxTimestamp) {
+                maxTimestamp = timestamp
+            }
+        });
+
+        team.maxTimestamp = maxTimestamp;
+    })
+
+    allTeams.sort((a, b) => b.maxTimestamp - a.maxTimestamp);
+
     console.log(allTeams[0], allTeams[1])
 
     let finalData = {
