@@ -164,7 +164,7 @@ exports.getScoreboard = async function(req, res) {
         }
     }]);
 
-    console.log(allTeams[0], allTeams[1], allTeams[2])
+    console.log(allTeams[0].users, allTeams[1].users, allTeams[2].users)
 
     let finalData = {
         standings: []
