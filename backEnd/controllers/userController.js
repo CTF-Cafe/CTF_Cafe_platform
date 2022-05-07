@@ -150,11 +150,11 @@ exports.getScoreboard = async function(req, res) {
         "$project": {
             "name": 1,
             "users": 1,
-            "totalScore": {
-                "$sum": "$users.score"
-            },
             "userSolves": {
                 "$push": "$users.solved"
+            },
+            "totalScore": {
+                "$sum": "$users.score"
             },
         }
     }, {
