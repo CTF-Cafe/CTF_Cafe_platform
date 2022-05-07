@@ -25,15 +25,33 @@ exports.run = async(bot, message, args) => {
                 "totalScore": {
                     "$sum": "$users.score"
                 },
-                "totalTimes": {
-                    "$sum": "$users.solved"
-                }
+                "timestamps": "$users.solved.timestamp"
             }
         }, {
             '$sort': {
                 'totalScore': -1
             }
         }]).limit(24);
+
+        top.forEach(team => {
+            let maxTimestamp = 0;
+
+            team.timestamps.forEach(timestamp => {
+                if (max(timestamp) > maxTimestamp) {
+                    maxTimestamp = max(timestamp)
+                }
+            });
+
+            team.maxTimestamp = maxTimestamp;
+        })
+
+        top.sort((a, b) => {
+            if (b.totalScore - a.totalScore == 0) {
+                return a.maxTimestamp - b.maxTimestamp;
+            } else {
+                return b.totalScore - a.totalScore;
+            }
+        });
 
         const scoreboardEmbed = new MessageEmbed()
             .setColor('#ff0000')
