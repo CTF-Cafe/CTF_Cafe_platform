@@ -172,7 +172,7 @@ exports.getScoreboard = async function(req, res) {
 
         team.timestamps.forEach(timestamp => {
             if (max(timestamp) > maxTimestamp) {
-                maxTimestamp = timestamp
+                maxTimestamp = max(timestamp)
             }
         });
 
