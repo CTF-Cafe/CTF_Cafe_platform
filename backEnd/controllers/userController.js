@@ -154,9 +154,11 @@ exports.getScoreboard = async function(req, res) {
                 "$sum": "$users.score"
             },
             "lastTime": {
-                "$users": {
-                    "$project": {
-                        "lastTime": "$solved.timestamp"
+                "$sum": {
+                    "$users": {
+                        "$project": {
+                            "lastTime": "$solved.timestamp"
+                        }
                     }
                 }
             }
