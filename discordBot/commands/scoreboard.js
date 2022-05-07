@@ -2,6 +2,13 @@ const { MessageEmbed } = require('discord.js');
 const users = require('./models/userModel');
 const teams = require('./models/teamModel');
 
+function max(input) {
+    if (toString.call(input) !== "[object Array]")
+        return false;
+    return Math.max.apply(null, input);
+}
+
+
 exports.run = async(bot, message, args) => {
     if (!args[0]) return message.reply('Please specify (users/teams) as the first argument.');
 
