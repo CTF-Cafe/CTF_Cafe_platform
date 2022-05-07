@@ -161,10 +161,6 @@ exports.getScoreboard = async function(req, res) {
                 "$sum": "$users.score"
             },
         }
-    }, {
-        '$sort': {
-            'totalScore': -1,
-        },
     }]);
 
     allTeams.forEach(team => {
@@ -179,7 +175,7 @@ exports.getScoreboard = async function(req, res) {
         team.maxTimestamp = maxTimestamp;
     })
 
-    allTeams.sort((a, b) => b.maxTimestamp - a.maxTimestamp);
+    allTeams.sort((a, b) => (b.maxTimestamp + b.totalScore * 10000000) - (a.maxTimestamp + a.totalScore * 10000000));
 
     console.log(allTeams[0], allTeams[1])
 
