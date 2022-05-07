@@ -164,12 +164,13 @@ exports.getScoreboard = async function(req, res) {
     }, {
         '$sort': {
             'totalScore': -1,
+        },
+        '$sort': {
+            'timestamps': -1,
         }
     }]);
 
     console.log(allTeams[0], allTeams[1])
-
-    allTeams.sort((a, b) => b.timestamps - a.timestamps);
 
     let finalData = {
         standings: []
