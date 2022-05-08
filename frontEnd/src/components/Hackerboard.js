@@ -248,7 +248,7 @@ function Hackerboard(props) {
                 Where the world 's greatest get ranked!
               </p>
               {globalData.userData.team ? (
-                <div style="text-align: center;">
+                <div style={{textAlign: 'center'}}>
                   <button
                     className="btn btn-outline-danger btn-shadow"
                     onClick={() => {
