@@ -248,15 +248,17 @@ function Hackerboard(props) {
                 Where the world 's greatest get ranked!
               </p>
               {globalData.userData.team ? (
-                <button
-                  className="btn btn-outline-danger btn-shadow"
-                  onClick={() => {
-                    downloadCert();
-                  }}
-                  style={{ marginBottom: "25px" }}
-                >
-                  Download Certificate
-                </button>
+                <div style="text-align: center;">
+                  <button
+                    className="btn btn-outline-danger btn-shadow"
+                    onClick={() => {
+                      downloadCert();
+                    }}
+                    style={{ marginBottom: "25px" }}
+                  >
+                    Download Certificate
+                  </button>
+                </div>
               ) : null}
             </div>
           </div>
