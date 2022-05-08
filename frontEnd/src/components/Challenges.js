@@ -149,13 +149,12 @@ function Challenges(props) {
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
 
-
   const handleEnterSubmit = (event, index) => {
     // look for the `Enter` keyCode
     if (event.keyCode === 13 || event.which === 13) {
-      submitFlag(index)
+      submitFlag(index);
     }
-  }
+  };
 
   return (
     <div>
@@ -352,7 +351,9 @@ function Challenges(props) {
                                   aria-label="Enter Flag"
                                   aria-describedby="basic-addon2"
                                   id={"flag_id_" + index}
-                                  onKeyPress={(index) => { handleEnterSubmit(index) }}
+                                  onKeyPress={(index) => {
+                                    handleEnterSubmit(index);
+                                  }}
                                 />
                                 <div className="input-group-append">
                                   <button
@@ -420,14 +421,6 @@ function Challenges(props) {
           <div className="modal-dialog modal-dialog-centered" role="document">
             <div className="modal-content">
               <div className="modal-body">
-                <button
-                  type="button"
-                  class="close"
-                  data-dismiss="modal"
-                  aria-label="Close"
-                >
-                  <span aria-hidden="true">&times;</span>
-                </button>
                 {currentHint.length > 0 ? (
                   <div className="col-md-12">
                     <p style={{ textAlign: "center" }}>
@@ -442,6 +435,15 @@ function Challenges(props) {
                     </p>
                   </div>
                 ) : null}
+              </div>
+              <div class="modal-footer" style={{ justifyContent: "center" }}>
+                <button
+                  type="button"
+                  class="btn btn-danger"
+                  data-dismiss="modal"
+                >
+                  Close
+                </button>
               </div>
             </div>
           </div>
