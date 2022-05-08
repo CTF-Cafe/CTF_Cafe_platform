@@ -36,7 +36,6 @@ accentsTidy = function(s) {
     r = r.replace(new RegExp("œ", 'g'), "oe");
     r = r.replace(new RegExp("[ùúûü]", 'g'), "u");
     r = r.replace(new RegExp("[ýÿ]", 'g'), "y");
-    r = r.replace(new RegExp("\\W", 'g'), "");
     return r;
 };
 
