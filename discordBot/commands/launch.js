@@ -13,7 +13,8 @@ exports.run = async(bot, message, args) => {
     let checkUser = await users.findOne({ discordId: message.author.id });
 
     if (checkUser) {
-        if (checkUser.isAdmin) {
+        if (checkUser.isAdmin) /* checks the site's database to make sure the Discord user is
+		an admin on the backend as well */ {
             let scoreboardEmbed = new MessageEmbed()
                 .setColor('#ff0000')
                 .setTitle('EZ CTF | Challenges')
