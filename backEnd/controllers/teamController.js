@@ -123,7 +123,8 @@ exports.getTeams = async function(req, res) {
                     '$sort': {
                         'totalScore': -1
                     }
-                }]).skip((page - 1) * 100).limit(100);
+                }]);
+                // .skip((page - 1) * 100).limit(100);
 
                 allTeams.forEach(team => {
                     let maxTimestamp = 0;
