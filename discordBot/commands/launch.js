@@ -2,11 +2,12 @@ const challenges = require('./models/challengeModel');
 const { MessageEmbed } = require('discord.js');
 const users = require('./models/userModel');
 const crypto = require("crypto");
+const perms = require('../permissions.js');
 
 exports.run = async(bot, message, args) => {
     if (!message.member) return message.reply("You are not an admin!");
-    if (!message.member.permissions.has("ADMINISTRATOR")) return message.reply("You are not an admin!");
-    if (!args[0]) return message.reply('You must provide a channel id!');
+    if (!perms.allowedUsers.includes(message.member.author.id)) return message.reply("You are not an admin!");
+    if (!args[0]) return message.reply('You must provide a channel ID!');
 
     const allChallenges = await challenges.find();
 
