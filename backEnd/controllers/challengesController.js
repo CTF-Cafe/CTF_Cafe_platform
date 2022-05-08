@@ -34,7 +34,7 @@ exports.submitFlag = async function(req, res) {
         res.send({ state: 'error', message: 'CTF has not started!' });
     } else {
         const username = (req.session.username);
-        const flag = (req.body.flag.trim());
+        const flag = (req.body.flag.trim().toUpperCase());
         const user = await users.findOne({ username: username });
 
         if (user) {

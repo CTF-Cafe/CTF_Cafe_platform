@@ -45,28 +45,9 @@ exports.saveChallenge = async function(req, res) {
             level: parseInt(req.body.level),
             info: req.body.info,
             hints: (req.body.hint.length > 0 ? [req.body.hint] : []),
-            flag: req.body.flag.trim(),
+            flag: req.body.flag.trim().toUpperCase(),
             file: (req.body.file.length > 0 ? req.body.file : ''),
         });
-
-        // let pointDiff = parseInt(challengeExists.points) - parseInt(updatedChallenge.points);
-
-        // await users.updateMany({
-        //     solved: { $elemMatch: { 'challenge._id': challengeExists._id } }
-        // }, {
-        //     $set: { 'solved.$.challenge': updatedChallenge, 'solved.$._id': updatedChallenge._id },
-        //     $inc: { score: -pointDiff },
-        // });
-
-        // await teams.updateMany({
-        //     users: { $elemMatch: { solved: { $elemMatch: { 'challenge._id': challengeExists._id } } } }
-        // }, {
-        //     $set: { 'users.$.solved.$[solve].challenge': updatedChallenge, 'users.$.solved.$[solve]._id': updatedChallenge._id },
-        //     $inc: { 'users.$.score': -pointDiff },
-        // }, {
-        //     arrayFilters: [{ 'solve._id': challengeExists._id }],
-        //     upsert: true
-        // });
 
         res.send({ state: 'success', message: 'Challenge updated!' });
     } else {
@@ -83,7 +64,7 @@ exports.createChallenge = async function(req, res) {
         level: req.body.level,
         info: req.body.info,
         hints: (req.body.hint.length > 0 ? [req.body.hint] : []),
-        flag: req.body.flag,
+        flag: req.body.flag.toUpperCase(),
         file: (req.body.file.length > 0 ? req.body.file : ''),
         category: req.body.category
     });
