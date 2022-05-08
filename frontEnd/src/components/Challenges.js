@@ -351,8 +351,8 @@ function Challenges(props) {
                                   aria-label="Enter Flag"
                                   aria-describedby="basic-addon2"
                                   id={"flag_id_" + index}
-                                  onKeyPress={(index) => {
-                                    handleEnterSubmit(index);
+                                  onKeyPress={(e, index) => {
+                                    handleEnterSubmit(e, index);
                                   }}
                                 />
                                 <div className="input-group-append">
