@@ -411,9 +411,17 @@ function Challenges(props) {
           <div className="modal-dialog modal-dialog-centered" role="document">
             <div className="modal-content">
               <div className="modal-body">
+              <button
+                type="button"
+                class="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
                 {currentHint.length > 0 ? (
                   <div className="col-md-12">
-                    <p>
+                    <p style={{ textAlign: "center" }}>
                       {currentHint.split("\\n").map(function (item, idx) {
                         return (
                           <span key={idx}>
