@@ -15,9 +15,9 @@ var challengeSchema = new Schema({
         type: String,
         required: true
     },
-    hints: {
-        type: Array,
-        default: [],
+    hint: {
+        type: String,
+        required: true
     },
     points: {
         type: Number,

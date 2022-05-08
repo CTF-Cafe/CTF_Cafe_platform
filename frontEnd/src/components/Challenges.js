@@ -35,7 +35,7 @@ const formatHours = (time) => {
 function Challenges(props) {
   const globalData = useContext(AppContext);
   const [challenges, setChallenges] = useState([]);
-  const [currentHints, setCurrentHints] = useState(["none :)"]);
+  const [currentHint, setCurrentHint] = useState("");
   const [categories, setCategories] = useState([]);
   const [endTime, setEndTime] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -208,7 +208,7 @@ function Challenges(props) {
                               ? "card category_steg"
                               : challenge.category == "pwn"
                               ? "card category_pwning"
-                              :challenge.category == "forensics"
+                              : challenge.category == "forensics"
                               ? "card category_forensics"
                               : "card category_misc"
                           }
@@ -224,7 +224,9 @@ function Challenges(props) {
                                     (user) => {
                                       return (
                                         user.solved.filter((obj) => {
-                                          return obj.challenge._id == challenge._id;
+                                          return (
+                                            obj.challenge._id == challenge._id
+                                          );
                                         }).length > 0
                                       );
                                     }
@@ -318,18 +320,22 @@ function Challenges(props) {
                                   </a>
                                 ) : null
                               ) : null}
-                              <a
-                                onClick={() => {
-                                  setCurrentHints(challenge.hints);
-                                }}
-                                href="#hint"
-                                data-toggle="modal"
-                                data-target="#hint"
-                                className="btn btn-outline-danger btn-shadow"
-                              >
-                                <span className="far fa-lightbulb mr-2"></span>
-                                Hint
-                              </a>
+                              {challenge.hint ? (
+                                challenge.hint.trim().length > 0 ? (
+                                  <a
+                                    onClick={() => {
+                                      setCurrentHint(challenge.hint);
+                                    }}
+                                    href="#hint"
+                                    data-toggle="modal"
+                                    data-target="#hint"
+                                    className="btn btn-outline-danger btn-shadow"
+                                  >
+                                    <span className="far fa-lightbulb mr-2"></span>
+                                    Hint
+                                  </a>
+                                ) : null
+                              ) : null}
                               <div className="input-group mt-3">
                                 <input
                                   type="text"
@@ -405,40 +411,20 @@ function Challenges(props) {
           <div className="modal-dialog modal-dialog-centered" role="document">
             <div className="modal-content">
               <div className="modal-body">
-                {currentHints.map(function (hint, index) {
-                  return (
-                    <div className="col-md-12">
-                      <div className="card category_reversing">
-                        <div
-                          className="card-header"
-                          data-target={"#hint_id_" + index}
-                          data-toggle="collapse"
-                          aria-expanded="false"
-                          aria-controls={"hint_id_" + index}
-                        >
-                          Hint #{index}
-                        </div>
-                        <div
-                          id={"hint_id_" + index}
-                          className="collapse card-body"
-                        >
-                          <blockquote className="card-blockquote">
-                            <p>
-                              {hint.split("\\n").map(function (item, idx) {
-                                return (
-                                  <span key={idx}>
-                                    {item}
-                                    <br />
-                                  </span>
-                                );
-                              })}
-                            </p>
-                          </blockquote>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+                {currentHint.length > 0 ? (
+                  <div className="col-md-12">
+                    <p>
+                      {currentHint.split("\\n").map(function (item, idx) {
+                        return (
+                          <span key={idx}>
+                            {item}
+                            <br />
+                          </span>
+                        );
+                      })}
+                    </p>
+                  </div>
+                ) : null}
               </div>
             </div>
           </div>

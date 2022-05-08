@@ -95,7 +95,7 @@ function ChallengeCard(props) {
                 {props.challenge.info}
               </p>
 
-              <label>Hints:</label>
+              <label>Hint:</label>
               <div>
                 <p
                   style={{
@@ -105,7 +105,7 @@ function ChallengeCard(props) {
                   contenteditable="true"
                   id={"hint" + props.challenge._id}
                 >
-                  {props.challenge.hints}
+                  {props.challenge.hint}
                 </p>
               </div>
 

@@ -59,7 +59,7 @@ exports.saveChallenge = async function(req, res) {
             points: parseInt(req.body.points),
             level: parseInt(req.body.level),
             info: req.body.info,
-            hints: (req.body.hint.length > 0 ? [req.body.hint] : []),
+            hint: req.body.hint,
             flag: accentsTidy(req.body.flag.trim()).toUpperCase(),
             file: (req.body.file.length > 0 ? req.body.file : ''),
         });
@@ -78,7 +78,7 @@ exports.createChallenge = async function(req, res) {
         points: parseInt(req.body.points),
         level: req.body.level,
         info: req.body.info,
-        hints: (req.body.hint.length > 0 ? [req.body.hint] : []),
+        hint: req.body.hint,
         flag: req.body.flag.toUpperCase(),
         file: (req.body.file.length > 0 ? req.body.file : ''),
         category: req.body.category
