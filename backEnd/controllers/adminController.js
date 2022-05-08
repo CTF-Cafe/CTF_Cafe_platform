@@ -45,7 +45,7 @@ exports.saveChallenge = async function(req, res) {
             level: parseInt(req.body.level),
             info: req.body.info,
             hints: (req.body.hint.length > 0 ? [req.body.hint] : []),
-            flag: req.body.flag.trim().toUpperCase(),
+            flag: accentsTidy(req.body.flag.trim()).toUpperCase(),
             file: (req.body.file.length > 0 ? req.body.file : ''),
         });
 
