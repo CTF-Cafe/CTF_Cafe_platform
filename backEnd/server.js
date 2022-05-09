@@ -35,7 +35,6 @@ app.set('trust proxy', true)
 // Body-parser middleware
 app.use(bodyparser.urlencoded({ extended: false }));
 app.use(bodyparser.json());
-app.use(express.static(path.join(__dirname, "..", "build")));
 app.use(session({
     store: new MongoStore({
         mongooseConnection: mongoose.connection
