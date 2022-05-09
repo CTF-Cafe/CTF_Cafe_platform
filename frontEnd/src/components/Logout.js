@@ -5,7 +5,7 @@ import axios from "axios";
 function Logout(props) {
   const globalData = useContext(AppContext);
   useEffect(() => {
-    axios.get(process.env.REACT_APP_SERVER_URI + "/api/logout");
+    axios.get(process.env.REACT_APP_SERVER_URI + "/api/logout", { withCredentials: true });
     globalData.alert.success("Logged Out!");
     globalData.setUserData({});
     globalData.setLoggedIn(false);

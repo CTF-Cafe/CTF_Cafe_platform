@@ -61,7 +61,7 @@ function App() {
 
   const getGlobalMessage = () => {
     axios
-      .get(process.env.REACT_APP_SERVER_URI + "/api/getGlobalMessage")
+      .get(process.env.REACT_APP_SERVER_URI + "/api/getGlobalMessage", { withCredentials: true })
       .then((response) => {
         if (response.data.message && response.data.state == "success") {
           alert.info("Admin Message: " + response.data.message, {
@@ -109,7 +109,7 @@ function App() {
   useEffect(() => {
     if (!loggedIn) {
       axios
-        .post(process.env.REACT_APP_SERVER_URI + "/api/checkSession")
+        .get(process.env.REACT_APP_SERVER_URI + "/api/checkSession", { withCredentials: true })
         .then((res) => {
           if (res.data.state == "success") {
             alert.success("Logged In!");

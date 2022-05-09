@@ -123,7 +123,7 @@ function Tools(props) {
     axios
       .post(process.env.REACT_APP_SERVER_URI + "/api/admin/sendGlobalMessage", {
         globalMessage: globalMessage
-      })
+      }, { withCredentials: true })
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");

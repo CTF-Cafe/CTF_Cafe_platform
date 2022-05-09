@@ -8,7 +8,9 @@ function Config(props) {
 
   const getTheme = () => {
     axios
-      .get(process.env.REACT_APP_SERVER_URI + "/api/getTheme")
+      .get(process.env.REACT_APP_SERVER_URI + "/api/getTheme", {
+        withCredentials: true,
+      })
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -22,19 +24,27 @@ function Config(props) {
 
           root.style.setProperty(
             "--color-1",
-            response.data.theme.color_1 ? response.data.theme.color_1 : "#ff3c5c"
+            response.data.theme.color_1
+              ? response.data.theme.color_1
+              : "#ff3c5c"
           );
           root.style.setProperty(
             "--color-2",
-            response.data.theme.color_2 ? response.data.theme.color_2 : "#ff707f"
+            response.data.theme.color_2
+              ? response.data.theme.color_2
+              : "#ff707f"
           );
           root.style.setProperty(
             "--color-1-50",
-            response.data.theme.color_1 ? response.data.theme.color_1 + "50" : "#ff707f50"
+            response.data.theme.color_1
+              ? response.data.theme.color_1 + "50"
+              : "#ff707f50"
           );
           root.style.setProperty(
             "--bg-img",
-            response.data.theme.bg_img ? `url(${response.data.theme.bg_img})` : "none"
+            response.data.theme.bg_img
+              ? `url(${response.data.theme.bg_img})`
+              : "none"
           );
         }
       })
@@ -53,7 +63,7 @@ function Config(props) {
         color_1: document.getElementById("theme_color_1").value,
         color_2: document.getElementById("theme_color_2").value,
         bg_img: document.getElementById("theme_img").innerHTML,
-      })
+      }, { withCredentials: true })
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -81,16 +91,16 @@ function Config(props) {
         className="display-1 bold color_white"
         style={{ textAlign: "center", marginBottom: "50px" }}
       >
-        THEME
-      </h1>
+        THEME{" "}
+      </h1>{" "}
       <table className="table table-hover table-striped">
         <thead className="thead-dark hackerFont">
           <tr>
-            <th scope="col">COLOR #1</th>
-            <th scope="col">COLOR #2</th>
-            <th scope="col">BACKROUND IMAGE</th>
-          </tr>
-        </thead>
+            <th scope="col"> COLOR #1</th>
+            <th scope="col"> COLOR #2</th>
+            <th scope="col"> BACKROUND IMAGE </th>{" "}
+          </tr>{" "}
+        </thead>{" "}
         <tbody>
           <tr>
             <td>
@@ -98,22 +108,23 @@ function Config(props) {
                 type="color"
                 id="theme_color_1"
                 defaultValue={globalData.theme.color_1}
-              />
-            </td>
+              />{" "}
+            </td>{" "}
             <td>
               {" "}
               <input
                 type="color"
                 id="theme_color_2"
                 defaultValue={globalData.theme.color_2}
-              />
-            </td>
+              />{" "}
+            </td>{" "}
             <td contenteditable="true" id={"theme_img"}>
-              {globalData.theme.bg_img}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+              {" "}
+              {globalData.theme.bg_img}{" "}
+            </td>{" "}
+          </tr>{" "}
+        </tbody>{" "}
+      </table>{" "}
       <button
         id="submit_p2"
         className="btn btn-outline-danger"
@@ -122,8 +133,8 @@ function Config(props) {
           saveTheme();
         }}
       >
-        Save
-      </button>
+        Save{" "}
+      </button>{" "}
     </div>
   );
 }

@@ -9,6 +9,8 @@
 ```
 SECRET_KEY=<secure randomly generated session key for validating session cookies>
 MONGODB_CONNSTRING=<mongodb connect URI, e.g. "mongodb://localhost:27017" - you may need to surround it in quotes if you experience glitches or formatting issues>
+NODE_ENV=<development/production>
+FRONTEND_URI=<frontend url>
 ```
 
 - Make a `.env` file on /frontEnd/ in this format:

@@ -15,7 +15,7 @@ function Team(props) {
     axios
       .post(process.env.REACT_APP_SERVER_URI + "/api/getTeam", {
         teamName: teamName,
-      })
+      }, { withCredentials: true })
       .then((response) => {
         if (response.data.state != "error") {
             console.log(response.data);

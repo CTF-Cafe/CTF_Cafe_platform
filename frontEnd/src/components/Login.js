@@ -15,7 +15,7 @@ function Login(props) {
       .post(process.env.REACT_APP_SERVER_URI + "/api/login", {
         username: username,
         password: password,
-      })
+      }, { withCredentials: true })
       .then((response) => {
         if (response.data.state == "success") {
           globalData.alert.success("Logged In!");

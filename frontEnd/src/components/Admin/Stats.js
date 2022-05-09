@@ -15,9 +15,13 @@ function Stats(props) {
 
   const getStats = () => {
     axios
-      .post(process.env.REACT_APP_SERVER_URI + "/api/admin/getStats", {
-        name: "users",
-      })
+      .post(
+        process.env.REACT_APP_SERVER_URI + "/api/admin/getStats",
+        {
+          name: "users",
+        },
+        { withCredentials: true }
+      )
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -81,9 +85,13 @@ function Stats(props) {
       });
 
     axios
-      .post(process.env.REACT_APP_SERVER_URI + "/api/admin/getStats", {
-        name: "challenges",
-      })
+      .post(
+        process.env.REACT_APP_SERVER_URI + "/api/admin/getStats",
+        {
+          name: "challenges",
+        },
+        { withCredentials: true }
+      )
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");

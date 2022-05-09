@@ -9,7 +9,7 @@ function Assets(props) {
 
   const getAssets = () => {
     axios
-      .get(process.env.REACT_APP_SERVER_URI + "/api/admin/getAssets")
+      .get(process.env.REACT_APP_SERVER_URI + "/api/admin/getAssets", { withCredentials: true })
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -34,7 +34,7 @@ function Assets(props) {
     axios
       .post(process.env.REACT_APP_SERVER_URI + "/api/admin/deleteAsset", {
         asset: asset.name,
-      })
+      }, { withCredentials: true })
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -65,7 +65,7 @@ function Assets(props) {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
-    }).then((response) => {
+    }, { withCredentials: true }).then((response) => {
       if (response.data.state == "sessionError") {
         globalData.alert.error("Session expired!");
         globalData.setUserData({});

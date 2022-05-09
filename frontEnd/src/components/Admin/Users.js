@@ -12,7 +12,7 @@ function Users(props) {
     axios
       .post(process.env.REACT_APP_SERVER_URI + "/api/admin/getUsers", {
         page: index,
-      })
+      }, { withCredentials: true })
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -51,7 +51,7 @@ function Users(props) {
     axios
       .post(process.env.REACT_APP_SERVER_URI + "/api/admin/deleteUser", {
         user: user,
-      })
+      }, { withCredentials: true })
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -77,7 +77,7 @@ function Users(props) {
     axios
       .post(process.env.REACT_APP_SERVER_URI + "/api/admin/addAdmin", {
         user: user,
-      })
+      }, { withCredentials: true })
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -103,7 +103,7 @@ function Users(props) {
     axios
       .post(process.env.REACT_APP_SERVER_URI + "/api/admin/removeAdmin", {
         user: user,
-      })
+      }, { withCredentials: true })
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
