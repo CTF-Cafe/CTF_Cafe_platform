@@ -70,52 +70,41 @@ function Config(props) {
       });
   };
 
-  return (
-    <div>
-      <h1
-        className="display-1 bold color_white"
-        style={{ textAlign: "center", marginBottom: "50px" }}
-      >
-        ASSETS
-      </h1>
-      <table className="table table-hover table-striped">
-        <thead className="thead-dark hackerFont">
-          <tr>
-            <th scope="col" style={{ textAlign: "center" }}>
-              #
-            </th>
-            <th scope="col"> Config Name </th>
-            <th scope="col"> Config Data </th>
-          </tr>
-        </thead>
-        <tbody>
-          {configs.map((config, index) => {
-            return (
-              <tr key={config._id}>
-                <th scope="row" style={{ textAlign: "center" }}>
-                  {index}
-                </th>
-                <td> {config.name} </td>
-                <td contenteditable="true" id={"config-data" + config._id}>
-                  {JSON.stringify(config.value)}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-      <button
-        id="submit_p2"
+    return ( 
+        <div>
+        <h1 className = "display-1 bold color_white"
+        style = {
+            { textAlign: "center", marginBottom: "50px" }
+        }>ASSETS </h1>
+        <table className = "table table-hover table-striped" >
+        <thead className = "thead-dark hackerFont" >
+        <tr >
+        <th scope = "col"
+        style = {
+            { textAlign: "center" }
+        } > #</th> <th scope = "col" > Config Name </th> 
+        <th scope = "col" > Config Data </th> 
+        </tr> </thead> <tbody> {
+            configs.map((config, index) => {
+                return ( <tr key = { config._id } >
+                    <th scope = "row"
+                    style = {
+                        { textAlign: "center" }
+                    } > { index } </th>
+                    <td> { config.name } </td> <td contenteditable = "true" id = { "config-data" + config._id } > { JSON.stringify(config.value) } </td> </tr>
+                );
+            })
+        } </tbody> </table>
+        <button id="submit_p2"
         className="btn btn-outline-danger"
         type="button"
-        onClick={() => {
-          saveConfig();
-        }}
-      >
-        Save
-      </button>
-    </div>
-  );
+        onClick = {
+            () => {
+                saveConfig();
+            }
+        }>Save </button> 
+        </div>
+    );
 }
 
 export default Config;
