@@ -1,4 +1,4 @@
-# Frontend & Backendup Setup
+# Frontend & Backend Setup
 ## Prerequisites
 - Node.JS
 - MongoDB
