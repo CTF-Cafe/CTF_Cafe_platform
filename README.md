@@ -20,6 +20,9 @@ GENERATE_SOURCEMAP=<true for dev | false for production>
 
 ## Startup
 
+`MongoDB`
+- Start your mongoDB database
+
 `/frontEnd`
 - Run `npm install` to install the requirements from `package.json`, then run `npm start` or `npm run start-react` for easier dev to start the frontend
 
