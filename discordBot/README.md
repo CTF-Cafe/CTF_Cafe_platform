@@ -2,7 +2,7 @@
 ## Prerequisites
 - Discord.JS v13
 - Node.JS
-- If you want to use `?launch` to display the challenge list, make sure that you add your organizers' Discord IDs into the site's database
+- If you want to use `?launch` to display the challenge list, make sure that you add your organizers' Discord IDs into the site's database with ?auth
 
 ## Installation
 - Set up a bot on https://discord.com/developers
@@ -15,4 +15,4 @@ SERVER_URI=<website url>
 
 MONGODB_URI=<mongodb connect url>
 ```
-- Run `npm install` to install the requirements from `package.json`, then run `node ./bot.js` in the bot's directory
+- Run `npm install` to install the requirements from `package.json`, then run `npm start` in the bot's directory
