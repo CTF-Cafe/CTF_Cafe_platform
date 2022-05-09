@@ -12,7 +12,7 @@ function Teams(props) {
     axios
       .post(process.env.REACT_APP_SERVER_URI + "/api/getTeams", {
         page: index,
-      })
+      }, { withCredentials: true })
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -73,7 +73,7 @@ function Teams(props) {
     axios
       .post(process.env.REACT_APP_SERVER_URI + "/api/admin/deleteTeam", {
         team: team,
-      })
+      }, { withCredentials: true })
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");

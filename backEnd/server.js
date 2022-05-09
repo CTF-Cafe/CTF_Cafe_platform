@@ -4,6 +4,7 @@ const port = process.env.PORT || 3001;
 const mongoose = require('mongoose');
 const db = mongoose.connection;
 const dotenv = require('dotenv');
+dotenv.config()
 const bodyparser = require('body-parser');
 const path = require("path");
 const session = require('express-session');
@@ -11,7 +12,6 @@ const MongoStore = require('connect-mongo')(session);
 const fileUpload = require('express-fileupload');
 const mongoSanitize = require('express-mongo-sanitize');
 const xssClean = require('xss-clean/lib/xss').clean;
-dotenv.config()
 const setup = require('./setup.js');
 const userController = require('./controllers/userController.js');
 const challengesController = require('./controllers/challengesController.js');
@@ -29,13 +29,11 @@ db.once("open", async function() {
     setup.setupDB();
 });
 
-// Trust Proxy to be able to read X-Forwaded-For (user ips)
-app.set('trust proxy', true)
-
 // Body-parser middleware
 app.use(bodyparser.urlencoded({ extended: false }));
 app.use(bodyparser.json());
-app.use(session({
+
+var sess = {
     store: new MongoStore({
         mongooseConnection: mongoose.connection
     }),
@@ -45,19 +43,27 @@ app.use(session({
     cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 7 * 2 // two weeks
     }
-}));
+}
+
+// Trust Proxy to be able to read X-Forwaded-For (user ips)
+if (app.get('env') === 'production') {
+    app.set('trust proxy', 1) // trust first proxy
+    sess.cookie.secure = true // serve secure cookies
+}
+
+app.use(session(sess))
 
 // Add headers before the routes are defined
 app.use(function(req, res, next) {
 
     // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', process.env.FRONTEND_URI);
 
     // Request methods you wish to allow
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
 
     // Request headers you wish to allow
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    res.setHeader('Access-Control-Allow-Headers', 'Set-Cookie,X-Requested-With,content-type');
 
     // Set to true if you need the website to include cookies in the requests sent
     // to the API (e.g. in case you use sessions)
@@ -130,7 +136,7 @@ app.post('/api/register', (req, res) => {
     userController.register(req, res);
 });
 
-app.post('/api/checkSession', (req, res) => {
+app.get('/api/checkSession', (req, res) => {
     users.findOne({ username: req.session.username }).then(async function(user) {
         if (!user) {
             res.send({ state: 'sessionError' })

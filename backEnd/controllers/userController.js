@@ -4,7 +4,6 @@ const { v4 } = require('uuid');
 const ctfConfig = require('../models/ctfConfigModel.js');
 const theme = require('../models/themeModel.js');
 const teams = require('../models/teamModel.js');
-const challenges = require('../models/challengeModel');
 
 exports.login = async function(req, res) {
     const username = req.body.username.trim();

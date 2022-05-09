@@ -22,7 +22,9 @@ function Challenges(props) {
 
   const getChallenges = () => {
     axios
-      .get(process.env.REACT_APP_SERVER_URI + "/api/admin/getAssets")
+      .get(process.env.REACT_APP_SERVER_URI + "/api/admin/getAssets", {
+        withCredentials: true,
+      })
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -38,9 +40,13 @@ function Challenges(props) {
       });
 
     axios
-      .post(process.env.REACT_APP_SERVER_URI + "/api/admin/getStats", {
-        name: "challenges&categories",
-      })
+      .post(
+        process.env.REACT_APP_SERVER_URI + "/api/admin/getStats",
+        {
+          name: "challenges&categories",
+        },
+        { withCredentials: true }
+      )
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -95,16 +101,20 @@ function Challenges(props) {
     const flag = document.getElementById("flag" + oldChallenge._id).textContent;
 
     axios
-      .post(process.env.REACT_APP_SERVER_URI + "/api/admin/saveChallenge", {
-        id: oldChallenge._id,
-        name: name,
-        points: points,
-        level: level,
-        info: info,
-        hint: hint,
-        file: file,
-        flag: flag,
-      })
+      .post(
+        process.env.REACT_APP_SERVER_URI + "/api/admin/saveChallenge",
+        {
+          id: oldChallenge._id,
+          name: name,
+          points: points,
+          level: level,
+          info: info,
+          hint: hint,
+          file: file,
+          flag: flag,
+        },
+        { withCredentials: true }
+      )
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -125,9 +135,13 @@ function Challenges(props) {
 
   const deleteChallenge = (e, oldChallenge) => {
     axios
-      .post(process.env.REACT_APP_SERVER_URI + "/api/admin/deleteChallenge", {
-        id: oldChallenge._id,
-      })
+      .post(
+        process.env.REACT_APP_SERVER_URI + "/api/admin/deleteChallenge",
+        {
+          id: oldChallenge._id,
+        },
+        { withCredentials: true }
+      )
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -193,7 +207,8 @@ function Challenges(props) {
           {
             id: challenge.id.replace("challenge-top", ""),
             category: newCategory.children[0].id,
-          }
+          },
+          { withCredentials: true }
         )
         .then((response) => {
           if (response.data.state == "sessionError") {
@@ -219,16 +234,20 @@ function Challenges(props) {
   const createChallenge = (e, category) => {
     e.preventDefault();
     axios
-      .post(process.env.REACT_APP_SERVER_URI + "/api/admin/createChallenge", {
-        name: "Challenge",
-        points: 100,
-        level: 0,
-        info: "I am a challenge!",
-        hint: "Easy Peasy Lemon Squeezy!",
-        file: "",
-        flag: "FLAG{H3LL0_W0RLD}",
-        category: category,
-      })
+      .post(
+        process.env.REACT_APP_SERVER_URI + "/api/admin/createChallenge",
+        {
+          name: "Challenge",
+          points: 100,
+          level: 0,
+          info: "I am a challenge!",
+          hint: "Easy Peasy Lemon Squeezy!",
+          file: "",
+          flag: "FLAG{H3LL0_W0RLD}",
+          category: category,
+        },
+        { withCredentials: true }
+      )
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -249,7 +268,7 @@ function Challenges(props) {
 
   const setAction = (action) => {
     props.setAction(action);
-  }
+  };
 
   return (
     <div>

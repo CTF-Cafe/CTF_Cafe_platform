@@ -14,7 +14,7 @@ function Register(props) {
       .post(process.env.REACT_APP_SERVER_URI + "/api/register", {
         username: username,
         password: password,
-      })
+      }, { withCredentials: true })
       .then((response) => {
         if (response.data.state == "success") {
           globalData.alert.success("Registered!");
