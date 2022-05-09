@@ -8,6 +8,11 @@
 - Set up a bot on https://discord.com/developers
 - Make a `.env` file with the token in this format:
 ```
-DISCORD_BOT_TOKEN = <insert the bot's token>
+DISCORD_BOT_TOKEN=<insert the bot's token>
+DISCORD_BOT_PREFIX=<prefix>
+
+SERVER_URI=<website url>
+
+MONGODB_URI=<mongodb connect url>
 ```
 - Run `npm install` to install the requirements from `package.json`, then run `node ./bot.js` in the bot's directory
