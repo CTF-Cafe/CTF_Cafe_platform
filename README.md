@@ -8,7 +8,7 @@
 - Make a `.env` file on /backEnd/ in this format:
 ```
 SECRET_KEY=<secure randomly generated session key for validating session cookies>
-MONGODB_CONNSTRING=<mongodb connect ur, e.g. "mongodb://localhost:27017" - you may need to surround it in quotes if you experience glitches or formatting issues>
+MONGODB_CONNSTRING=<mongodb connect URI, e.g. "mongodb://localhost:27017" - you may need to surround it in quotes if you experience glitches or formatting issues>
 ```
 
 - Make a `.env` file on /frontEnd/ in this format:
