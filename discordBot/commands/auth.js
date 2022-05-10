@@ -1,6 +1,6 @@
 const users = require('./models/userModel');
 const { MessageEmbed } = require('discord.js');
-const crypto = require("crypto");
+const encryptionController = require('../controllers/encryptionController.js');
 
 exports.run = async(bot, message, args) => {
     if (!(message.guild === null)) {
@@ -13,7 +13,7 @@ exports.run = async(bot, message, args) => {
     if (!args[1]) return message.reply('You must provide a password');
 
     const username = args[0];
-    const password = crypto.createHash('sha256').update(args[1]).digest('hex');
+    const password = encryptionController.encrypt(args[1]);
 
     let userCheck = await users.findOne({ username: username, password: password });
 
