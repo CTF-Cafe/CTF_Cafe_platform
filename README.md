@@ -2,6 +2,8 @@
 
 [Script](https://github.com/CTF-Cafe/CTF_Cafe/blob/e39322de4278d190e9b7ec6908e59763b2588435/serverSetupScript.sh)
 
+## Make sure to create a new account, promote him to admin and delete the admin:admin user after setup!
+
 # Manual Backend & Frontend Setup
 
 ## Prerequisites
@@ -39,5 +41,7 @@ GENERATE_SOURCEMAP=<true for dev | false for production>
 
 `/discordBot`
 - This is optional, but can be used to setup a bot for the CTF. See here: https://github.com/CTF-Cafe/CTF_Cafe/tree/master/discordBot
+
+Make sure to create a new account, promote him to admin and delete the admin:admin user after setup!
 
 Good to go!
