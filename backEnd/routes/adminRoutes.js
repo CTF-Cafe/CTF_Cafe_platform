@@ -30,10 +30,6 @@ router.get('/getAssets', (req, res) => {
     adminController.getAssets(req, res);
 });
 
-router.get('/getConfigs', (req, res) => {
-    adminController.getConfigs(req, res);
-});
-
 router.post('/saveConfigs', (req, res) => {
     adminController.saveConfigs(req, res);
 });
