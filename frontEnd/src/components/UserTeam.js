@@ -10,7 +10,7 @@ function UserTeam(props) {
 
   const getTeam = () => {
     axios
-      .post(process.env.REACT_APP_SERVER_URI + "/api/getUserTeam", {
+      .post(process.env.REACT_APP_SERVER_URI + "/api/user/getUserTeam", {
         teamId: globalData.userData.teamId,
       }, { withCredentials: true })
       .then((response) => {
@@ -37,7 +37,7 @@ function UserTeam(props) {
     const teamName = document.getElementById("teamName").value;
 
     axios
-      .post(process.env.REACT_APP_SERVER_URI + "/api/registerTeam", {
+      .post(process.env.REACT_APP_SERVER_URI + "/api/user/registerTeam", {
         teamName: teamName,
       })
       .then((response) => {
@@ -64,7 +64,7 @@ function UserTeam(props) {
     const teamCode = document.getElementById("teamCode").value;
 
     axios
-      .post(process.env.REACT_APP_SERVER_URI + "/api/joinTeam", {
+      .post(process.env.REACT_APP_SERVER_URI + "/api/user/joinTeam", {
         teamCode: teamCode,
       })
       .then((response) => {
@@ -89,7 +89,7 @@ function UserTeam(props) {
 
   const copyCode = (e) => {
     axios
-      .post(process.env.REACT_APP_SERVER_URI + "/api/getTeamCode", {
+      .post(process.env.REACT_APP_SERVER_URI + "/api/user/getTeamCode", {
         teamName: globalData.userData.team.name,
       })
       .then((response) => {
@@ -112,7 +112,7 @@ function UserTeam(props) {
 
   const leaveTeam = (e) => {
     axios
-      .get(process.env.REACT_APP_SERVER_URI + "/api/leaveTeam")
+      .get(process.env.REACT_APP_SERVER_URI + "/api/user/leaveTeam")
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
