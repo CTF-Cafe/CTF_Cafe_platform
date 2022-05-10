@@ -11,6 +11,7 @@
     "license": "ISC",
     "dependencies": {
         "axios": "^0.26.1",
+        "bcryptjs": "^2.4.3",
         "connect-mongo": "^3.1.2",
         "crypto-js": "^4.1.1",
         "dotenv": "^16.0.0",
