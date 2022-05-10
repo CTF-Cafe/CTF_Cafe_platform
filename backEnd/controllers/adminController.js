@@ -184,12 +184,6 @@ exports.uploadAsset = async function(req, res) {
     }
 }
 
-exports.getConfigs = async function(req, res) {
-    const configs = await ctfConfig.find({});
-
-    res.send(configs);
-}
-
 exports.saveConfigs = async function(req, res) {
     const newConfigs = req.body.newConfigs;
     let error = false;
