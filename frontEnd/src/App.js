@@ -26,6 +26,7 @@ function App() {
   const [userData, setUserData] = useState(false);
   const [theme, setTheme] = useState({});
   const [rules, setRules] = useState([]);
+  const [sponsors, setSponsors] = useState([]);
   const alert = useAlert();
   const navigate = useNavigate();
 
@@ -34,6 +35,7 @@ function App() {
     userData: userData,
     theme: theme,
     rules: rules,
+    sponsors: sponsors,
     setTheme,
     setLoggedIn,
     setUserData,
@@ -41,9 +43,9 @@ function App() {
     navigate,
   };
 
-  const getRules = () => {
+  const getConfigs = () => {
     axios
-      .get(process.env.REACT_APP_SERVER_URI + "/api/getRules")
+      .get(process.env.REACT_APP_SERVER_URI + "/api/getConfigs")
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -51,7 +53,19 @@ function App() {
           globalData.setLoggedIn(false);
           globalData.navigate("/", { replace: true });
         } else {
-          setRules(response.data);
+          console.log(response.data);
+          response.data.forEach((config) => {
+            switch (config.name) {
+              case "rules":
+                setRules(config.value)
+                break;
+              case 'sponsors':
+                setSponsors(config.value)
+                break;
+              default:
+                break;
+            }
+          })
         }
       })
       .catch((err) => {
@@ -61,7 +75,9 @@ function App() {
 
   const getGlobalMessage = () => {
     axios
-      .get(process.env.REACT_APP_SERVER_URI + "/api/user/getGlobalMessage", { withCredentials: true })
+      .get(process.env.REACT_APP_SERVER_URI + "/api/user/getGlobalMessage", {
+        withCredentials: true,
+      })
       .then((response) => {
         if (response.data.message && response.data.state == "success") {
           alert.info("Admin Message: " + response.data.message, {
@@ -102,14 +118,16 @@ function App() {
       .catch((err) => {
         console.error(err);
       });
-    getRules();
+    getConfigs();
     getGlobalMessage();
   }, []);
 
   useEffect(() => {
     if (!loggedIn) {
       axios
-        .get(process.env.REACT_APP_SERVER_URI + "/api/checkSession", { withCredentials: true })
+        .get(process.env.REACT_APP_SERVER_URI + "/api/checkSession", {
+          withCredentials: true,
+        })
         .then((res) => {
           if (res.data.state == "success") {
             alert.success("Logged In!");

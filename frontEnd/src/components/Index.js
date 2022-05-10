@@ -123,30 +123,19 @@ function Index(props) {
               style={{ marginTop: "30px", textAlign: "center" }}
             >
               <h2 className="display-2 bold color_white">SPONSORS</h2>
-              <img
-                src="https://www.pentesterlab.com/newdesign/imgs/logo.png"
-                style={{
-                  margin: "0px 15px",
-                  marginTop: "30px",
-                  width: "400px",
-                }}
-              />
-              <img
-                src="https://www.offensive-security.com/wp-content/themes/OffSec/assets/images/offsec-logo.svg"
-                style={{
-                  margin: "0px 15px",
-                  marginTop: "30px",
-                  width: "400px",
-                }}
-              />
-              <img
-                src="https://www.digitalocean.com/_next/static/media/logo.87a8f3b8.svg"
-                style={{
-                  margin: "0px 15px",
-                  marginTop: "30px",
-                  width: "400px",
-                }}
-              />
+              {globalData.sponsors.map((sponsor) => {
+                return (
+                  <img
+                   key={sponsor.image}
+                    src={sponsor.image}
+                    style={{
+                      margin: "0px 15px",
+                      marginTop: "30px",
+                      width: "400px",
+                    }}
+                  />
+                );
+              })}
             </div>
           </div>
         </div>

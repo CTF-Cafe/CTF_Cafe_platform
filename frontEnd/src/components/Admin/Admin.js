@@ -122,35 +122,35 @@ function Admin(props) {
 
       {/* <!-- Modal --> */}
       <div
-        class="modal fade"
+        className="modal fade"
         id="confirmModal"
         tabindex="-1"
         role="dialog"
         aria-labelledby="confirmModalLabel"
         aria-hidden="true"
       >
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="confirmModalLabel">
+        <div className="modal-dialog" role="document">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title" id="confirmModalLabel">
                 Confirm action?
               </h5>
               <button
                 type="button"
-                class="close"
+                className="close"
                 data-dismiss="modal"
                 aria-label="Close"
               >
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
-            <div class="modal-footer" style={{ justifyContent: "center" }}>
-              <button type="button" class="btn btn-danger" data-dismiss="modal">
+            <div className="modal-footer" style={{ justifyContent: "center" }}>
+              <button type="button" className="btn btn-danger" data-dismiss="modal">
                 Cancel
               </button>
               <button
                 type="button"
-                class="btn btn-success"
+                className="btn btn-success"
                 data-dismiss="modal"
                 onClick={() => {
                   action.function(action.e, action.data);

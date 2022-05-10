@@ -436,10 +436,10 @@ function Challenges(props) {
                   </div>
                 ) : null}
               </div>
-              <div class="modal-footer" style={{ justifyContent: "center" }}>
+              <div className="modal-footer" style={{ justifyContent: "center" }}>
                 <button
                   type="button"
-                  class="btn btn-danger"
+                  className="btn btn-danger"
                   data-dismiss="modal"
                 >
                   Close
