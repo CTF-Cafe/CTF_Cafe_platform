@@ -11,7 +11,7 @@
 - Automatic competition starting and ending
   - Easily set endTime & starTime from the admin dashboard
 - Team and user management, and banning
-- Customize site colors & background
+- Customize site colors, background, rules & frontpage
 - Importing and Exporting of CTF scoreboards into json
 - And more...
 
