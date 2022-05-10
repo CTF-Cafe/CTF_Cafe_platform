@@ -97,7 +97,7 @@ function Assets(props) {
       <div  style={{ marginBottom: "30px", display: 'flex', flexDirection: 'column' }}>
         <label
           for="formFile"
-          class="form-label"
+          className="form-label"
         >
           Upload File
         </label>

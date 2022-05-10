@@ -127,11 +127,10 @@ exports.getEndTime = async function(req, res) {
     res.send(endTime.value.toString());
 }
 
+exports.getConfigs = async function(req, res) {
+    const configs = await ctfConfig.find({});
 
-exports.getRules = async function(req, res) {
-    const rules = await ctfConfig.findOne({ name: 'rules' });
-
-    res.send(rules.value);
+    res.send(configs);
 }
 
 exports.getTheme = async function(req, res) {

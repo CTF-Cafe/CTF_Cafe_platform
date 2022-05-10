@@ -43,8 +43,8 @@ router.get('/getEndTime', (req, res) => {
     userController.getEndTime(req, res);
 });
 
-router.get('/getRules', (req, res) => {
-    userController.getRules(req, res);
+router.get('/getConfigs', (req, res) => {
+    userController.getConfigs(req, res);
 });
 
 router.get('/checkSession', (req, res) => {

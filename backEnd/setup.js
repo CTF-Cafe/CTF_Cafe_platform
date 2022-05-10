@@ -51,6 +51,15 @@ exports.setupDB = async function() {
         });
     }
 
+    const sponsorsConfig = await ctfConfig.findOne({ name: 'sponsors' });
+
+    if (!sponsorsConfig) {
+        await ctfConfig.create({
+            name: 'sponsors',
+            value: [{ image: 'https://www.offensive-security.com/wp-content/themes/OffSec/assets/images/offsec-logo.svg' }],
+        });
+    }
+
     const currentTheme = await theme.findOne({});
     if (!currentTheme) {
         await theme.create({
