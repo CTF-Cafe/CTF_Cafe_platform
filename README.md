@@ -1,3 +1,21 @@
+# Features
+
+- Create your own challenges, files, hints, and flags from the admin dashboard
+  - File uploads to the server
+  - Automatic bruteforce protection
+- Individual and Team based competitions
+  - Have users play on their own or form teams to play together
+- Scoreboard with automatic tie resolution
+  - See global user, team and challenge stats
+  - See indivudal team & user stats
+- Automatic competition starting and ending
+  - Easily set endTime & starTime from the admin dashboard
+- Team and user management, and banning
+- Customize site colors & background
+- Importing and Exporting of CTF scoreboards into json
+- And more...
+
+
 # Auto Infrastructure Setup
 
 [Script](https://github.com/CTF-Cafe/CTF_Cafe/blob/e39322de4278d190e9b7ec6908e59763b2588435/serverSetupScript.sh)
