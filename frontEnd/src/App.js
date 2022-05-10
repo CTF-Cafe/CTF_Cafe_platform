@@ -61,7 +61,7 @@ function App() {
 
   const getGlobalMessage = () => {
     axios
-      .get(process.env.REACT_APP_SERVER_URI + "/api/getGlobalMessage", { withCredentials: true })
+      .get(process.env.REACT_APP_SERVER_URI + "/api/user/getGlobalMessage", { withCredentials: true })
       .then((response) => {
         if (response.data.message && response.data.state == "success") {
           alert.info("Admin Message: " + response.data.message, {

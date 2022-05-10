@@ -13,14 +13,10 @@ const fileUpload = require('express-fileupload');
 const mongoSanitize = require('express-mongo-sanitize');
 const xssClean = require('xss-clean/lib/xss').clean;
 const setup = require('./setup.js');
-const userController = require('./controllers/userController.js');
-const challengesController = require('./controllers/challengesController.js');
-const adminController = require('./controllers/adminController.js');
-const teamController = require('./controllers/teamController.js');
+const userRouter = require('./routes/userRoutes.js');
+const adminRouter = require('./routes/adminRoutes.js');
+const globalRouter = require('./routes/globalRoutes.js');
 const users = require('./models/userModel.js');
-const teams = require('./models/teamModel.js');
-const ctfConfig = require('./models/ctfConfigModel.js');
-const ObjectId = mongoose.Types.ObjectId;
 
 mongoose.connect(process.env.MONGODB_CONNSTRING, { useNewUrlParser: true, useUnifiedTopology: true });
 
@@ -98,6 +94,7 @@ app.use(customSanitize);
 
 function checkAuth(req, res, next) {
 
+    console.log(1)
     users.findOne({ username: req.session.username }).then(function(user) {
         if (!user) {
             res.send({ state: 'sessionError' })
@@ -124,196 +121,9 @@ function checkAdminAuth(req, res, next) {
     });
 }
 
-app.post('/api/login', (req, res) => {
-    userController.login(req, res);
-});
-
-app.get('/api/logout', (req, res) => {
-    userController.logout(req, res);
-});
-
-app.post('/api/register', (req, res) => {
-    userController.register(req, res);
-});
-
-app.get('/api/checkSession', (req, res) => {
-    users.findOne({ username: req.session.username }).then(async function(user) {
-        if (!user) {
-            res.send({ state: 'sessionError' })
-        } else if (!(user.key == req.session.key)) {
-            res.send({ state: 'sessionError' })
-        } else {
-
-            if (ObjectId.isValid(user.teamId)) {
-                team = await teams.findById(user.teamId);
-
-                if (team) {
-                    team.inviteCode = 'Nice try XD';
-
-                    res.send({ state: 'success', user: user, team: team });
-                } else {
-                    res.send({ state: 'success', user: user })
-                }
-            } else {
-                res.send({ state: 'success', user: user })
-            }
-        }
-    });
-});
-
-
-app.post('/api/registerTeam', checkAuth, (req, res) => {
-    teamController.register(req, res);
-});
-
-app.post('/api/joinTeam', checkAuth, (req, res) => {
-    teamController.joinTeam(req, res);
-});
-
-app.get('/api/leaveTeam', checkAuth, (req, res) => {
-    teamController.leaveTeam(req, res);
-});
-
-app.post('/api/getTeamCode', checkAuth, (req, res) => {
-    teamController.getCode(req, res);
-});
-
-app.post('/api/getUserTeam', checkAuth, (req, res) => {
-    teamController.getUserTeam(req, res);
-});
-
-
-app.post('/api/submitFlag', checkAuth, (req, res) => {
-    challengesController.submitFlag(req, res);
-});
-
-app.get('/api/getChallenges', checkAuth, (req, res) => {
-    challengesController.getChallenges(req, res);
-});
-
-app.post('/api/getUsers', (req, res) => {
-    userController.getUsers(req, res);
-});
-
-app.post('/api/getUser', (req, res) => {
-    userController.getUser(req, res);
-});
-
-app.post('/api/getTeam', (req, res) => {
-    teamController.getTeam(req, res);
-});
-
-app.post('/api/getTeams', (req, res) => {
-    teamController.getTeams(req, res);
-});
-
-app.get('/api/getScoreboard', (req, res) => {
-    userController.getScoreboard(req, res);
-});
-
-app.get('/api/getEndTime', (req, res) => {
-    userController.getEndTime(req, res);
-});
-
-app.get('/api/getRules', (req, res) => {
-    userController.getRules(req, res);
-});
-
-app.get('/api/getGlobalMessage', checkAuth, async(req, res) => {
-    const globalMessage = await ctfConfig.findOne({ name: 'globalMessage' });
-    let message;
-
-    if (globalMessage) {
-        if (globalMessage.value) {
-            if (globalMessage.value.message && globalMessage.value.seenBy) {
-                if (globalMessage.value.message.length > 0) {
-                    if (!globalMessage.value.seenBy.includes(req.session.username)) {
-                        await ctfConfig.updateOne({ name: 'globalMessage' }, { $push: { 'value.seenBy': req.session.username } });
-                        message = globalMessage.value.message;
-                    }
-                }
-            }
-        }
-    }
-
-    if (message) {
-        res.send({ state: 'success', message: message })
-    } else {
-        res.send({ state: 'error', message: 'No message!' })
-    }
-})
-
-app.get('/api/getTheme', (req, res) => {
-    userController.getTheme(req, res);
-});
-
-app.post('/api/admin/getUsers', checkAdminAuth, (req, res) => {
-    adminController.getUsers(req, res);
-});
-
-app.post('/api/admin/deleteUser', checkAdminAuth, (req, res) => {
-    adminController.deleteUser(req, res);
-});
-
-app.post('/api/admin/deleteTeam', checkAdminAuth, (req, res) => {
-    adminController.deleteTeam(req, res);
-});
-
-app.post('/api/admin/addAdmin', checkAdminAuth, (req, res) => {
-    adminController.addAdmin(req, res);
-});
-
-app.post('/api/admin/removeAdmin', checkAdminAuth, (req, res) => {
-    adminController.removeAdmin(req, res);
-});
-
-app.post('/api/admin/getStats', checkAdminAuth, (req, res) => {
-    adminController.getStats(req, res);
-});
-
-app.get('/api/admin/getAssets', checkAdminAuth, (req, res) => {
-    adminController.getAssets(req, res);
-});
-
-app.get('/api/admin/getConfigs', checkAdminAuth, (req, res) => {
-    adminController.getConfigs(req, res);
-});
-
-app.post('/api/admin/saveConfigs', checkAdminAuth, (req, res) => {
-    adminController.saveConfigs(req, res);
-});
-
-app.post('/api/admin/deleteAsset', checkAdminAuth, (req, res) => {
-    adminController.deleteAsset(req, res);
-});
-
-app.post('/api/admin/uploadAsset', checkAdminAuth, (req, res) => {
-    adminController.uploadAsset(req, res);
-});
-
-app.post('/api/admin/saveChallenge', checkAdminAuth, (req, res) => {
-    adminController.saveChallenge(req, res);
-});
-
-app.post('/api/admin/createChallenge', checkAdminAuth, (req, res) => {
-    adminController.createChallenge(req, res);
-});
-
-app.post('/api/admin/updateChallengeCategory', checkAdminAuth, (req, res) => {
-    adminController.updateChallengeCategory(req, res);
-});
-
-app.post('/api/admin/deleteChallenge', checkAdminAuth, (req, res) => {
-    adminController.deleteChallenge(req, res);
-});
-
-app.post('/api/admin/saveTheme', checkAdminAuth, (req, res) => {
-    adminController.saveTheme(req, res);
-});
-
-app.post('/api/admin/sendGlobalMessage', checkAdminAuth, (req, res) => {
-    adminController.sendGlobalMessage(req, res);
-});
+app.use('/api', globalRouter)
+app.use('/api/user', checkAuth, userRouter)
+app.use('/api/admin', checkAdminAuth, adminRouter)
 
 app.use('/api/assets', express.static('assets'));
 

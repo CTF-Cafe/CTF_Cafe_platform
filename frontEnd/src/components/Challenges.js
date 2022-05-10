@@ -56,7 +56,7 @@ function Challenges(props) {
 
   const getChallenges = () => {
     axios
-      .get(process.env.REACT_APP_SERVER_URI + "/api/getChallenges", { withCredentials: true })
+      .get(process.env.REACT_APP_SERVER_URI + "/api/user/getChallenges", { withCredentials: true })
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -119,7 +119,7 @@ function Challenges(props) {
     const flag = document.getElementById(`flag_id_${index}`).value;
 
     axios
-      .post(process.env.REACT_APP_SERVER_URI + "/api/submitFlag", {
+      .post(process.env.REACT_APP_SERVER_URI + "/api/user/submitFlag", {
         flag: flag,
         username: globalData.userData.username,
       }, { withCredentials: true })
