@@ -1,4 +1,8 @@
 # Frontend & Backend Setup
+
+## Full Automatic Ubuntu Server setup:
+https://github.com/CTF-Cafe/CTF_Cafe/blob/e39322de4278d190e9b7ec6908e59763b2588435/serverSetupScript.sh
+
 ## Prerequisites
 - Node.JS
 - MongoDB
