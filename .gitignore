@@ -11,6 +11,8 @@ build
 
 challenges
 
+serverSetup
+
 .env
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
