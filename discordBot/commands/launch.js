@@ -1,7 +1,6 @@
 const challenges = require('./models/challengeModel');
 const { MessageEmbed } = require('discord.js');
 const users = require('./models/userModel');
-const crypto = require("crypto");
 
 exports.run = async(bot, message, args) => {
     if (!message.member) return message.reply("You are not an admin!");
@@ -13,8 +12,10 @@ exports.run = async(bot, message, args) => {
     let checkUser = await users.findOne({ discordId: message.author.id });
 
     if (checkUser) {
-        if (checkUser.isAdmin) /* checks the site's database to make sure the Discord user is
-		an admin on the backend as well */ {
+        if (checkUser.isAdmin)
+        /* checks the site's database to make sure the Discord user is
+		an admin on the backend as well */
+        {
             let scoreboardEmbed = new MessageEmbed()
                 .setColor('#ff0000')
                 .setTitle('EZ CTF | Challenges')
