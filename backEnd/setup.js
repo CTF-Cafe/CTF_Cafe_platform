@@ -1,7 +1,7 @@
 const ctfConfig = require('./models/ctfConfigModel.js');
 const theme = require('./models/themeModel.js');
 const users = require('./models/userModel.js');
-const crypto = require("crypto");
+const encryptionController = require('./controllers/encryptionController.js');
 
 exports.setupDB = async function() {
     const endTimeConfig = await ctfConfig.findOne({ name: 'endTime' });
@@ -63,7 +63,7 @@ exports.setupDB = async function() {
     const adminExists = await users.findOne({ isAdmin: true });
 
     if (!adminExists) {
-        const password = crypto.createHash('sha256').update('admin').digest('hex');
+        const password = await encryptionController.encrypt('admin');
 
         await users.create({ username: 'admin', password: password, key: 'none', isAdmin: true });
         console.log('Created default admin. admin:admin');

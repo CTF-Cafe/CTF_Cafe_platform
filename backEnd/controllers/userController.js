@@ -1,18 +1,18 @@
 const users = require('../models/userModel');
-const crypto = require("crypto");
 const { v4 } = require('uuid');
 const ctfConfig = require('../models/ctfConfigModel.js');
 const theme = require('../models/themeModel.js');
 const teams = require('../models/teamModel.js');
+const encryptionController = require('./encryptionController.js');
 
 exports.login = async function(req, res) {
     const username = req.body.username.trim();
-    const password = crypto.createHash('sha256').update(req.body.password.trim()).digest('hex');
+    const password = req.body.password.trim();
 
     const user = await users.findOne({ username: username });
 
     if (user) {
-        if (user.password === password) {
+        if (await encryptionController.compare(password, user.password)) {
             const newKey = v4();
 
             req.session.username = username;
@@ -35,7 +35,7 @@ exports.logout = async function(req, res) {
 
 exports.register = async function(req, res) {
     const username = req.body.username.trim();
-    const password = crypto.createHash('sha256').update(req.body.password.trim()).digest('hex');
+    const password = await encryptionController.encrypt(req.body.password.trim());
     const startTime = await ctfConfig.findOne({ name: 'startTime' });
 
     if (parseInt(startTime.value) - (Math.floor((new Date()).getTime() / 1000)) >= 0) {
