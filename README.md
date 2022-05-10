@@ -1,7 +1,8 @@
-# Frontend & Backend Setup
+# Auto Infrastructure Setup
 
-## Full Automatic Ubuntu Server setup:
-https://github.com/CTF-Cafe/CTF_Cafe/blob/e39322de4278d190e9b7ec6908e59763b2588435/serverSetupScript.sh
+[Script](https://github.com/CTF-Cafe/CTF_Cafe/blob/e39322de4278d190e9b7ec6908e59763b2588435/serverSetupScript.sh)
+
+# Manual Backend & Frontend Setup
 
 ## Prerequisites
 - Node.JS
