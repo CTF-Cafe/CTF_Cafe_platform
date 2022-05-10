@@ -2,7 +2,7 @@
 
 - Create your own challenges, files, hints, and flags from the admin dashboard
   - File uploads to the server
-  - Automatic bruteforce protection
+  - Flag submit bruteforce protection
 - Individual and Team based competitions
   - Have users play on their own or form teams to play together
 - Scoreboard with automatic tie resolution
