@@ -39,7 +39,7 @@ function UserTeam(props) {
     axios
       .post(process.env.REACT_APP_SERVER_URI + "/api/user/registerTeam", {
         teamName: teamName,
-      })
+      }, { withCredentials: true })
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -66,7 +66,7 @@ function UserTeam(props) {
     axios
       .post(process.env.REACT_APP_SERVER_URI + "/api/user/joinTeam", {
         teamCode: teamCode,
-      })
+      }, { withCredentials: true })
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -91,7 +91,7 @@ function UserTeam(props) {
     axios
       .post(process.env.REACT_APP_SERVER_URI + "/api/user/getTeamCode", {
         teamName: globalData.userData.team.name,
-      })
+      }, { withCredentials: true })
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -112,7 +112,7 @@ function UserTeam(props) {
 
   const leaveTeam = (e) => {
     axios
-      .get(process.env.REACT_APP_SERVER_URI + "/api/user/leaveTeam")
+      .get(process.env.REACT_APP_SERVER_URI + "/api/user/leaveTeam", { withCredentials: true })
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");

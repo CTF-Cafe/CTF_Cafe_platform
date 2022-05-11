@@ -94,7 +94,6 @@ app.use(customSanitize);
 
 function checkAuth(req, res, next) {
 
-    console.log(1)
     users.findOne({ username: req.session.username }).then(function(user) {
         if (!user) {
             res.send({ state: 'sessionError' })
