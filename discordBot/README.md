@@ -14,5 +14,7 @@ DISCORD_BOT_PREFIX=<prefix>
 SERVER_URI=<website url>
 
 MONGODB_URI=<mongodb connect url>
+
+CTF_NAME=<ctf name>
 ```
 - Run `npm install` to install the requirements from `package.json`, then run `npm start` in the bot's directory
