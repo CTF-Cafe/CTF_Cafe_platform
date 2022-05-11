@@ -5,6 +5,7 @@ export domainName="dev.ctf.cafe"
 export ctfName="TEST_CTF"
 export dbPass="password"
 export sessionKey="test-session"
+export devPassword="password"
 
 # Installs
 apt-get -y update
@@ -99,7 +100,7 @@ service nginx reload
 
 # Create dev user & switch to it
 useradd -m dev
-echo "dev:password" | chpasswd --encrypted
+echo "dev:$devPassword" | chpasswd --encrypted
 usermod -aG docker dev
 touch /home/dev/devSetup.sh
 
