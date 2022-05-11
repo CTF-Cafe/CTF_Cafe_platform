@@ -20,9 +20,9 @@ exports.run = async(bot, message, args) => {
 
             const teamEmbed = new MessageEmbed()
                 .setColor('#ff0000')
-                .setTitle(`EZ CTF | ${userTeam.name} Team`)
+                .setTitle(process.env.CTF_NAME + ` | ${userTeam.name} Team`)
                 .setTimestamp()
-                .setFooter({ text: 'Raxo#0468' });
+                .setFooter({ text: 'powered by CTF Cafe' });
 
             userTeam.users.map((user, index) => {
                 teamEmbed.addField(`${index + 1}. ${user.username}`, user.score.toString(), true);

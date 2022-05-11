@@ -18,9 +18,9 @@ exports.run = async(bot, message, args) => {
         {
             let scoreboardEmbed = new MessageEmbed()
                 .setColor('#ff0000')
-                .setTitle('EZ CTF | Challenges')
+                .setTitle(process.env.CTF_NAME + ' | Challenges')
                 .setTimestamp()
-                .setFooter({ text: 'Raxo#0468' });
+                .setFooter({ text: 'powered by CTF Cafe' });
 
 
             for (let i = 0; i < allChallenges.length; i++) {
@@ -38,9 +38,9 @@ exports.run = async(bot, message, args) => {
 
                     scoreboardEmbed = new MessageEmbed()
                         .setColor('#ff0000')
-                        .setTitle('EZ CTF | Challenges')
+                        .setTitle(process.env.CTF_NAME + ' | Challenges')
                         .setTimestamp()
-                        .setFooter({ text: 'Raxo#0468' });
+                        .setFooter({ text: 'powered by CTF Cafe' });
                 }
             }
 

@@ -8,7 +8,6 @@ function max(input) {
     return Math.max.apply(null, input);
 }
 
-
 exports.run = async(bot, message, args) => {
     if (!args[0]) return message.reply('Please specify (users/teams) as the first argument.');
 
@@ -17,9 +16,9 @@ exports.run = async(bot, message, args) => {
 
         const scoreboardEmbed = new MessageEmbed()
             .setColor('#ff0000')
-            .setTitle('EZ CTF | Scoreboard')
+            .setTitle(process.env.CTF_NAME + ' | Scoreboard')
             .setTimestamp()
-            .setFooter({ text: 'Raxo#0468' });
+            .setFooter({ text: 'powered by CTF Cafe' });
 
         top.map((user, index) => scoreboardEmbed.addField(`${index + 1}. ${user.username}`, user.score.toString(), true))
 
@@ -62,9 +61,9 @@ exports.run = async(bot, message, args) => {
 
         const scoreboardEmbed = new MessageEmbed()
             .setColor('#ff0000')
-            .setTitle('EZ CTF | Scoreboard')
+            .setTitle(process.env.CTF_NAME + ' | Scoreboard')
             .setTimestamp()
-            .setFooter({ text: 'Raxo#0468' });
+            .setFooter({ text: 'powered by CTF Cafe' });
 
         top.map((team, index) => {
             scoreboardEmbed.addField(`${index + 1}. ${team.name}`, team.totalScore.toString(), true);
