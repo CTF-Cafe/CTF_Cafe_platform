@@ -98,6 +98,9 @@ function Challenges(props) {
     const info = document.getElementById("info" + oldChallenge._id).textContent;
     const hint = document.getElementById("hint" + oldChallenge._id).textContent;
     const file = document.getElementById("file" + oldChallenge._id).value;
+    const codeSnippet = document.getElementById("code_snippet" + oldChallenge._id).textContent;
+    const codeLanguage = document.getElementById("code_language" + oldChallenge._id).value;
+
     const flag = document.getElementById("flag" + oldChallenge._id).textContent;
 
     axios
@@ -112,6 +115,8 @@ function Challenges(props) {
           hint: hint,
           file: file,
           flag: flag,
+          codeSnippet: codeSnippet,
+          codeLanguage: codeLanguage
         },
         { withCredentials: true }
       )
@@ -170,7 +175,6 @@ function Challenges(props) {
 
   const drag = function (ev) {
     ev.dataTransfer.setData("text", ev.target.id);
-    console.log(ev.dataTransfer.getData("text"));
   };
 
   const drop = function (ev) {

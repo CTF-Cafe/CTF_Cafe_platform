@@ -1,4 +1,14 @@
+import AceEditor from "react-ace";
+import { useState } from "react";
+
+import "ace-builds/src-noconflict/mode-javascript";
+import "ace-builds/src-noconflict/mode-python";
+import "ace-builds/src-noconflict/theme-monokai";
+
 function ChallengeCard(props) {
+  const [code, setCode] = useState(props.challenge.codeSnippet);
+  const [codeLanguage, setCodeLanguage] = useState(props.challenge.codeLanguage);
+
   return (
     <div
       style={{ flex: "0 0 100%", maxWidth: "50%" }}
@@ -40,7 +50,7 @@ function ChallengeCard(props) {
             style={{ display: "flex", justifyContent: "space-between" }}
           >
             <span
-              contenteditable="true"
+              contentEditable="true"
               style={{ outline: "none" }}
               id={"name" + props.challenge._id}
             >
@@ -48,7 +58,7 @@ function ChallengeCard(props) {
             </span>
             <span className="badge align-self-end">
               <span
-                contenteditable="true"
+                contentEditable="true"
                 style={{ outline: "none" }}
                 id={"points" + props.challenge._id}
               >
@@ -85,7 +95,7 @@ function ChallengeCard(props) {
               </div>
               <label>Info:</label>
               <p
-                contenteditable="true"
+                contentEditable="true"
                 style={{
                   backgroundColor: "rgb(30, 32, 55)",
                   outline: "none",
@@ -96,22 +106,23 @@ function ChallengeCard(props) {
               </p>
 
               <label>Hint:</label>
-              <div>
-                <p
-                  style={{
-                    backgroundColor: "rgb(30, 32, 55)",
-                    outline: "none",
-                  }}
-                  contenteditable="true"
-                  id={"hint" + props.challenge._id}
-                >
-                  {props.challenge.hint}
-                </p>
-              </div>
+              <p
+                style={{
+                  backgroundColor: "rgb(30, 32, 55)",
+                  outline: "none",
+                }}
+                contentEditable="true"
+                id={"hint" + props.challenge._id}
+              >
+                {props.challenge.hint}
+              </p>
 
               <label>File:</label>
-              <div>
-                <select defaultValue={props.challenge.file} id={"file" + props.challenge._id}>
+              <div style={{ marginBottom: "16px" }}>
+                <select
+                  defaultValue={props.challenge.file}
+                  id={"file" + props.challenge._id}
+                >
                   <option value="">None</option>
                   {props.assets.map((asset) => {
                     return (
@@ -123,20 +134,53 @@ function ChallengeCard(props) {
                 </select>
               </div>
 
-              <label>Flag:</label>
-              <div className="input-group mt-3">
-                <p
-                  contenteditable="true"
-                  style={{
-                    overflowWrap: "anywhere",
-                    backgroundColor: "rgb(30, 32, 55)",
-                    outline: "none",
-                  }}
-                  id={"flag" + props.challenge._id}
+              <label>Code Snippet:</label>
+              <select
+                  defaultValue={props.challenge.codeLanguage || codeLanguage}
+                  id={"code_language" + props.challenge._id}
+                  onChange={(e) => setCodeLanguage(e.target.value) }
                 >
-                  {props.challenge.flag}
-                </p>
-              </div>
+                  <option value="python">Python</option>
+                  <option value="javascript">Javascript</option>
+              </select>
+              <AceEditor
+                style={{
+                  height: "300px",
+                  width: "100%",
+                  marginBottom: "16px"
+                }}
+                placeholder="Write code here..."
+                mode={codeLanguage}
+                theme="monokai"
+                name={"code" + props.challenge._id}
+                onChange={(currentCode) => setCode(currentCode)}
+                fontSize={14}
+                showPrintMargin={true}
+                showGutter={true}
+                highlightActiveLine={true}
+                value={code}
+                setOptions={{
+                  enableBasicAutocompletion: false,
+                  enableLiveAutocompletion: false,
+                  enableSnippets: false,
+                  showLineNumbers: true,
+                  tabSize: 2,
+                }}
+              />
+
+              <p hidden id={"code_snippet" + props.challenge._id}>{code}</p>
+
+              <label>Flag:</label>
+              <p
+                contentEditable="true"
+                style={{
+                  backgroundColor: "rgb(30, 32, 55)",
+                  outline: "none",
+                }}
+                id={"flag" + props.challenge._id}
+              >
+                {props.challenge.flag}
+              </p>
 
               <div
                 style={{
@@ -158,12 +202,12 @@ function ChallengeCard(props) {
                   id="submit_p2"
                   className="btn btn-outline-danger"
                   data-toggle="modal"
-                    data-target="#confirmModal"
+                  data-target="#confirmModal"
                   onClick={(e) => {
                     props.setAction({
                       function: props.deleteChallenge,
                       e: e,
-                      data: props.challenge
+                      data: props.challenge,
                     });
                   }}
                 >

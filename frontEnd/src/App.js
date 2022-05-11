@@ -1,5 +1,6 @@
 import "./css/bootstrap4-neon-glow.css";
 import "./css/main.css";
+import "./css/prism.css";
 import { Outlet, Routes, Route, Link } from "react-router-dom";
 import Index from "./components/Index.js";
 import FourOFour from "./components/FourOFour.js";
@@ -53,7 +54,6 @@ function App() {
           globalData.setLoggedIn(false);
           globalData.navigate("/", { replace: true });
         } else {
-          console.log(response.data);
           response.data.forEach((config) => {
             switch (config.name) {
               case "rules":
