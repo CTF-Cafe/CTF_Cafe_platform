@@ -789,36 +789,9 @@ span.fail:after {
     content: ']';
 }
 
-#main {
-    display: none;
-}
-
 a.text-light:hover,
 a.text-light:focus {
     color: #dbebfb !important;
-}
-
-@-webkit-keyframes fadeOut {
-    0% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0;
-    }
-}
-
-@keyframes fadeOut {
-    0% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0;
-    }
-}
-
-.fadeOut {
-    -webkit-animation-name: fadeOut 2s;
-    animation-name: fadeOut 2s;
 }
 
 #__react-alert__ div div div {

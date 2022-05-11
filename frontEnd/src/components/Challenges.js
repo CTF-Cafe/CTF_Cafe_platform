@@ -5,6 +5,12 @@ import { saveAs } from "file-saver";
 import LoadingScreen from "react-loading-screen";
 import AppContext from "./Data/AppContext";
 import Navbar from "./Global/Navbar.js";
+import copy from 'copy-to-clipboard';
+import "../css/prism.css";
+import Prism from "prismjs";
+import "prismjs/plugins/line-numbers/prism-line-numbers.js";
+import "prismjs/components/prism-python";
+import "prismjs/components/prism-javascript";
 
 // Prepend `0` for one digit numbers. For that the number has to be
 // converted to string, as numbers don't have length method
@@ -36,6 +42,7 @@ function Challenges(props) {
   const globalData = useContext(AppContext);
   const [challenges, setChallenges] = useState([]);
   const [currentHint, setCurrentHint] = useState("");
+  const [currentSnippet, setCurrentSnippet] = useState({});
   const [categories, setCategories] = useState([]);
   const [endTime, setEndTime] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -56,7 +63,9 @@ function Challenges(props) {
 
   const getChallenges = () => {
     axios
-      .get(process.env.REACT_APP_SERVER_URI + "/api/user/getChallenges", { withCredentials: true })
+      .get(process.env.REACT_APP_SERVER_URI + "/api/user/getChallenges", {
+        withCredentials: true,
+      })
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -112,6 +121,10 @@ function Challenges(props) {
   };
 
   useEffect(() => {
+    Prism.highlightAll();
+  }, [currentSnippet]);
+
+  useEffect(() => {
     getChallenges();
   }, []);
 
@@ -119,9 +132,13 @@ function Challenges(props) {
     const flag = document.getElementById(`flag_id_${index}`).value;
 
     axios
-      .post(process.env.REACT_APP_SERVER_URI + "/api/user/submitFlag", {
-        flag: flag,
-      }, { withCredentials: true })
+      .post(
+        process.env.REACT_APP_SERVER_URI + "/api/user/submitFlag",
+        {
+          flag: flag,
+        },
+        { withCredentials: true }
+      )
       .then((response) => {
         if (response.data.state == "success") {
           globalData.setUserData(response.data.user);
@@ -309,6 +326,7 @@ function Challenges(props) {
                                     );
                                   })}
                               </p>
+
                               {challenge.file ? (
                                 challenge.file.length > 0 ? (
                                   <a
@@ -326,15 +344,37 @@ function Challenges(props) {
                                   </a>
                                 ) : null
                               ) : null}
+
+                              {challenge.codeSnippet ? (
+                                challenge.codeSnippet.trim().length > 0 ? (
+                                  <a
+                                    onClick={() => {
+                                      setCurrentHint("");
+                                      setCurrentSnippet({
+                                        code: challenge.codeSnippet,
+                                        language: challenge.codeLanguage,
+                                      });
+                                    }}
+                                    href="#modal"
+                                    data-toggle="modal"
+                                    data-target="#modal"
+                                    className="btn btn-outline-danger btn-shadow"
+                                  >
+                                    <span className="fa fa-laptop-code mr-2"></span>
+                                    Code Snippet
+                                  </a>
+                                ) : null
+                              ) : null}
+
                               {challenge.hint ? (
                                 challenge.hint.trim().length > 0 ? (
                                   <a
                                     onClick={() => {
                                       setCurrentHint(challenge.hint);
                                     }}
-                                    href="#hint"
+                                    href="#modal"
                                     data-toggle="modal"
-                                    data-target="#hint"
+                                    data-target="#modal"
                                     className="btn btn-outline-danger btn-shadow"
                                   >
                                     <span className="far fa-lightbulb mr-2"></span>
@@ -410,14 +450,18 @@ function Challenges(props) {
         </div>
         <div
           className="modal fade"
-          id="hint"
+          id="modal"
           tabindex="-1"
           role="dialog"
-          aria-labelledby="hint label"
+          aria-labelledby="modal label"
           style={{ display: "none" }}
           aria-hidden="true"
         >
-          <div className="modal-dialog modal-dialog-centered" role="document">
+          <div
+            className="modal-dialog modal-dialog-centered"
+            role="document"
+            style={{ maxWidth: "80%", width: "fit-content" }}
+          >
             <div className="modal-content">
               <div className="modal-body">
                 {currentHint.length > 0 ? (
@@ -433,9 +477,28 @@ function Challenges(props) {
                       })}
                     </p>
                   </div>
+                ) : currentSnippet.code ? (
+                  <pre className="line-numbers">
+                    <code className={"language-" + currentSnippet.language}>
+                      {currentSnippet.code}
+                    </code>
+                  </pre>
                 ) : null}
               </div>
-              <div className="modal-footer" style={{ justifyContent: "center" }}>
+              <div
+                className="modal-footer"
+                style={{ justifyContent: "center" }}
+              >
+                {currentSnippet.code ? (
+                  <button
+                    type="button"
+                    className="btn btn-success"
+                    data-dismiss="modal"
+                    onClick={() => {copy(currentSnippet.code)}}
+                  >
+                    Copy Code
+                  </button>
+                ) : null}
                 <button
                   type="button"
                   className="btn btn-danger"

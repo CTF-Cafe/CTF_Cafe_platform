@@ -38,6 +38,14 @@ var challengeSchema = new Schema({
     file: {
         type: String,
         default: '',
+    },
+    codeSnippet: {
+        type: String,
+        default: ''
+    },
+    codeLanguage: {
+        type: String,
+        default: 'python'
     }
 });
 

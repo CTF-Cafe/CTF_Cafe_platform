@@ -62,6 +62,8 @@ exports.saveChallenge = async function(req, res) {
             hint: req.body.hint,
             flag: accentsTidy(req.body.flag.trim()).toUpperCase(),
             file: (req.body.file.length > 0 ? req.body.file : ''),
+            codeSnippet: (req.body.codeSnippet.length > 0 ? req.body.codeSnippet : ''),
+            codeLanguage: req.body.codeLanguage,
         });
 
         res.send({ state: 'success', message: 'Challenge updated!' });
@@ -81,7 +83,9 @@ exports.createChallenge = async function(req, res) {
         hint: req.body.hint,
         flag: req.body.flag.toUpperCase(),
         file: (req.body.file.length > 0 ? req.body.file : ''),
-        category: req.body.category
+        category: req.body.category,
+        codeSnippet: '',
+        codeLanguage: 'python',
     });
     res.send({ state: 'success', message: 'Challenge created!' });
 

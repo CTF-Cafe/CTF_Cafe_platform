@@ -2,7 +2,7 @@ import { Outlet, Routes, Route, Link } from "react-router-dom";
 import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import AppContext from "../Data/AppContext";
-const configsToShow = ['endTime', 'startTime', 'rules', 'sponsors']
+const configsToShow = ["endTime", "startTime", "rules", "sponsors"];
 
 function Config(props) {
   const globalData = useContext(AppContext);
@@ -34,12 +34,13 @@ function Config(props) {
     let configsArray = [];
 
     configs.forEach((config) => {
-      if(configsToShow.includes(config.name)) {
-      configsArray.push({
-        name: config.name,
-        value: document.getElementById("config-data" + config._id).textContent,
-      });
-    }
+      if (configsToShow.includes(config.name)) {
+        configsArray.push({
+          name: config.name,
+          value: document.getElementById("config-data" + config._id)
+            .textContent,
+        });
+      }
     });
 
     axios
