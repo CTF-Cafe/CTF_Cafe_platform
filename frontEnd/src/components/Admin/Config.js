@@ -34,10 +34,12 @@ function Config(props) {
     let configsArray = [];
 
     configs.forEach((config) => {
+      if(configsToShow.includes(config.name)) {
       configsArray.push({
         name: config.name,
         value: document.getElementById("config-data" + config._id).textContent,
       });
+    }
     });
 
     axios

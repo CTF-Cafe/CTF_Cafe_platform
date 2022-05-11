@@ -121,7 +121,6 @@ function Challenges(props) {
     axios
       .post(process.env.REACT_APP_SERVER_URI + "/api/user/submitFlag", {
         flag: flag,
-        username: globalData.userData.username,
       }, { withCredentials: true })
       .then((response) => {
         if (response.data.state == "success") {
