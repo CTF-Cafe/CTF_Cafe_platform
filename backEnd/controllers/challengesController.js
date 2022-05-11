@@ -38,78 +38,108 @@ accentsTidy = function(s) {
     return r;
 };
 
+let currentlySubmittingUsers = [];
+let currentlySubmittingTeams = [];
+
 exports.submitFlag = async function(req, res) {
-    const endTime = await ctfConfig.findOne({ name: 'endTime' });
-    const startTime = await ctfConfig.findOne({ name: 'startTime' });
+    if (req.body.flag) {
+        if (!currentlySubmittingUsers.includes(req.session.username)) {
+            currentlySubmittingUsers.push(req.session.username);
 
-    if (parseInt(endTime.value) - (Math.floor((new Date()).getTime() / 1000)) <= 0) {
-        res.send({ state: 'error', message: 'CTF is Over!' });
-    } else if (parseInt(startTime.value) - (Math.floor((new Date()).getTime() / 1000)) >= 0) {
-        res.send({ state: 'error', message: 'CTF has not started!' });
-    } else {
-        const username = (req.session.username);
-        const flag = accentsTidy(req.body.flag.trim()).toUpperCase();
-        const user = await users.findOne({ username: username });
+            const endTime = await ctfConfig.findOne({ name: 'endTime' });
+            const startTime = await ctfConfig.findOne({ name: 'startTime' });
 
-        if (user) {
-            let checkFlag = await challenges.findOne({ flag: flag });
+            if (parseInt(endTime.value) - (Math.floor((new Date()).getTime() / 1000)) <= 0) {
+                currentlySubmittingUsers.filter(item => item !== req.session.username)
+                res.send({ state: 'error', message: 'CTF is Over!' });
+            } else if (parseInt(startTime.value) - (Math.floor((new Date()).getTime() / 1000)) >= 0) {
+                currentlySubmittingUsers.filter(item => item !== req.session.username)
+                res.send({ state: 'error', message: 'CTF has not started!' });
+            } else {
+                const username = (req.session.username);
+                const flag = accentsTidy(req.body.flag.trim()).toUpperCase();
+                const user = await users.findOne({ username: username });
 
-            if (checkFlag) {
-                if (checkFlag.flag === flag) {
-                    checkFlag.flag = 'Nice try XD';
+                if (user) {
+                    let checkFlag = await challenges.findOne({ flag: flag });
 
-                    if (user.solved.filter(obj => { return obj.challenge._id.equals(checkFlag._id) }).length > 0) {
-                        res.send({ state: 'error', message: 'Already Solved!' });
-                    } else {
+                    if (checkFlag) {
+                        if (checkFlag.flag === flag) {
+                            checkFlag.flag = 'Nice try XD';
 
-                        if (ObjectId.isValid(user.teamId)) {
-
-                            const team = await teams.findById(user.teamId);
-
-                            if (team) {
-                                if (team.users.filter(user => {
-                                        return (user.solved.filter(obj => {
-                                            return obj.challenge._id.equals(checkFlag._id)
-                                        }).length > 0)
-                                    }).length > 0) {
-                                    res.send({ state: 'error', message: 'Already Solved!' });
-                                } else {
-                                    let timestamp = new Date().getTime();
-
-                                    await users.updateOne({ username: username }, { $push: { solved: { _id: checkFlag._id, challenge: checkFlag, timestamp: timestamp } } });
-                                    await users.updateOne({ username: username }, { $inc: { score: checkFlag.points } });
-
-                                    const updatedUser = await users.findOne({ username: username });
-
-                                    await teams.updateOne({
-                                        _id: team._id,
-                                        users: { $elemMatch: { username: updatedUser.username } }
-                                    }, {
-                                        $set: {
-                                            "users.$.solved": updatedUser.solved,
-                                            "users.$.score": updatedUser.score,
-                                        }
-                                    });
-
-                                    await challenges.updateOne({ flag: flag }, { $inc: { solveCount: 1 } });
-
-                                    res.send({ state: 'success', user: updatedUser });
-                                }
+                            if (user.solved.filter(obj => { return obj.challenge._id.equals(checkFlag._id) }).length > 0) {
+                                currentlySubmittingUsers.filter(item => item !== req.session.username)
+                                res.send({ state: 'error', message: 'Already Solved!' });
                             } else {
-                                res.send({ state: 'error', message: 'Not in a team!' });
+                                if (ObjectId.isValid(user.teamId)) {
+                                    const team = await teams.findById(user.teamId);
+
+                                    if (team) {
+                                        currentlySubmittingTeams.push(user.teamId);
+
+                                        if (!currentlySubmittingTeams.includes(user.teamId)) {
+                                            if (team.users.filter(user => {
+                                                    return (user.solved.filter(obj => {
+                                                        return obj.challenge._id.equals(checkFlag._id)
+                                                    }).length > 0)
+                                                }).length > 0) {
+
+                                                currentlySubmittingUsers.filter(item => item !== req.session.username)
+                                                currentlySubmittingTeams.filter(item => item !== user.teamId)
+                                                res.send({ state: 'error', message: 'Already Solved!' });
+                                            } else {
+                                                let timestamp = new Date().getTime();
+
+                                                await users.updateOne({ username: username }, { $push: { solved: { _id: checkFlag._id, challenge: checkFlag, timestamp: timestamp } } });
+                                                await users.updateOne({ username: username }, { $inc: { score: checkFlag.points } });
+
+                                                const updatedUser = await users.findOne({ username: username });
+
+                                                await teams.updateOne({
+                                                    _id: team._id,
+                                                    users: { $elemMatch: { username: updatedUser.username } }
+                                                }, {
+                                                    $set: {
+                                                        "users.$.solved": updatedUser.solved,
+                                                        "users.$.score": updatedUser.score,
+                                                    }
+                                                });
+
+                                                await challenges.updateOne({ flag: flag }, { $inc: { solveCount: 1 } });
+
+                                                currentlySubmittingUsers.filter(item => item !== req.session.username)
+                                                currentlySubmittingTeams.filter(item => item !== user.teamId)
+                                                res.send({ state: 'success', user: updatedUser });
+                                            }
+                                        } else {
+                                            res.send({ state: 'error', message: 'Submiting to fast!' });
+                                        }
+                                    } else {
+                                        currentlySubmittingUsers.filter(item => item !== req.session.username)
+                                        res.send({ state: 'error', message: 'Not in a team!' });
+                                    }
+                                } else {
+                                    currentlySubmittingUsers.filter(item => item !== req.session.username)
+                                    res.send({ state: 'error', message: 'Not in a team!' });
+                                }
                             }
                         } else {
-                            res.send({ state: 'error', message: 'Not in a team!' });
+                            currentlySubmittingUsers.filter(item => item !== req.session.username)
+                            res.send({ state: 'error', message: 'Wrong Flag :(' });
                         }
+                    } else {
+                        currentlySubmittingUsers.filter(item => item !== req.session.username)
+                        res.send({ state: 'error', message: 'Wrong Flag :(' });
                     }
                 } else {
-                    res.send({ state: 'error', message: 'Wrong Flag :(' });
+                    currentlySubmittingUsers.filter(item => item !== req.session.username)
+                    res.send({ state: 'error', message: 'Not logged in!' });
                 }
-            } else {
-                res.send({ state: 'error', message: 'Wrong Flag :(' });
             }
         } else {
-            res.send({ state: 'error', message: 'Not logged in!' });
+            res.send({ state: 'error', message: 'Submiting to fast!' });
         }
+    } else {
+        res.send({ state: 'error', message: 'No flag provided!' });
     }
 }
