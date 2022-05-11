@@ -2,6 +2,7 @@ import { Outlet, Routes, Route, Link } from "react-router-dom";
 import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import AppContext from "../Data/AppContext";
+const configsToShow = ['endTime', 'startTime', 'rules', 'sponsors']
 
 function Config(props) {
   const globalData = useContext(AppContext);
@@ -9,9 +10,7 @@ function Config(props) {
 
   const getConfigs = () => {
     axios
-      .get(process.env.REACT_APP_SERVER_URI + "/api/admin/getConfigs", {
-        withCredentials: true,
-      })
+      .get(process.env.REACT_APP_SERVER_URI + "/api/getConfigs")
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -81,26 +80,22 @@ function Config(props) {
       <table className="table table-hover table-striped">
         <thead className="thead-dark hackerFont">
           <tr>
-            <th scope="col" style={{ textAlign: "center" }}>
-              #
-            </th>
             <th scope="col"> Config Name </th>
             <th scope="col"> Config Data </th>
           </tr>
         </thead>
         <tbody>
           {configs.map((config, index) => {
-            return (
-              <tr key={config._id}>
-                <th scope="row" style={{ textAlign: "center" }}>
-                  {index}
-                </th>
-                <td> {config.name} </td>
-                <td contenteditable="true" id={"config-data" + config._id}>
-                  {JSON.stringify(config.value)}
-                </td>
-              </tr>
-            );
+            if (configsToShow.includes(config.name)) {
+              return (
+                <tr key={config._id}>
+                  <td> {config.name} </td>
+                  <td contentEditable="true" id={"config-data" + config._id}>
+                    {JSON.stringify(config.value)}
+                  </td>
+                </tr>
+              );
+            }
           })}
         </tbody>
       </table>
