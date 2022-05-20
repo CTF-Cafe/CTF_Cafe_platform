@@ -69,9 +69,11 @@ exports.register = async function(req, res) {
         // Check admin has deleted the admin:admin account before allowing others.
         const defaultAdminCheck = await users.findOne({ username: 'admin', password: 'admin', isAdmin: true });
 
-        if (defaultAdminCheck) {
-            throw new Error('Change the default admins password first!');
-        }
+        // COOMMENTED OUT UNTIL WE ADD PASSWORD CHANGE FUNCTIONALITY
+
+        // if (defaultAdminCheck) {
+        //     throw new Error('Change the default admins password first!');
+        // }
 
         // Create new User
         const newKey = v4();
