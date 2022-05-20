@@ -6,7 +6,7 @@ import silverMask from "./img/silverMask.png";
 import bronzeMask from "./img/bronzeMask.png";
 import LoadingScreen from "react-loading-screen";
 import AppContext from "./Data/AppContext";
-import Navbar from "./Global/Navbar.js";
+import Navbar from "./Global/Navbar";
 
 const now = new Date();
 now.setHours(0, 0, 0, 0);

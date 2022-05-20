@@ -1,6 +1,6 @@
 import { Outlet, Routes, Route, Link } from "react-router-dom";
-import BarChart from "../Charts/BarChart.js";
-import PieChart from "../Charts/PieChart.js";
+import BarChart from "../Charts/BarChart";
+import PieChart from "../Charts/PieChart";
 import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";

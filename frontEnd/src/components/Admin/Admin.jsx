@@ -1,12 +1,12 @@
 import { Outlet, Routes, Route, Link, useLocation } from "react-router-dom";
-import Stats from "./Stats.js";
-import Challenges from "./Challenges.js";
-import Assets from "./Assets.js";
-import Config from "./Config.js";
-import Users from "./Users.js";
-import Teams from "./Teams.js";
-import Theme from "./Theme.js";
-import Tools from "./Tools.js";
+import Stats from "./Stats";
+import Challenges from "./Challenges";
+import Assets from "./Assets";
+import Config from "./Config";
+import Users from "./Users";
+import Teams from "./Teams";
+import Theme from "./Theme";
+import Tools from "./Tools";
 import { useState } from "react";
 
 function Admin(props) {

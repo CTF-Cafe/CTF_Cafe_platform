@@ -2,8 +2,8 @@ import { Outlet, Routes, Route, Link, useLocation } from "react-router-dom";
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import AppContext from "./Data/AppContext";
-import Navbar from "./Global/Navbar.js";
-import PieChart from "./Charts/PieChart.js";
+import Navbar from "./Global/Navbar";
+import PieChart from "./Charts/PieChart";
 
 function User(props) {
   const globalData = useContext(AppContext);

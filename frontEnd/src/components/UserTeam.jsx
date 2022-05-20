@@ -3,7 +3,7 @@ import axios from "axios";
 import { useContext, useEffect } from "react";
 import copy from "copy-to-clipboard";
 import AppContext from "./Data/AppContext";
-import Navbar from "./Global/Navbar.js";
+import Navbar from "./Global/Navbar";
 
 function UserTeam(props) {
   const globalData = useContext(AppContext);

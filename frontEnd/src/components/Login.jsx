@@ -1,23 +1,24 @@
 import { Outlet, Routes, Route, Link } from "react-router-dom";
 import axios from "axios";
-import { useContext } from 'react';
-import AppContext from './Data/AppContext';
-import Navbar from './Global/Navbar.js';
+import { useContext } from "react";
+import AppContext from "./Data/AppContext";
+import Navbar from "./Global/Navbar";
 
-function Register(props) {
+function Login(props) {
   const globalData = useContext(AppContext);
-  const register = () => {
+
+  const checkLogin = () => {
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
 
     axios
-      .post(process.env.REACT_APP_SERVER_URI + "/api/register", {
+      .post(process.env.REACT_APP_SERVER_URI + "/api/login", {
         username: username,
         password: password,
       }, { withCredentials: true })
       .then((response) => {
         if (response.data.state == "success") {
-          globalData.alert.success("Registered!");
+          globalData.alert.success("Logged In!");
           globalData.setUserData(response.data.user);
           globalData.setLoggedIn(true);
           globalData.navigate("/", { replace: true });
@@ -39,7 +40,7 @@ function Register(props) {
         <div className="glitch__img"></div>
         <div className="glitch__img"></div>
       </div>
-      
+
       <Navbar />
 
       <div className="jumbotron bg-transparent mb-0 pt-3 radius-0">
@@ -47,10 +48,11 @@ function Register(props) {
           <div className="row">
             <div className="col-xl-8">
               <h1 className="display-1 bold color_white content__title">
-                {process.env.REACT_APP_CTF_NAME}<span className="vim-caret">&nbsp;</span>
+                {process.env.REACT_APP_CTF_NAME}
+                <span className="vim-caret">&nbsp;</span>
               </h1>
               <p className="text-grey text-spacey hackerFont lead mb-5">
-                Join the worlds leading forces, and battle it out for the win!
+                Type your credentials to conquer the world
               </p>
               <div className="row hackerFont">
                 <div className="col-md-6">
@@ -81,9 +83,9 @@ function Register(props) {
             <div className="col-xl-8">
               <button
                 className="btn btn-outline-danger btn-shadow px-3 my-2 ml-0 ml-sm-1 text-left"
-                onClick={register}
+                onClick={checkLogin}
               >
-                <h4>Register</h4>
+                <h4>Login</h4>
               </button>
             </div>
           </div>
@@ -93,4 +95,4 @@ function Register(props) {
   );
 }
 
-export default Register;
+export default Login;
