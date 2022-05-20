@@ -1,3 +1,5 @@
+// VERY IMPORTANT!! READ: https://www.troyhunt.com/we-didnt-encrypt-your-password-we-hashed-it-heres-what-that-means/
+
 const bcrypt = require('bcryptjs');
 
 exports.encrypt = async function(pass) {

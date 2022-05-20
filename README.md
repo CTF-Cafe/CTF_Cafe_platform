@@ -1,6 +1,6 @@
 # Features
 
-- Create your own challenges, files, hints, and flags from the admin dashboard
+- Create your own challenges, files, hints, code snippets and flags from the admin dashboard
   - File uploads to the server
   - Flag submit bruteforce protection
 - Individual and Team based competitions
