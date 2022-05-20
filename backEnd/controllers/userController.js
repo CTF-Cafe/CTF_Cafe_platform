@@ -34,41 +34,59 @@ exports.logout = async function(req, res) {
 }
 
 exports.register = async function(req, res) {
-    const username = req.body.username.trim();
-    const password = await encryptionController.encrypt(req.body.password.trim());
-    const startTime = await ctfConfig.findOne({ name: 'startTime' });
+    try {
+        const username = req.body.username.trim();
+        const password = await encryptionController.encrypt(req.body.password.trim());
+        const startTime = await ctfConfig.findOne({ name: 'startTime' });
 
-    if (parseInt(startTime.value) - (Math.floor((new Date()).getTime() / 1000)) >= 0) {
-        if (username.length >= 4) {
-            if (username.length > 32) {
-                res.send({ state: 'error', message: 'Username is to long! 32 characters maximum!' });
-            } else {
-                if (req.body.password.trim().length < 8) {
-                    res.send({ state: 'error', message: 'Password is to short 8 characters minimum!!' });
-                } else {
-                    const userExists = await users.findOne({ username: username });
-
-                    if (!userExists) {
-                        const newKey = v4();
-
-                        await users.create({ username: username, password: password, key: newKey.toString(), isAdmin: false }).then(async function(user) {
-
-                            req.session.username = username;
-                            req.session.key = newKey;
-                            res.send({ state: 'success', message: 'Registered!', user: user });
-                        }).catch(function(err) {
-                            res.send({ state: 'error', message: 'User creation failed!' });
-                        });
-                    } else {
-                        res.send({ state: 'error', message: 'User name Exists!' });
-                    }
-                }
-            }
-        } else {
-            res.send({ state: 'error', message: 'Username is to short! 4 characters minimum!' });
+        // Check if CTF has started
+        if (parseInt(startTime.value) - (Math.floor((new Date()).getTime() / 1000)) >= 0) {
+            throw new Error('Registrations are closed!');
         }
-    } else {
-        res.send({ state: 'error', message: 'Registrations are closed!' });
+
+        // Username to short
+        if (username.length >= 4) {
+            throw new Error('Username is to short! 4 characters minimum!');
+        }
+
+        // Username to long
+        if (username.length > 32) {
+            throw new Error('Username is to long! 32 characters maximum!');
+        }
+
+        // Check password length
+        if (req.body.password.trim().length < 8) {
+            throw new Error('Password is to short 8 characters minimum!!');
+        }
+
+        // Check if username exists
+        const userExists = await users.findOne({ username: username });
+
+        if (userExists) {
+            throw new Error('User name Exists!');
+        }
+
+        // Check admin has deleted the admin:admin account before allowing others.
+        const defaultAdminCheck = await users.findOne({ username: 'admin', password: 'admin', isAdmin: true });
+
+        if (defaultAdminCheck) {
+            throw new Error('Change the default admins password first!');
+        }
+
+        // Create new User
+        const newKey = v4();
+
+        await users.create({ username: username, password: password, key: newKey.toString(), isAdmin: false }).then(async function(user) {
+            req.session.username = username;
+            req.session.key = newKey;
+            res.send({ state: 'success', message: 'Registered!', user: user });
+        }).catch(function(err) {
+            throw new Error('User creation failed!');
+        });
+    } catch (err) {
+        if (err) {
+            res.send({ state: 'error', message: err.message });
+        }
     }
 }
 
