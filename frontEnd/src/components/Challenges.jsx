@@ -4,11 +4,11 @@ import { useState, useEffect, useContext } from "react";
 import { saveAs } from "file-saver";
 import LoadingScreen from "react-loading-screen";
 import AppContext from "./Data/AppContext";
-import Navbar from "./Global/Navbar.js";
+import Navbar from "./Global/Navbar";
 import copy from 'copy-to-clipboard';
 import "../css/prism.css";
 import Prism from "prismjs";
-import "prismjs/plugins/line-numbers/prism-line-numbers.js";
+import "prismjs/plugins/line-numbers/prism-line-numbers";
 import "prismjs/components/prism-python";
 import "prismjs/components/prism-javascript";
 

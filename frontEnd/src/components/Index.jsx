@@ -1,7 +1,7 @@
 import { Outlet, Routes, Route, Link } from "react-router-dom";
 import { useContext, useState } from "react";
 import AppContext from "./Data/AppContext";
-import Navbar from "./Global/Navbar.js";
+import Navbar from "./Global/Navbar";
 
 function Index(props) {
   const globalData = useContext(AppContext);

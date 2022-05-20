@@ -3,7 +3,7 @@ import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import AppContext from "../Data/AppContext";
-import ChallengeCard from "./components/ChallengeCard.js";
+import ChallengeCard from "./components/ChallengeCard";
 
 function Challenges(props) {
   const globalData = useContext(AppContext);
