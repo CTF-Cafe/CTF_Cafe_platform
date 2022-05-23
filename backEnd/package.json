@@ -22,7 +22,7 @@
         "fs": "^0.0.1-security",
         "mongo-sanitize": "^1.1.0",
         "mongoose": "^6.2.8",
-        "passport": "^0.5.2",
+        "passport": "^0.6.0",
         "passport-local": "^1.0.0",
         "path": "^0.12.7",
         "rate-limiter-flexible": "^2.3.7",
