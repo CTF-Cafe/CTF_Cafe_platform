@@ -167,7 +167,8 @@ function Challenges(props) {
 
   const handleEnterSubmit = (event, index) => {
     // look for the `Enter` keyCode
-    if (event.keyCode === 13 || event.which === 13) {
+    if (event.key === 'Enter') {
+      console.log(index);
       submitFlag(index);
     }
   };
@@ -390,7 +391,7 @@ function Challenges(props) {
                                   aria-label="Enter Flag"
                                   aria-describedby="basic-addon2"
                                   id={"flag_id_" + index}
-                                  onKeyPress={(e, index) => {
+                                  onKeyPress={(e) => {
                                     handleEnterSubmit(e, index);
                                   }}
                                 />
@@ -489,7 +490,7 @@ function Challenges(props) {
                 className="modal-footer"
                 style={{ justifyContent: "center" }}
               >
-                {currentSnippet.code ? (
+                {currentHint.length == 0 ? (
                   <button
                     type="button"
                     className="btn btn-success"
