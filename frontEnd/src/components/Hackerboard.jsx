@@ -285,13 +285,13 @@ function Hackerboard(props) {
                     className="btn btn-outline-danger btn-shadow"
                     onClick={previousPage}
                   >
-                    <span className="fa fa-arrow-left"></span>
+                    <span className="fa-solid fa-arrow-left"></span>
                   </button>
                   <button
                     className="btn btn-outline-danger btn-shadow"
                     onClick={nextPage}
                   >
-                    <span className="fa fa-arrow-right"></span>
+                    <span className="fa-solid fa-arrow-right"></span>
                   </button>
                 </div>
               </div>
@@ -312,8 +312,8 @@ function Hackerboard(props) {
                         <span
                           className={
                             selectionScore == "down"
-                              ? "fa fa-arrow-down"
-                              : "fa fa-arrow-up"
+                              ? "fa-solid fa-arrow-down"
+                              : "fa-solid fa-arrow-up"
                           }
                         ></span>
                       </button>

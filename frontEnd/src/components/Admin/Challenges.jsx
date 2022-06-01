@@ -306,7 +306,7 @@ function Challenges(props) {
                   createChallenge(e, category);
                 }}
               >
-                <span className="fa fa-plus"> </span>{" "}
+                <span className="fa-solid fa-plus"> </span>{" "}
               </a>{" "}
             </div>
             {challenges.map((challenge, index) => {

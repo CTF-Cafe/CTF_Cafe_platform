@@ -146,13 +146,13 @@ function Users(props) {
           className="btn btn-outline-danger btn-shadow"
           onClick={previousPage}
         >
-          <span className="fa fa-arrow-left"></span>
+          <span className="fa-solid fa-arrow-left"></span>
         </button>
         <button
           className="btn btn-outline-danger btn-shadow"
           onClick={nextPage}
         >
-          <span className="fa fa-arrow-right"></span>
+          <span className="fa-solid fa-arrow-right"></span>
         </button>
       </div>
       <table className="table table-hover table-striped">
@@ -188,7 +188,7 @@ function Users(props) {
                     }}
                     style={{ marginRight: "30px" }}
                   >
-                    <span className="fa fa-minus"></span>
+                    <span className="fa-solid fa-minus"></span>
                   </button>
                   {user.username}
                 </td>
@@ -209,7 +209,7 @@ function Users(props) {
                     }}
                     style={{ marginLeft: "15px" }}
                   >
-                    <span className="fa fa-arrow-up"></span>
+                    <span className="fa-solid fa-arrow-up"></span>
                   </button>
                   <button
                     className="btn btn-outline-danger btn-shadow"
@@ -224,7 +224,7 @@ function Users(props) {
                     }}
                     style={{ marginLeft: "5px" }}
                   >
-                    <span className="fa fa-arrow-down"></span>
+                    <span className="fa-solid fa-arrow-down"></span>
                   </button>
                 </td>
               </tr>
