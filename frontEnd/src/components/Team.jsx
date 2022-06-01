@@ -18,7 +18,6 @@ function Team(props) {
       })
       .then((response) => {
         if (response.data.state != "error") {
-            console.log(response.data);
           setTeam(response.data);
         }
       })

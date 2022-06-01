@@ -4,6 +4,7 @@ const ctfConfig = require('../models/ctfConfigModel.js');
 const theme = require('../models/themeModel.js');
 const teams = require('../models/teamModel.js');
 const encryptionController = require('./encryptionController.js');
+const ObjectId = require('mongoose').Types.ObjectId;
 
 exports.login = async function(req, res) {
     const username = req.body.username.trim();
@@ -85,6 +86,61 @@ exports.register = async function(req, res) {
         }).catch(function(err) {
             throw new Error('User creation failed!');
         });
+    } catch (err) {
+        if (err) {
+            res.send({ state: 'error', message: err.message });
+        }
+    }
+}
+
+exports.updateUsername = async function(req, res) {
+    try {
+        const username = req.body.newUsername.trim();
+
+        // Username to short
+        if (username.length < 4) {
+            throw new Error('Username is to short! 4 characters minimum!');
+        }
+
+        // Username to long
+        if (username.length > 32) {
+            throw new Error('Username is to long! 32 characters maximum!');
+        }
+
+        // Check if username exists
+        const userExists = await users.findOne({ username: username });
+
+        if (userExists) {
+            throw new Error('User name Exists!');
+        }
+
+        await users.findOneAndUpdate({ username: req.session.username, key: req.session.key }, { username: username }, { returnOriginal: false }).then(async function(user) {
+            if (ObjectId.isValid(user.teamId)) {
+                userTeamExists = await teams.findById(user.teamId);
+
+                if (userTeamExists) {
+                    let newUsers = userTeamExists.users;
+                    newUsers.forEach(userInTeam => {
+                        if (userInTeam.username == req.session.username) {
+                            userInTeam.username = username;
+                        }
+                    });
+
+                    await teams.findByIdAndUpdate(user.teamId, { users: newUsers }, { returnOriginal: false }).then(async function(user) {
+                        req.session.username = username;
+                        res.send({ state: 'success', message: 'Username updated!', user: user, team: team });
+                    });
+                }
+
+            } else {
+                req.session.username = username;
+                res.send({ state: 'success', message: 'Username updated!', user: user });
+            }
+        }).catch(function(err) {
+            throw new Error('User update failed!');
+        });
+
+
     } catch (err) {
         if (err) {
             res.send({ state: 'error', message: err.message });
