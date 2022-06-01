@@ -128,7 +128,7 @@ function Assets(props) {
                     }}
                     style={{ marginRight: "30px" }}
                   >
-                    <span className="fa fa-minus"></span>
+                    <span className="fa-solid fa-minus"></span>
                   </a>
                   {asset.name}
                 </td>

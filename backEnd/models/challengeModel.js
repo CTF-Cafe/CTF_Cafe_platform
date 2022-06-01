@@ -46,6 +46,10 @@ var challengeSchema = new Schema({
     codeLanguage: {
         type: String,
         default: 'python'
+    },
+    firstBlood: {
+        type: String,
+        default: 'none'
     }
 });
 

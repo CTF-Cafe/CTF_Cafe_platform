@@ -140,7 +140,11 @@ exports.submitFlag = async function(req, res) {
             }
         });
 
-        await challenges.updateOne({ flag: flag }, { $inc: { solveCount: 1 } });
+        if (checkFlag.firstBlood == 'none') {
+            await challenges.updateOne({ flag: flag }, { $inc: { solveCount: 1 }, firstBlood: updatedUser.username });
+        } else {
+            await challenges.updateOne({ flag: flag }, { $inc: { solveCount: 1 } });
+        }
 
         res.send({ state: 'success', user: updatedUser });
 

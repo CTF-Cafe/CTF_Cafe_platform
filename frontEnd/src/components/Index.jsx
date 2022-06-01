@@ -88,7 +88,7 @@ function Index(props) {
                 style={{ paddingRight: "8px" }}
               >
                 <span
-                  className="fab fa-discord"
+                  className="fa-brands fa-discord"
                   style={{ fontSize: "32px" }}
                 ></span>
               </a>
@@ -99,7 +99,7 @@ function Index(props) {
                 style={{ paddingRight: "8px" }}
               >
                 <span
-                  className="fab fa-twitter"
+                  className="fa-brands fa-twitter"
                   style={{ fontSize: "32px" }}
                 ></span>
               </a>
@@ -110,7 +110,7 @@ function Index(props) {
                 style={{ paddingRight: "8px" }}
               >
                 <span
-                  className="fab fa-github"
+                  className="fa-brands fa-github"
                   style={{ fontSize: "32px" }}
                 ></span>
               </a>

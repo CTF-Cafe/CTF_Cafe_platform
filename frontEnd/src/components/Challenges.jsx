@@ -5,7 +5,7 @@ import { saveAs } from "file-saver";
 import LoadingScreen from "react-loading-screen";
 import AppContext from "./Data/AppContext";
 import Navbar from "./Global/Navbar";
-import copy from 'copy-to-clipboard';
+import copy from "copy-to-clipboard";
 import "../css/prism.css";
 import Prism from "prismjs";
 import "prismjs/plugins/line-numbers/prism-line-numbers";
@@ -167,7 +167,7 @@ function Challenges(props) {
 
   const handleEnterSubmit = (event, index) => {
     // look for the `Enter` keyCode
-    if (event.key === 'Enter') {
+    if (event.key === "Enter") {
       console.log(index);
       submitFlag(index);
     }
@@ -281,6 +281,12 @@ function Challenges(props) {
                                 {challenge.points} points
                               </span>
                             </div>
+                            {challenge.firstBlood ==
+                            globalData.userData.username ? (
+                              <div style={{display: 'flex', color: "red"}}>
+                                <span class="fa-solid fa-droplet" style={{fontSize: "22px"}}></span>
+                              </div>
+                            ) : null}
                           </div>
                           <div
                             id={"problem_id_" + index}
@@ -340,7 +346,7 @@ function Challenges(props) {
                                       );
                                     }}
                                   >
-                                    <span className="fa fa-download mr-2"></span>
+                                    <span className="fa-solid fa-download mr-2"></span>
                                     Files
                                   </a>
                                 ) : null
@@ -361,7 +367,7 @@ function Challenges(props) {
                                     data-target="#modal"
                                     className="btn btn-outline-danger btn-shadow"
                                   >
-                                    <span className="fa fa-laptop-code mr-2"></span>
+                                    <span className="fa-solid fa-laptop-code mr-2"></span>
                                     Code Snippet
                                   </a>
                                 ) : null
@@ -378,7 +384,7 @@ function Challenges(props) {
                                     data-target="#modal"
                                     className="btn btn-outline-danger btn-shadow"
                                   >
-                                    <span className="far fa-lightbulb mr-2"></span>
+                                    <span className="fa-solid fa-lightbulb mr-2"></span>
                                     Hint
                                   </a>
                                 ) : null
@@ -495,7 +501,9 @@ function Challenges(props) {
                     type="button"
                     className="btn btn-success"
                     data-dismiss="modal"
-                    onClick={() => {copy(currentSnippet.code)}}
+                    onClick={() => {
+                      copy(currentSnippet.code);
+                    }}
                   >
                     Copy Code
                   </button>
