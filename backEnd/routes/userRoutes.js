@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const challengesController = require('../controllers/challengesController.js');
 const teamController = require('../controllers/teamController.js');
+const userController = require('../controllers/userController.js');
 const ctfConfig = require('../models/ctfConfigModel.js');
 const users = require('../models/userModel.js');
 
@@ -15,6 +16,10 @@ router.post('/joinTeam', (req, res) => {
 
 router.get('/leaveTeam', (req, res) => {
     teamController.leaveTeam(req, res);
+});
+
+router.post('/updateUsername', (req, res) => {
+    userController.updateUsername(req, res);
 });
 
 router.post('/getTeamCode', (req, res) => {

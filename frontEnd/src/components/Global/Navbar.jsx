@@ -79,7 +79,13 @@ function Navbar() {
                   <Link to={`/user/${globalData.userData.username}`}>
                     <span
                       className="fa fa-user-ninja text-light bold"
-                      style={{ fontSize: "18px", padding: '0.2rem 1rem !important' }}
+                      style={{ fontSize: "18px", paddingRight: "10px"}}
+                    ></span>
+                  </Link>
+                  <Link to={`/usersettings`}>
+                    <span
+                      className="fa fa-cog text-light bold"
+                      style={{ fontSize: "18px" }}
                     ></span>
                   </Link>
                 </>

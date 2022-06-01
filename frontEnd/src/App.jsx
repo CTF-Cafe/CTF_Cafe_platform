@@ -14,6 +14,7 @@ import Admin from "./components//Admin/Admin";
 import Team from "./components/Team";
 import UserTeam from "./components/UserTeam";
 import User from "./components/User";
+import UserSettings from "./components/UserSettings";
 import { useState, useEffect, useLayoutEffect } from "react";
 import { useAlert, positions } from "react-alert";
 import { useNavigate } from "react-router-dom";
@@ -164,6 +165,7 @@ function App() {
                 <Route path="/challenges" element={<Challenges />} />
                 <Route path="/logout" element={<Logout />} />
                 <Route path="/userteam" element={<UserTeam />} />
+                <Route path="/usersettings" element={<UserSettings />} />
               </>
             ) : (
               <>
