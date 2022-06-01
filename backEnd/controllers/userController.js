@@ -45,7 +45,7 @@ exports.register = async function(req, res) {
         }
 
         // Username to short
-        if (username.length >= 4) {
+        if (username.length < 4) {
             throw new Error('Username is to short! 4 characters minimum!');
         }
 

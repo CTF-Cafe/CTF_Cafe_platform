@@ -8,7 +8,7 @@ dotenv.config()
 const bodyparser = require('body-parser');
 const path = require("path");
 const session = require('express-session');
-const MongoStore = require('connect-mongo')(session);
+const MongoStore = require('connect-mongo');
 const fileUpload = require('express-fileupload');
 const mongoSanitize = require('express-mongo-sanitize');
 const xssClean = require('xss-clean/lib/xss').clean;
@@ -30,8 +30,9 @@ app.use(bodyparser.urlencoded({ extended: false }));
 app.use(bodyparser.json());
 
 var sess = {
-    store: new MongoStore({
-        mongooseConnection: mongoose.connection
+    store: MongoStore.create({
+        mongoUrl: process.env.MONGODB_CONNSTRING,
+        touchAfter: 24 * 3600 // time period in seconds
     }),
     secret: process.env.SECRET_KEY,
     resave: false,
