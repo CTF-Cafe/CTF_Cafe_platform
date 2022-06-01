@@ -11,15 +11,6 @@ export devPassword="password"
 apt-get -y update
 apt-get -y install nginx docker.io
 
-if [[ $domainSetup = 'true' ]] 
-then 
-    apt-get -y install snapd
-    snap install core
-    snap install --classic certbot
-    ln -s /snap/bin/certbot /usr/bin/certbot
-    certbot --nginx -d $domainName --agree-to --email "dev@$domainName" -n
-fi 
-
 # Firewall
 ufw allow ssh
 ufw allow 'Nginx Full'
@@ -96,6 +87,16 @@ server {
 }" > ctf.conf
 cd ../sites-enabled
 ln -s ../sites-available/ctf.conf .
+
+if [[ $domainSetup = 'true' ]] 
+then 
+    apt-get -y install snapd
+    snap install core
+    snap install --classic certbot
+    ln -s /snap/bin/certbot /usr/bin/certbot
+    certbot --nginx -d $domainName --agree-to --email "dev@$domainName" -n
+fi 
+
 service nginx reload
 
 # Create dev user & switch to it
