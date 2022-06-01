@@ -5,7 +5,7 @@ export domainName="dev.ctf.cafe"
 export ctfName="TEST_CTF"
 export dbPass="password"
 export sessionKey="test-session"
-export devPassword="password"
+export devPassword="dev_password"
 
 # Installs
 apt-get -y update
@@ -119,7 +119,7 @@ docker run --name mongodb -d -e MONGO_INITDB_ROOT_USERNAME=dev -e MONGO_INITDB_R
 git clone https://github.com/CTF-Cafe/CTF_Cafe.git
 cd CTF_Cafe/frontEnd
 echo "
-    REACT_APP_SERVER_URI=http://"$( if [ $domainSetup = 'true' ]; then echo $domainName; else hostname -I | awk -F ' ' '{ print $1 }'; fi; )"
+    REACT_APP_SERVER_URI=http://"$( if [ $domainSetup = 'true' ]; then echo httpd://$domainName; else hostname -I | awk -F ' ' '{ print http://$1 }'; fi; )"
     REACT_APP_CTF_NAME=$ctfName
     GENERATE_SOURCEMAP=false
 " > .env
@@ -131,7 +131,7 @@ cd ../backEnd
 echo "
     SECRET_KEY=$sessionKey
     NODE_ENV=production
-    FRONTEND_URI=http://"$( if [ $domainSetup = 'true' ]; then echo $domainName; else hostname -I | awk -F ' ' '{ print $1 }'; fi; )"
+    FRONTEND_URI="$( if [ $domainSetup = 'true' ]; then echo https://$domainName; else hostname -I | awk -F ' ' '{ print http://$1 }'; fi; )"
 " > .env
 docker build -t ctf_cafe/backend .
 docker stop backend_1
