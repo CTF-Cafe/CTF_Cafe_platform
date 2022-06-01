@@ -163,7 +163,7 @@ function Tools(props) {
         {/* Hidden Stuff */}
         <img
           style={{ display: "none" }}
-          src="https://ez.ctf.cafe/api/assets/template.jpg"
+          src={process.env.REACT_APP_SERVER_URI + "/api/assets/template.jpg"}
           crossorigin="anonymous"
           id="certImg"
         />
