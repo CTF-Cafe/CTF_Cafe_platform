@@ -40,7 +40,7 @@ exports.register = async function(req, res) {
         const startTime = await ctfConfig.findOne({ name: 'startTime' });
 
         // Check if CTF has started
-        if (parseInt(startTime.value) - (Math.floor((new Date()).getTime() / 1000)) >= 0) {
+        if (parseInt(startTime.value) - (Math.floor((new Date()).getTime() / 1000)) <= 0) {
             throw new Error('Registrations are closed!');
         }
 
