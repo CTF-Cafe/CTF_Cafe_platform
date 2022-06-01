@@ -105,6 +105,8 @@ echo "dev:$devPassword" | chpasswd --encrypted
 usermod -aG docker dev
 touch /home/dev/devSetup.sh
 
+rm -r CTF_Cafe
+
 cat >/home/dev/devSetup.sh <<'EOF'
 #!/bin/bash
 
