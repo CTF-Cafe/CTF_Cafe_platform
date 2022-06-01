@@ -125,6 +125,10 @@ exports.submitFlag = async function(req, res) {
 
         let timestamp = new Date().getTime();
 
+        if (checkFlag.firstBlood == 'none') {
+            checkFlag.firstBlood = username;
+        }
+
         await users.updateOne({ username: username }, { $push: { solved: { _id: checkFlag._id, challenge: checkFlag, timestamp: timestamp } } });
         await users.updateOne({ username: username }, { $inc: { score: checkFlag.points } });
 
@@ -140,7 +144,7 @@ exports.submitFlag = async function(req, res) {
             }
         });
 
-        if (checkFlag.firstBlood == 'none') {
+        if (checkFlag.firstBlood == 'none' || checkFlag.firstBlood == username) {
             await challenges.updateOne({ flag: flag }, { $inc: { solveCount: 1 }, firstBlood: updatedUser.username });
         } else {
             await challenges.updateOne({ flag: flag }, { $inc: { solveCount: 1 } });

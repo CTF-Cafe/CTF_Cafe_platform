@@ -29,7 +29,7 @@ db.once("open", async function() {
 
     console.log("Teams reset successfully");
 
-    await challenges.updateMany({ solveCount: { $gt: 0 } }, { solveCount: 0 });
+    await challenges.updateMany({ solveCount: { $gt: 0 } }, { solveCount: 0, firstBlood: 'none' });
 
     console.log("Challenges reset successfully");
 

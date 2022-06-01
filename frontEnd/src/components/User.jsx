@@ -42,7 +42,6 @@ function User(props) {
                 });
               }
 
-              console.log(finalDataCategory);
               setChallengeStatsCategory(finalDataCategory);
 
               var difficulty = finalDataDifficulty.find((obj) => {
@@ -140,7 +139,15 @@ function User(props) {
                               <th scope="row" style={{ textAlign: "center" }}>
                                 {index}
                               </th>
-                              <td>{solve.challenge.name}</td>
+                              <td>
+                                {solve.challenge.firstBlood == user.username ? (
+                                  <span
+                                    class="fa-solid fa-droplet"
+                                    style={{ fontSize: "22px", color: "red", marginRight: '5px' }}
+                                  ></span>
+                                ) : null}
+                                {solve.challenge.name}
+                              </td>
                               <td>{solve.challenge.points}</td>
                               <td>{solve.challenge.category}</td>
                               <td>{solve.timestamp}</td>
