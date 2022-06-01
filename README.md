@@ -5,6 +5,7 @@
   - Flag submit bruteforce protection
 - Individual and Team based competitions
   - Have users play on their own or form teams to play together
+  - First blood's
 - Scoreboard with automatic tie resolution
   - See global user, team and challenge stats
   - See indivudal team & user stats
