@@ -15,21 +15,7 @@ db.once("open", async function() {
     console.log("Database Connected successfully");
 
 
-    const teamsFound = await teams.aggregate([{
-            "$unwind": {
-                "path": "$users",
-
-            }
-        },
-        {
-            $group: {
-                _id: "$_id",
-                users: { $push: "$users" },
-                solved: { $first: "$users.solved" },
-                name: { $first: "$name" },
-            }
-        },
-        {
+    const usersFound = await users.aggregate([{
             "$unwind": {
                 "path": "$solved",
 
@@ -49,6 +35,8 @@ db.once("open", async function() {
                             _id: 0,
                             solve: {
                                 _id: "$_id",
+                                challenge: { points: "$points", name: "$name", _id: "$_id" },
+                                timestamp: "$$timestamp",
                                 points: "$points",
                             }
                         }
@@ -57,25 +45,27 @@ db.once("open", async function() {
                         $replaceRoot: { newRoot: "$solve" }
                     }
                 ],
-                as: "newSolved"
+                as: "solved"
             }
         },
         {
             "$unwind": {
-                "path": "$newSolved",
+                "path": "$solved",
 
             }
         },
         {
             $group: {
                 _id: "$_id",
-                users: { $first: "$users" },
-                totalScore: { $sum: "$newSolved.points" },
+                username: { $first: "$username" },
+                score: { $sum: "$solved.points" },
+                solved: { $push: "$solved" },
+                isAdmin: { $first: "$isAdmin" }
             }
         }
-    ]);
+    ])
 
-    console.log(teamsFound[1])
+    console.log(usersFound, usersFound[1])
 
     process.exit(0);
 });
