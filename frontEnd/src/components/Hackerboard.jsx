@@ -68,29 +68,6 @@ function Hackerboard(props) {
           globalData.alert.error(response.data.message);
           setLoading(false);
         } else {
-          response.data.forEach((team) => {
-            team.totalScore = 0;
-            team.users.forEach((user) => {
-              if (team.totalScore) {
-                team.totalScore += user.score;
-              } else {
-                team.totalScore = user.score;
-              }
-            });
-          });
-
-          response.data.forEach((team) => {
-            team.totalSolved = 0;
-            team.users.forEach((user) => {
-              if (team.totalSolved) {
-                team.totalSolved += user.solved.length;
-              } else {
-                team.totalSolved = user.solved.length;
-              }
-            });
-          });
-
-          response.data.sort((a, b) => b.totalScore - a.totalScore);
 
           if (selectionScore == "down") {
             setTeams(response.data.reverse());

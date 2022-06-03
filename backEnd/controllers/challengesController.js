@@ -90,7 +90,7 @@ exports.submitFlag = async function(req, res) {
         checkFlag.flag = 'Nice try XD';
 
         // Check if challenge is already solved
-        if (user.solved.filter(obj => { return obj.challenge._id.equals(checkFlag._id) }).length > 0) {
+        if (user.solved.filter(obj => { return obj._id.equals(checkFlag._id) }).length > 0) {
             throw new Error('Already Solved!');
         }
 
@@ -116,7 +116,7 @@ exports.submitFlag = async function(req, res) {
 
         if (team.users.filter(user => {
                 return (user.solved.filter(obj => {
-                    return obj.challenge._id.equals(checkFlag._id)
+                    return obj._id.equals(checkFlag._id)
                 }).length > 0)
             }).length > 0) {
 
@@ -129,8 +129,8 @@ exports.submitFlag = async function(req, res) {
             checkFlag.firstBlood = username;
         }
 
-        await users.updateOne({ username: username }, { $push: { solved: { _id: checkFlag._id, challenge: checkFlag, timestamp: timestamp } } });
-        await users.updateOne({ username: username }, { $inc: { score: checkFlag.points } });
+        await users.updateOne({ username: username }, { $push: { solved: { _id: checkFlag._id, timestamp: timestamp } } });
+        // await users.updateOne({ username: username }, { $inc: { score: checkFlag.points } });
 
         const updatedUser = await users.findOne({ username: username });
 
@@ -140,7 +140,6 @@ exports.submitFlag = async function(req, res) {
         }, {
             $set: {
                 "users.$.solved": updatedUser.solved,
-                "users.$.score": updatedUser.score,
             }
         });
 

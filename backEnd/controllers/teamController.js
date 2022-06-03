@@ -110,49 +110,74 @@ exports.getTeams = async function(req, res) {
 
             let allTeams = [];
             try {
+
                 allTeams = await teams.aggregate([{
-                    "$project": {
-                        "name": 1,
-                        "users": 1,
-                        "timestamps": "$users.solved.timestamp",
-                        "totalScore": {
-                            "$sum": "$users.score"
+                        "$unwind": {
+                            "path": "$users",
+
                         }
-                    }
-                }, {
-                    '$sort': {
-                        'totalScore': -1
-                    }
-                }]);
-                // .skip((page - 1) * 100).limit(100);
-
-                allTeams.forEach(team => {
-                    let maxTimestamp = 0;
-
-                    team.timestamps.forEach(timestamp => {
-                        if (max(timestamp) > maxTimestamp) {
-                            maxTimestamp = max(timestamp)
+                    },
+                    {
+                        $group: {
+                            _id: "$_id",
+                            users: { $push: "$users" },
+                            solved: { $first: "$users.solved" },
+                            name: { $first: "$name" },
                         }
-                    });
+                    },
+                    {
+                        "$unwind": {
+                            "path": "$solved",
 
-                    team.maxTimestamp = maxTimestamp;
-                })
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: "challenges",
+                            let: { "chalId": "$solved._id", "timestamp": "$solved.timestamp" },
+                            pipeline: [{
+                                    $match: {
+                                        $expr: { $eq: ["$$chalId", "$_id"] },
+                                    },
+                                },
+                                {
+                                    $project: {
+                                        _id: 0,
+                                        solve: {
+                                            _id: "$_id",
+                                            points: "$points",
+                                            timestamp: "$$timestamp",
+                                        }
+                                    }
+                                },
+                                {
+                                    $replaceRoot: { newRoot: "$solve" }
+                                }
+                            ],
+                            as: "newSolved"
+                        }
+                    },
+                    {
+                        "$unwind": {
+                            "path": "$newSolved",
 
-                allTeams.sort((a, b) => {
-                    if (b.totalScore - a.totalScore == 0) {
-                        return a.maxTimestamp - b.maxTimestamp;
-                    } else {
-                        return b.totalScore - a.totalScore;
-                    }
-                });
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: "$_id",
+                            users: { $first: "$users" },
+                            totalScore: { $sum: "$newSolved.points" },
+                            totalSolved: { $sum: 1 },
+                            maxTimestamp: { $max: "$newSolved.timestamp" },
+                            name: { $first: "$name" },
+                        }
+                    },
+                ]).sort({ totalScore: -1, maxTimestamp: -1, _id: 1 }).skip((page - 1) * 100).limit(100);
 
             } catch (err) {
-                allTeams = await teams.find({}).sort({ 'users.score': -1, _id: 1 });
+                res.send({ state: 'error', message: err.message });
             }
-
-            await allTeams.forEach(team => {
-                team.inviteCode = 'Nice try XD';
-            });
 
             res.send(allTeams);
         }
