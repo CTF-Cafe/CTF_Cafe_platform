@@ -22,40 +22,6 @@ function Teams(props) {
         } else if (response.data.state == "error") {
           globalData.alert.error(response.data.message);
         } else {
-          console.log(response.data);
-
-          response.data.forEach((team) => {
-            team.users.forEach((user) => {
-              if (team.totalScore) {
-                team.totalScore += user.score;
-              } else {
-                team.totalScore = user.score;
-              }
-            });
-          });
-
-          response.data.forEach((team) => {
-            team.users.forEach((user) => {
-              if (team.totalSolved) {
-                team.totalSolved += user.solved.length;
-              } else {
-                team.totalSolved = user.solved.length;
-              }
-            });
-          });
-
-          response.data.sort((a, b) => {
-            if (a.totalScore < b.totalScore) {
-              return 1;
-            }
-
-            if (a.totalScore > b.totalScore) {
-              return -1;
-            }
-
-            return 0;
-          });
-
           setTeams(response.data);
           setPage(index);
         }

@@ -240,7 +240,7 @@ function Challenges(props) {
                           <div
                             className={
                               globalData.userData.solved.filter((obj) => {
-                                return obj.challenge._id == challenge._id;
+                                return obj._id == challenge._id;
                               }).length > 0
                                 ? "card-header solved"
                                 : globalData.userData.team
@@ -249,7 +249,7 @@ function Challenges(props) {
                                       return (
                                         user.solved.filter((obj) => {
                                           return (
-                                            obj.challenge._id == challenge._id
+                                            obj._id == challenge._id
                                           );
                                         }).length > 0
                                       );
@@ -271,7 +271,7 @@ function Challenges(props) {
                             {challenge.name}{" "}
                             <div>
                               {globalData.userData.solved.filter((obj) => {
-                                return obj.challenge._id == challenge._id;
+                                return obj._id == challenge._id;
                               }).length > 0 ? (
                                 <>
                                   <span className="badge">solved</span>{" "}

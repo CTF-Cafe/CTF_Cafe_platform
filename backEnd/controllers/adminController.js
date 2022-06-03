@@ -217,7 +217,55 @@ exports.getUsers = async function(req, res) {
 
             let allUsers = [];
             try {
-                allUsers = await users.find().sort({ score: -1, _id: 1 }).skip((page - 1) * 100).limit(100);
+                allUsers = await users.aggregate([{
+                        "$unwind": {
+                            "path": "$solved",
+
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: "challenges",
+                            let: { "chalId": "$solved._id", "timestamp": "$solved.timestamp" },
+                            pipeline: [{
+                                    $match: {
+                                        $expr: { $eq: ["$$chalId", "$_id"] },
+                                    },
+                                },
+                                {
+                                    $project: {
+                                        _id: 0,
+                                        solve: {
+                                            _id: "$_id",
+                                            challenge: { points: "$points", name: "$name", _id: "$_id" },
+                                            timestamp: "$$timestamp",
+                                            points: "$points",
+                                        }
+                                    }
+                                },
+                                {
+                                    $replaceRoot: { newRoot: "$solve" }
+                                }
+                            ],
+                            as: "solved"
+                        }
+                    },
+                    {
+                        "$unwind": {
+                            "path": "$solved",
+
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: "$_id",
+                            username: { $first: "$username" },
+                            score: { $sum: "$solved.points" },
+                            solved: { $push: "$solved" },
+                            isAdmin: { $first: "$isAdmin" }
+                        }
+                    }
+                ]).sort({ score: -1, _id: 1 }).skip((page - 1) * 100).limit(100);
             } catch (err) {
                 console.log(err.message)
                 allUsers = await users.find().sort({ score: -1, _id: 1 });

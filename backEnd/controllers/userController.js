@@ -3,6 +3,7 @@ const { v4 } = require('uuid');
 const ctfConfig = require('../models/ctfConfigModel.js');
 const theme = require('../models/themeModel.js');
 const teams = require('../models/teamModel.js');
+const challenges = require('../models/challengeModel.js');
 const encryptionController = require('./encryptionController.js');
 const ObjectId = require('mongoose').Types.ObjectId;
 
@@ -164,16 +165,60 @@ exports.getUsers = async function(req, res) {
 
             let allUsers = [];
             try {
-                allUsers = await users.find({}).sort({ score: -1, _id: 1 }).skip((page - 1) * 100).limit(100);
-            } catch (err) {
-                allUsers = await users.find({}).sort({ score: -1, _id: 1 });
-            }
+                allUsers = await users.aggregate([{
+                        "$unwind": {
+                            "path": "$solved",
 
-            await allUsers.forEach(user => {
-                user.password = 'Nice try XD';
-                user.key = 'Nice try XD';
-                user.isAdmin = false;
-            });
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: "challenges",
+                            let: { "chalId": "$solved._id", "timestamp": "$solved.timestamp" },
+                            pipeline: [{
+                                    $match: {
+                                        $expr: { $eq: ["$$chalId", "$_id"] },
+                                    },
+                                },
+                                {
+                                    $project: {
+                                        _id: 0,
+                                        solve: {
+                                            _id: "$_id",
+                                            challenge: { points: "$points", name: "$name", _id: "$_id" },
+                                            timestamp: "$$timestamp",
+                                            points: "$points",
+                                        }
+                                    }
+                                },
+                                {
+                                    $replaceRoot: { newRoot: "$solve" }
+                                }
+                            ],
+                            as: "solved"
+                        }
+                    },
+                    {
+                        "$unwind": {
+                            "path": "$solved",
+
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: "$_id",
+                            username: { $first: "$username" },
+                            score: { $sum: "$solved.points" },
+                            solved: { $push: "$solved" }
+                        }
+                    }
+                ]).sort({ score: -1, _id: 1 }).skip((page - 1) * 100).limit(100);
+
+                // allUsers = await users.find({}).sort({ score: -1, _id: 1 }).skip((page - 1) * 100).limit(100);
+            } catch (err) {
+                console.log(err);
+                res.send({ state: 'error', message: err.message });
+            }
 
             res.send(allUsers);
         }
@@ -189,6 +234,13 @@ exports.getUser = async function(req, res) {
         user.password = 'Nice try XD';
         user.key = 'Nice try XD';
         user.isAdmin = false;
+        user.score = 0;
+
+        for (let i = 0; i < user.solved.length; i++) {
+            let challenge = await challenges.findById(user.solved[i]._id);
+            user.solved[i].challenge = challenge;
+            user.score += challenge.points;
+        }
 
         res.send(user);
     } else {
@@ -227,35 +279,68 @@ function max(input) {
 
 exports.getScoreboard = async function(req, res) {
     let allTeams = await teams.aggregate([{
-        "$project": {
-            "name": 1,
-            "users": 1,
-            "timestamps": "$users.solved.timestamp",
-            "totalScore": {
-                "$sum": "$users.score"
-            },
-        }
-    }]);
+            "$unwind": {
+                "path": "$users",
 
-    allTeams.forEach(team => {
-        let maxTimestamp = 0;
-
-        team.timestamps.forEach(timestamp => {
-            if (max(timestamp) > maxTimestamp) {
-                maxTimestamp = max(timestamp)
             }
-        });
+        },
+        {
+            $group: {
+                _id: "$_id",
+                users: { $push: "$users" },
+                solved: { $first: "$users.solved" },
+                name: { $first: "$name" },
+            }
+        },
+        {
+            "$unwind": {
+                "path": "$solved",
 
-        team.maxTimestamp = maxTimestamp;
-    })
+            }
+        },
+        {
+            $lookup: {
+                from: "challenges",
+                let: { "chalId": "$solved._id", "timestamp": "$solved.timestamp" },
+                pipeline: [{
+                        $match: {
+                            $expr: { $eq: ["$$chalId", "$_id"] },
+                        },
+                    },
+                    {
+                        $project: {
+                            _id: 0,
+                            solve: {
+                                _id: "$_id",
+                                points: "$points",
+                                timestamp: "$$timestamp",
+                            }
+                        }
+                    },
+                    {
+                        $replaceRoot: { newRoot: "$solve" }
+                    }
+                ],
+                as: "newSolved"
+            }
+        },
+        {
+            "$unwind": {
+                "path": "$newSolved",
 
-    allTeams.sort((a, b) => {
-        if (b.totalScore - a.totalScore == 0) {
-            return a.maxTimestamp - b.maxTimestamp;
-        } else {
-            return b.totalScore - a.totalScore;
-        }
-    });
+            }
+        },
+        {
+            $group: {
+                _id: "$_id",
+                users: { $first: "$users" },
+                totalScore: { $sum: "$newSolved.points" },
+                totalSolved: { $sum: 1 },
+                maxTimestamp: { $max: "$newSolved.timestamp" },
+                name: { $first: "$name" },
+            }
+        },
+    ]).sort({ totalScore: -1, maxTimestamp: -1, _id: 1 })
 
     let finalData = {
         standings: []
