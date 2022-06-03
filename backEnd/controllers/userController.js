@@ -168,7 +168,7 @@ exports.getUsers = async function(req, res) {
                 allUsers = await users.aggregate([{
                         "$unwind": {
                             "path": "$solved",
-
+                            "preserveNullAndEmptyArrays": true
                         }
                     },
                     {
@@ -201,7 +201,7 @@ exports.getUsers = async function(req, res) {
                     {
                         "$unwind": {
                             "path": "$solved",
-
+                            "preserveNullAndEmptyArrays": true
                         }
                     },
                     {
@@ -281,7 +281,7 @@ exports.getScoreboard = async function(req, res) {
     let allTeams = await teams.aggregate([{
             "$unwind": {
                 "path": "$users",
-
+                "preserveNullAndEmptyArrays": true
             }
         },
         {
@@ -295,7 +295,7 @@ exports.getScoreboard = async function(req, res) {
         {
             "$unwind": {
                 "path": "$solved",
-
+                "preserveNullAndEmptyArrays": true
             }
         },
         {
@@ -327,7 +327,7 @@ exports.getScoreboard = async function(req, res) {
         {
             "$unwind": {
                 "path": "$newSolved",
-
+                "preserveNullAndEmptyArrays": true
             }
         },
         {
