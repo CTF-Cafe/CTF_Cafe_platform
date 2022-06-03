@@ -14,7 +14,9 @@ mongoose.connect(process.env.MONGODB_CONNSTRING, { useNewUrlParser: true, useUni
 db.once("open", async function() {
     console.log("Database Connected successfully");
 
-    await users.updateMany({ score: { $gt: 0 } }, { score: 0, solved: [] });
+    await users.updateMany({
+        "$size": { solved: { $gt: 0 } }
+    }, { score: 0, solved: [] });
 
     console.log("Users reset successfully");
 
