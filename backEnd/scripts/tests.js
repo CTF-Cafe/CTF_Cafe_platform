@@ -18,7 +18,7 @@ db.once("open", async function() {
     const usersFound = await users.aggregate([{
             "$unwind": {
                 "path": "$solved",
-
+                "preserveNullAndEmptyArrays": true
             }
         },
         {
@@ -51,7 +51,7 @@ db.once("open", async function() {
         {
             "$unwind": {
                 "path": "$solved",
-
+                "preserveNullAndEmptyArrays": true
             }
         },
         {
