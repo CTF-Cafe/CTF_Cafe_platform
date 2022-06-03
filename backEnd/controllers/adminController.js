@@ -220,7 +220,7 @@ exports.getUsers = async function(req, res) {
                 allUsers = await users.aggregate([{
                         "$unwind": {
                             "path": "$solved",
-
+                            "preserveNullAndEmptyArrays": true
                         }
                     },
                     {
@@ -253,7 +253,7 @@ exports.getUsers = async function(req, res) {
                     {
                         "$unwind": {
                             "path": "$solved",
-
+                            "preserveNullAndEmptyArrays": true
                         }
                     },
                     {

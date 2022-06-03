@@ -114,7 +114,7 @@ exports.getTeams = async function(req, res) {
                 allTeams = await teams.aggregate([{
                         "$unwind": {
                             "path": "$users",
-
+                            "preserveNullAndEmptyArrays": true
                         }
                     },
                     {
@@ -128,7 +128,7 @@ exports.getTeams = async function(req, res) {
                     {
                         "$unwind": {
                             "path": "$solved",
-
+                            "preserveNullAndEmptyArrays": true
                         }
                     },
                     {
@@ -160,7 +160,7 @@ exports.getTeams = async function(req, res) {
                     {
                         "$unwind": {
                             "path": "$newSolved",
-
+                            "preserveNullAndEmptyArrays": true
                         }
                     },
                     {
