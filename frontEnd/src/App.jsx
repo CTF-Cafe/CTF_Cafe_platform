@@ -16,7 +16,7 @@ import UserTeam from "./components/UserTeam";
 import User from "./components/User";
 import UserSettings from "./components/UserSettings";
 import { useState, useEffect, useLayoutEffect } from "react";
-import { useAlert, positions } from "react-alert";
+import { useAlert, positions } from "@blaumaus/react-alert";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
