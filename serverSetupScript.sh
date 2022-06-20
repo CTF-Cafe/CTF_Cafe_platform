@@ -105,12 +105,13 @@ echo "dev:$devPassword" | chpasswd --encrypted
 usermod -aG docker dev
 touch /home/dev/devSetup.sh
 
-rm -r CTF_Cafe
-
 cat >/home/dev/devSetup.sh <<'EOF'
 #!/bin/bash
 
 cd /home/dev/
+
+# Clean old versions
+rm -r CTF_Cafe
 
 # MongoDB setup
 docker stop mongodb
