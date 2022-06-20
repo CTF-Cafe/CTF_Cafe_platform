@@ -111,7 +111,7 @@ cat >/home/dev/devSetup.sh <<'EOF'
 cd /home/dev/
 
 # Clean old versions
-rm -r CTF_Cafe
+rm -f -r CTF_Cafe
 
 # MongoDB setup
 docker stop mongodb
