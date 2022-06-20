@@ -10,7 +10,7 @@
   - See global user, team and challenge stats
   - See indivudal team & user stats
 - Automatic competition starting and ending
-  - Easily set endTime & starTime from the admin dashboard
+  - Easily set endTime & startTime from the admin dashboard
 - Team and user management, and banning
 - Customize site colors, background, rules & frontpage
 - Importing and Exporting of CTF scoreboards into json
