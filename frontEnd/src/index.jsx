@@ -1,7 +1,8 @@
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import { BrowserRouter } from "react-router-dom";
-import { transitions, positions, Provider as AlertProvider } from "@blaumaus/react-alert";
+import { transitions, positions, Provider as AlertProvider } from "react-alert";
+import AlertTemplate from "react-alert-template-basic";
 
 // optional configuration
 const options = {
@@ -12,13 +13,6 @@ const options = {
   // you can also just use 'scale'
   transition: transitions.SCALE,
 };
-
-const AlertTemplate = (style, options, message, close) => {
-  <div style={style}>
-    {message}
-    <button onClick={close}>X</button>
-  </div>
-}
 
 const root = createRoot(document.getElementById("root"));
 root.render(
