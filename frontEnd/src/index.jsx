@@ -1,4 +1,4 @@
-import { createRoot } from "react-dom/client";
+import ReactDOM from "react-dom";
 import App from "./App";
 import { BrowserRouter } from "react-router-dom";
 import { transitions, positions, Provider as AlertProvider } from "react-alert";
@@ -14,11 +14,11 @@ const options = {
   transition: transitions.SCALE,
 };
 
-const root = createRoot(document.getElementById("root"));
-root.render(
+ReactDOM.render(
   <AlertProvider template={AlertTemplate} {...options}>
     <BrowserRouter>
       <App />
     </BrowserRouter>
-  </AlertProvider>
+  </AlertProvider>,
+  document.getElementById('root')
 );
