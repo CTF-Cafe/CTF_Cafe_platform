@@ -121,7 +121,7 @@ docker run --name mongodb -d -e MONGO_INITDB_ROOT_USERNAME=dev -e MONGO_INITDB_R
 git clone https://github.com/CTF-Cafe/CTF_Cafe.git
 cd CTF_Cafe/frontEnd
 echo "
-    REACT_APP_SERVER_URI=http://"$( if [ $domainSetup = 'true' ]; then echo https://$domainName; else hostname -I | awk -F ' ' '{ print "http://"$1 }'; fi; )"
+    REACT_APP_SERVER_URI="$( if [ $domainSetup = 'true' ]; then echo https://$domainName; else hostname -I | awk -F ' ' '{ print "http://"$1 }'; fi; )"
     REACT_APP_CTF_NAME=$ctfName
     GENERATE_SOURCEMAP=false
 " > .env
