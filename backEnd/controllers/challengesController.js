@@ -139,6 +139,7 @@ exports.submitFlag = async function(req, res) {
             users: { $elemMatch: { username: updatedUser.username } }
         }, {
             $set: {
+                "users.$.score": updatedUser.score,
                 "users.$.solved": updatedUser.solved,
             }
         });
