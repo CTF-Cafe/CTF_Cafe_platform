@@ -43,7 +43,6 @@ function User(props) {
         <div className="container">
           {globalData.userData.username ? (
             <div>
-              {globalData.userData.solved.length > 0 ? (
                 <>
                   <div className="row" style={{ textAlign: "center" }}>
                     <div className="col-md-6 mb-3">
@@ -104,9 +103,6 @@ function User(props) {
                     </div>
                   </div>
                 </>
-              ) : (
-                <h3 style={{ textAlign: "center" }}>No Challenges Solved!</h3>
-              )}
             </div>
           ) : (
             <div>
