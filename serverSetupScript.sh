@@ -105,13 +105,16 @@ echo "dev:$devPassword" | chpasswd --encrypted
 usermod -aG docker dev
 touch /home/dev/devSetup.sh
 
+#Save Assets
+cp -r /home/dev/CTF_Cafe/backEnd/assets /tmp/assets
+
+# Clean old versions
+rm -f -r /home/dev/CTF_Cafe
+
 cat >/home/dev/devSetup.sh <<'EOF'
 #!/bin/bash
 
 cd /home/dev/
-
-# Clean old versions
-rm -f -r CTF_Cafe
 
 # MongoDB setup
 docker stop mongodb
@@ -140,6 +143,9 @@ docker build -t ctf_cafe/backend .
 docker stop backend_1
 docker rm backend_1
 docker run -d -p 3001:3001 -e MONGODB_CONNSTRING=mongodb://dev:$dbPass@$(docker inspect -f '{{.NetworkSettings.IPAddress}}' mongodb):27017/ctfDB?authSource=admin -v ~/CTF_Cafe/backEnd/assets:/server/assets --name backend_1 ctf_cafe/backend
+
+#Re-Add Assets
+cp /tmp/assets/* /home/dev/CTF_Cafe/backEnd/assets/
 EOF
 
 chmod 707 /home/dev/devSetup.sh
