@@ -285,10 +285,16 @@ exports.getScoreboard = async function(req, res) {
             }
         },
         {
+            "$unwind": {
+                "path": "$users.solved",
+                "preserveNullAndEmptyArrays": true
+            }
+        },
+        {
             $group: {
                 _id: "$_id",
                 users: { $push: "$users" },
-                solved: { $first: "$users.solved" },
+                solved: { $push: "$users.solved" },
                 name: { $first: "$name" },
             }
         },
@@ -341,6 +347,8 @@ exports.getScoreboard = async function(req, res) {
             }
         },
     ]).sort({ totalScore: -1, maxTimestamp: -1, _id: 1 })
+
+    // TO FIX_ 
 
     let finalData = {
         standings: []

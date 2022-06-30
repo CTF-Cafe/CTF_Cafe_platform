@@ -43,28 +43,32 @@ function User(props) {
         <div className="container">
           {globalData.userData.username ? (
             <div>
-                <>
-                  <div className="row" style={{ textAlign: "center" }}>
-                    <div className="col-md-6 mb-3">
-                      <div>
-                        <h3>Settings</h3>
-                        <div className="form-group">
-                          <input
-                            type="text"
-                            className="form-control"
-                            id="newUsername"
-                            placeholder="New Username"
-                            style={{ width: '75%', margin: 'auto', marginBottom: '10px'}}
-                          />
-                          <button
-                            className="btn btn-outline-danger btn-shadow"
-                            onClick={updateUsername}
-                            style={{ marginBottom: "25px" }}
-                          >
-                            Update Username
-                          </button>
-                        </div>
-                        {/* 
+              <>
+                <div className="row" style={{ textAlign: "center" }}>
+                  <div className="col-md-6 mb-3">
+                    <div>
+                      <h3>Settings</h3>
+                      <div className="form-group">
+                        <input
+                          type="text"
+                          className="form-control"
+                          id="newUsername"
+                          placeholder="New Username"
+                          style={{
+                            width: "75%",
+                            margin: "auto",
+                            marginBottom: "10px",
+                          }}
+                        />
+                        <button
+                          className="btn btn-outline-danger btn-shadow"
+                          onClick={updateUsername}
+                          style={{ marginBottom: "25px" }}
+                        >
+                          Update Username
+                        </button>
+                      </div>
+                      {/* 
                         <div className="form-group">
                           <input
                             type="text"
@@ -80,29 +84,29 @@ function User(props) {
                             Update Password
                           </button>
                         </div> */}
-                      </div>
-                    </div>
-                    <div className="col-md-6 mb-3">
-                      <div>
-                        <h3>User Info</h3>
-                        <ul
-                          style={{
-                            listStyle: "none",
-                            textAlign: "center",
-                            padding: 0,
-                          }}
-                        >
-                          <li>Username: {globalData.userData.username}</li>
-                          {globalData.userData.team ? (
-                            <li>Team: {globalData.userData.team.name}</li>
-                          ) : null}
-                          <li># Solved: {globalData.userData.solved.length}</li>
-                          <li>Score: {globalData.userData.score}</li>
-                        </ul>
-                      </div>
                     </div>
                   </div>
-                </>
+                  <div className="col-md-6 mb-3">
+                    <div>
+                      <h3>User Info</h3>
+                      <ul
+                        style={{
+                          listStyle: "none",
+                          textAlign: "center",
+                          padding: 0,
+                        }}
+                      >
+                        <li>Username: {globalData.userData.username}</li>
+                        {globalData.userData.team ? (
+                          <li>Team: {globalData.userData.team.name}</li>
+                        ) : null}
+                        <li># Solved: {globalData.userData.solved.length}</li>
+                        <li>Score: {globalData.userData.score}</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </>
             </div>
           ) : (
             <div>

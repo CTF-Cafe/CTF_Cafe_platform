@@ -18,6 +18,11 @@ function Team(props) {
       })
       .then((response) => {
         if (response.data.state != "error") {
+          response.data.users.forEach(user => {
+            user.solved.forEach(solved => {
+              user.score += solved.points;
+            })
+          })
           setTeam(response.data);
         }
       })
