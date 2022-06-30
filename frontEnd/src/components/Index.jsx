@@ -122,20 +122,24 @@ function Index(props) {
               className="col-xl-12"
               style={{ marginTop: "30px", textAlign: "center" }}
             >
-              <h2 className="display-2 bold color_white">SPONSORS</h2>
-              {globalData.sponsors.map((sponsor) => {
-                return (
-                  <img
-                   key={sponsor.image}
-                    src={sponsor.image}
-                    style={{
-                      margin: "0px 15px",
-                      marginTop: "30px",
-                      width: "400px",
-                    }}
-                  />
-                );
-              })}
+              {globalData.sponsors.length > 0 ? (
+                <>
+                  <h2 className="display-2 bold color_white">SPONSORS</h2>
+                  {globalData.sponsors.map((sponsor) => {
+                    return (
+                      <img
+                        key={sponsor.image}
+                        src={sponsor.image}
+                        style={{
+                          margin: "0px 15px",
+                          marginTop: "30px",
+                          width: "400px",
+                        }}
+                      />
+                    );
+                  })}
+                </>
+              ) : null}
             </div>
           </div>
         </div>
