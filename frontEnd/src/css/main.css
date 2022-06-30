@@ -799,7 +799,7 @@ a.text-light:focus {
 }
 
 .tradeMark {
-    position: absolute;
+    position: fixed;
     bottom: 0 !important;
     right: 0 !important;
     padding: 10px;
