@@ -18,11 +18,26 @@ function Team(props) {
       })
       .then((response) => {
         if (response.data.state != "error") {
-          response.data.users.forEach(user => {
-            user.solved.forEach(solved => {
+          const clubArray = (arr) => {
+            return arr.reduce((acc, val, ind) => {
+              const index = acc.findIndex((el) => el.username === val.username);
+              if (index !== -1) {
+                acc[index].solved.push(val.solved[0]);
+                acc[index].score += val.score;
+              } else {
+                acc.push(val);
+              }
+              return acc;
+            }, []);
+          };
+
+          response.data.users = clubArray(response.data.users);
+
+          response.data.users.forEach((user) => {
+            user.solved.forEach((solved) => {
               user.score += solved.points;
-            })
-          })
+            });
+          });
           setTeam(response.data);
         }
       })

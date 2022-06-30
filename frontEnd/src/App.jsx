@@ -135,6 +135,27 @@ function App() {
             alert.success("Logged In!");
 
             if (res.data.team) {
+              const clubArray = (arr) => {
+                return arr.reduce((acc, val, ind) => {
+                  const index = acc.findIndex((el) => el.username === val.username);
+                  if (index !== -1) {
+                    acc[index].solved.push(val.solved[0]);
+                    acc[index].score += val.score;
+                  } else {
+                    acc.push(val);
+                  }
+                  return acc;
+                }, []);
+              };
+    
+              res.data.team.users = clubArray(res.data.team.users);
+
+              res.data.team.users.forEach(user => {
+                user.solved.forEach(solved => {
+                  user.score += solved.points;
+                })
+              })
+
               res.data.user.team = res.data.team;
             }
 
