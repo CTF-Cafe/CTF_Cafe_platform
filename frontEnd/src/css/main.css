@@ -797,3 +797,21 @@ a.text-light:focus {
 #__react-alert__ div div div {
     width: auto !important;
 }
+
+.tradeMark {
+    position: absolute;
+    bottom: 0 !important;
+    right: 0 !important;
+    padding: 10px;
+    text-align: right;
+}
+
+.tradeMark img {
+    max-width: 50px;
+    transform: scaleX(-1);
+    cursor: pointer !important;
+}
+
+.tradeMark img:hover {
+    max-width: 100px;
+}

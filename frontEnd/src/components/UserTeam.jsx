@@ -20,6 +20,12 @@ function UserTeam(props) {
           globalData.setLoggedIn(false);
           globalData.navigate("/", { replace: true });
         } else if (response.data.state != "error") {
+          response.data.users.forEach(user => {
+            user.solved.forEach(solved => {
+              user.score += solved.points;
+            })
+          })
+
           globalData.userData.team = response.data;
           globalData.setUserData(globalData.userData);
         }
@@ -49,6 +55,13 @@ function UserTeam(props) {
         } else if (response.data.state == "success") {
           globalData.alert.success("Team registered!");
           globalData.userData = response.data.user;
+
+          response.data.team.users.forEach(function(user) {
+            user.solved.forEach(function(solved) {
+              user.score += solved.points;
+            })
+          });
+
           globalData.userData.team = response.data.team;
           globalData.setUserData(globalData.userData);
         } else {

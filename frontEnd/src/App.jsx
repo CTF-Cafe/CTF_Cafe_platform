@@ -19,6 +19,7 @@ import { useState, useEffect, useLayoutEffect } from "react";
 import { useAlert, positions } from "react-alert";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import TradeMark from "./components/Global/TradeMark";
 
 // Objects
 import AppContext from "./components/Data/AppContext";
@@ -58,15 +59,15 @@ function App() {
           response.data.forEach((config) => {
             switch (config.name) {
               case "rules":
-                setRules(config.value)
+                setRules(config.value);
                 break;
-              case 'sponsors':
-                setSponsors(config.value)
+              case "sponsors":
+                setSponsors(config.value);
                 break;
               default:
                 break;
             }
-          })
+          });
         }
       })
       .catch((err) => {
@@ -175,6 +176,7 @@ function App() {
             )}
             <Route path="/*" element={<FourOFour />} />
           </Routes>
+          <TradeMark />
         </div>
       </div>
     </AppContext.Provider>

@@ -118,10 +118,16 @@ exports.getTeams = async function(req, res) {
                         }
                     },
                     {
+                        "$unwind": {
+                            "path": "$users.solved",
+                            "preserveNullAndEmptyArrays": true
+                        }
+                    },
+                    {
                         $group: {
                             _id: "$_id",
                             users: { $push: "$users" },
-                            solved: { $first: "$users.solved" },
+                            solved: { $push: "$users.solved" },
                             name: { $first: "$name" },
                         }
                     },
@@ -187,12 +193,115 @@ exports.getTeams = async function(req, res) {
 exports.getUserTeam = async function(req, res) {
     if (ObjectId.isValid((req.body.teamId))) {
 
-        let team = await teams.findById((req.body.teamId));
+        try {
+            let team = await teams.aggregate([{
+                    "$match": { "_id": ObjectId(req.body.teamId) }
+                }, {
+                    "$unwind": {
+                        "path": "$users",
+                        "preserveNullAndEmptyArrays": true
+                    }
+                },
+                {
+                    "$unwind": {
+                        "path": "$users.solved",
+                        "preserveNullAndEmptyArrays": true
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "challenges",
+                        let: { "chalId": "$users.solved._id", "timestamp": "$users.solved.timestamp" },
+                        pipeline: [{
+                                $match: {
+                                    $expr: { $eq: ["$$chalId", "$_id"] },
+                                },
+                            },
+                            {
+                                $project: {
+                                    _id: 0,
+                                    solve: {
+                                        _id: "$_id",
+                                        points: "$points",
+                                    }
+                                }
+                            },
+                            {
+                                $replaceRoot: { newRoot: "$solve" }
+                            }
+                        ],
+                        as: "users.solved"
+                    }
+                },
+                {
+                    $group: {
+                        _id: "$_id",
+                        users: { $push: "$users" },
+                        solved: { $first: "$users.solved" },
+                        name: { $first: "$name" },
+                    }
+                },
+                {
+                    "$unwind": {
+                        "path": "$solved",
+                        "preserveNullAndEmptyArrays": true
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "challenges",
+                        let: { "chalId": "$solved._id", "timestamp": "$solved.timestamp" },
+                        pipeline: [{
+                                $match: {
+                                    $expr: { $eq: ["$$chalId", "$_id"] },
+                                },
+                            },
+                            {
+                                $project: {
+                                    _id: 0,
+                                    solve: {
+                                        _id: "$_id",
+                                        points: "$points",
+                                        timestamp: "$$timestamp",
+                                    }
+                                }
+                            },
+                            {
+                                $replaceRoot: { newRoot: "$solve" }
+                            }
+                        ],
+                        as: "newSolved"
+                    }
+                },
+                {
+                    "$unwind": {
+                        "path": "$newSolved",
+                        "preserveNullAndEmptyArrays": true
+                    }
+                },
+                {
+                    $group: {
+                        _id: "$_id",
+                        users: { $first: "$users" },
+                        totalScore: { $sum: "$newSolved.points" },
+                        totalSolved: { $sum: 1 },
+                        maxTimestamp: { $max: "$newSolved.timestamp" },
+                        name: { $first: "$name" },
+                    }
+                },
+            ])
 
-        if (team) {
-            team.inviteCode = 'Nice try XD';
-            res.send(team);
-        } else {
+
+
+            if (team[0]) {
+                team[0].inviteCode = 'Nice try XD';
+                res.send(team[0]);
+            } else {
+                res.send({ state: 'error' })
+            }
+
+        } catch (err) {
+            console.log(err);
             res.send({ state: 'error' })
         }
     }
@@ -227,12 +336,108 @@ exports.leaveTeam = async function(req, res) {
 }
 
 exports.getTeam = async function(req, res) {
-    let team = await teams.findOne({ name: decodeURIComponent(req.body.teamName.trim()) });
 
-    if (team) {
-        team.inviteCode = 'Nice try XD';
+    let team = await teams.aggregate([{
+            "$match": { name: decodeURIComponent(req.body.teamName.trim()) }
+        }, {
+            "$unwind": {
+                "path": "$users",
+                "preserveNullAndEmptyArrays": true
+            }
+        },
+        {
+            "$unwind": {
+                "path": "$users.solved",
+                "preserveNullAndEmptyArrays": true
+            }
+        },
+        {
+            $lookup: {
+                from: "challenges",
+                let: { "chalId": "$users.solved._id", "timestamp": "$users.solved.timestamp" },
+                pipeline: [{
+                        $match: {
+                            $expr: { $eq: ["$$chalId", "$_id"] },
+                        },
+                    },
+                    {
+                        $project: {
+                            _id: 0,
+                            solve: {
+                                _id: "$_id",
+                                points: "$points",
+                            }
+                        }
+                    },
+                    {
+                        $replaceRoot: { newRoot: "$solve" }
+                    }
+                ],
+                as: "users.solved"
+            }
+        },
+        {
+            $group: {
+                _id: "$_id",
+                users: { $push: "$users" },
+                solved: { $first: "$users.solved" },
+                name: { $first: "$name" },
+            }
+        },
+        {
+            "$unwind": {
+                "path": "$solved",
+                "preserveNullAndEmptyArrays": true
+            }
+        },
+        {
+            $lookup: {
+                from: "challenges",
+                let: { "chalId": "$solved._id", "timestamp": "$solved.timestamp" },
+                pipeline: [{
+                        $match: {
+                            $expr: { $eq: ["$$chalId", "$_id"] },
+                        },
+                    },
+                    {
+                        $project: {
+                            _id: 0,
+                            solve: {
+                                _id: "$_id",
+                                points: "$points",
+                                timestamp: "$$timestamp",
+                            }
+                        }
+                    },
+                    {
+                        $replaceRoot: { newRoot: "$solve" }
+                    }
+                ],
+                as: "newSolved"
+            }
+        },
+        {
+            "$unwind": {
+                "path": "$newSolved",
+                "preserveNullAndEmptyArrays": true
+            }
+        },
+        {
+            $group: {
+                _id: "$_id",
+                users: { $first: "$users" },
+                totalScore: { $sum: "$newSolved.points" },
+                totalSolved: { $sum: 1 },
+                maxTimestamp: { $max: "$newSolved.timestamp" },
+                name: { $first: "$name" },
+            }
+        },
+    ])
 
-        res.send(team);
+    if (team[0]) {
+        team[0].inviteCode = 'Nice try XD';
+
+        res.send(team[0]);
     } else {
         res.send({ state: 'error', message: 'Team not found' })
     }
