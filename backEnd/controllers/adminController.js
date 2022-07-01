@@ -12,9 +12,13 @@ exports.getStats = async function(req, res) {
     let allChallenges = await challenges.find({});
 
     switch ((req.body.name)) {
-        case 'users':
-            let allUsers = await users.find({});
-            res.send(allUsers);
+        case 'counts':
+            let finalObject = {};
+            finalObject.usersCount = await users.countDocuments({});
+            finalObject.teamsCount = await teams.countDocuments({});
+            finalObject.challengesCount = await challenges.countDocuments({});
+
+            res.send(finalObject);
             break;
         case 'challenges':
             res.send(allChallenges);
