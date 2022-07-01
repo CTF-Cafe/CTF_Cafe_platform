@@ -169,10 +169,6 @@ function Stats(props) {
       >
         STATS
       </h1>
-      <div style={{ marginBottom: "100px" }}>
-        <h3>Score Distribution</h3>
-        <BarChart data={userStats} />
-      </div>
       <div className="row">
         <div className="col-md-6 mb-3">
           <div>
