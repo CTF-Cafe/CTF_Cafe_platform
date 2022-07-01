@@ -20,12 +20,22 @@ function Hackerboard(props) {
   const [selectionScore, setSelectionScore] = useState("up");
   const [page, setPage] = useState(1);
   const [endTime, setEndTime] = useState(2651526762);
+  const [teamCount, setTeamCount] = useState(0);
 
   const getData = (index) => {
     axios
       .get(process.env.REACT_APP_SERVER_URI + "/api/getEndTime")
       .then((response) => {
         setEndTime(response.data + "000");
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+
+    axios
+      .get(process.env.REACT_APP_SERVER_URI + "/api/user/getTeamCount")
+      .then((response) => {
+        setTeamCount(response.data);
       })
       .catch((err) => {
         console.log(err.message);
@@ -132,7 +142,7 @@ function Hackerboard(props) {
     });
 
     var index = teams.indexOf(team) + 1;
-    var teamLength = teams.length;
+    var totalCount = teamCount;
 
     if (index < 10) {
       index = "00" + index.toString();
@@ -140,10 +150,10 @@ function Hackerboard(props) {
       index = "0" + index.toString();
     }
 
-    if (teamLength < 10) {
-      teamLength = "00" + teamLength.toString();
+    if (totalCount < 10) {
+      totalCount = "00" + totalCount.toString();
     } else if (index < 100) {
-      teamLength = "0" + teamLength.toString();
+      totalCount = "0" + totalCount.toString();
     }
 
     //   CTF Name
@@ -164,7 +174,7 @@ function Hackerboard(props) {
     //   Total Teams
     ctx.font = "bold 80px Fira Code";
     ctx.fillStyle = "red";
-    ctx.fillText(teamLength, 1250, 275);
+    ctx.fillText(totalCount, 1250, 275);
 
     var anchor = document.createElement("a");
     anchor.href = canvas.toDataURL("image/png");
