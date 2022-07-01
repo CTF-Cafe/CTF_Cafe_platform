@@ -374,3 +374,8 @@ exports.getScoreboard = async function(req, res) {
 //         { "pos": 3, "team": "MV Tech", "score": 100 }
 //     ]
 // }
+
+exports.getTeamCount = async function(req, res) {
+    let teamsCount = await teams.countDocuments({});
+    res.send(teamsCount);
+}
