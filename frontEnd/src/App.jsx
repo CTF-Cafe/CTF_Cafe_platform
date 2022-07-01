@@ -20,6 +20,7 @@ import { useAlert, positions } from "react-alert";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import TradeMark from "./components/Global/TradeMark";
+import LoadingScreen from "react-loading-screen";
 
 // Objects
 import AppContext from "./components/Data/AppContext";
@@ -29,6 +30,7 @@ function App() {
   const [userData, setUserData] = useState(false);
   const [theme, setTheme] = useState({});
   const [rules, setRules] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [sponsors, setSponsors] = useState([]);
   const alert = useAlert();
   const navigate = useNavigate();
@@ -137,7 +139,9 @@ function App() {
             if (res.data.team) {
               const clubArray = (arr) => {
                 return arr.reduce((acc, val, ind) => {
-                  const index = acc.findIndex((el) => el.username === val.username);
+                  const index = acc.findIndex(
+                    (el) => el.username === val.username
+                  );
                   if (index !== -1) {
                     acc[index].solved.push(val.solved[0]);
                     acc[index].score += val.score;
@@ -147,14 +151,14 @@ function App() {
                   return acc;
                 }, []);
               };
-    
+
               res.data.team.users = clubArray(res.data.team.users);
 
-              res.data.team.users.forEach(user => {
-                user.solved.forEach(solved => {
+              res.data.team.users.forEach((user) => {
+                user.solved.forEach((solved) => {
                   user.score += solved.points;
-                })
-              })
+                });
+              });
 
               res.data.user.team = res.data.team;
             }
@@ -162,6 +166,7 @@ function App() {
             setUserData(res.data.user);
             setLoggedIn(true);
           }
+          setLoading(false);
         })
         .catch((err) => {
           console.error(err);
@@ -171,6 +176,11 @@ function App() {
 
   return (
     <AppContext.Provider value={globalData}>
+      <LoadingScreen
+        loading={loading}
+        bgColor="#0c0d16"
+        spinnerColor="#ef121b"
+      />
       <div>
         <div id="main">
           <Routes>
