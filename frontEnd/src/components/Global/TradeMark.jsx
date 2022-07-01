@@ -4,6 +4,7 @@ function TradeMark() {
   return (
     <div className="tradeMark">
       <a href="https://github.com/CTF-Cafe/CTF_Cafe" target="_blank">
+      <p>Powered by CTFCafe</p>
         <img classname="trademarkSticker" src={ctfCafeLogo} />
       </a>
     </div>
