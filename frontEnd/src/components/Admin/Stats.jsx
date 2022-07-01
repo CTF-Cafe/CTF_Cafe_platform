@@ -57,7 +57,7 @@ function Stats(props) {
           let finalDataSolves = [];
 
           response.data.forEach((data) => {
-            finalDataSolves.push({ name: data.name, solves: data.solveCount });
+            finalDataSolves.push({ name: data.name, solves: data.solveCount, category: data.category});
             var result = finalDataCategory.find((obj) => {
               return obj.name == data.category;
             });
