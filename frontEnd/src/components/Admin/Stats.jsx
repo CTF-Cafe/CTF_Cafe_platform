@@ -1,5 +1,5 @@
 import { Outlet, Routes, Route, Link } from "react-router-dom";
-import BarChart from "../Charts/BarChart";
+import ColumnChart from "../Charts/ColumnChart";
 import PieChart from "../Charts/PieChart";
 import { useState, useEffect, useContext } from "react";
 import axios from "axios";
@@ -8,7 +8,8 @@ import AppContext from "../Data/AppContext";
 
 function Stats(props) {
   const globalData = useContext(AppContext);
-  const [userStats, setUserStats] = useState([]);
+  const [counts, setCounts] = useState({});
+  const [challengeSolves, setChallengeSolves] = useState([]);
   const [challengeStatsCategory, setChallengeStatsCategory] = useState([]);
   const [challengeStatsDifficulty, setChallengeStatsDifficulty] = useState([]);
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ function Stats(props) {
       .post(
         process.env.REACT_APP_SERVER_URI + "/api/admin/getStats",
         {
-          name: "users",
+          name: "counts",
         },
         { withCredentials: true }
       )
@@ -29,55 +30,7 @@ function Stats(props) {
           globalData.setLoggedIn(false);
           globalData.navigate("/", { replace: true });
         } else {
-          response.data.sort((a, b) => {
-            if (a.score < b.score) {
-              return 1;
-            }
-
-            if (a.score > b.score) {
-              return -1;
-            }
-
-            return 0;
-          });
-
-          const highestScore = response.data[0].score;
-
-          const one = {
-            score: `${highestScore / 1.25} - ${highestScore}`,
-            count: 0,
-          };
-
-          let two = {
-            score: `${highestScore / 2} - ${highestScore / 1.25 - 1}`,
-            count: 0,
-          };
-
-          let three = {
-            score: `${highestScore / 4} - ${highestScore / 2 - 1}`,
-            count: 0,
-          };
-
-          let four = {
-            score: `${0} - ${highestScore / 4 - 1}`,
-            count: 0,
-          };
-
-          response.data.forEach((item) => {
-            if (item.score >= highestScore / 1.25) {
-              one.count += 1;
-            } else if (item.score >= highestScore / 2) {
-              two.count += 1;
-            } else if (item.score >= highestScore / 4) {
-              three.count += 1;
-            } else {
-              four.count += 1;
-            }
-          });
-
-          const finalData = [one, two, three, four];
-
-          setUserStats(finalData);
+          setCounts(response.data);
         }
       })
       .catch((err) => {
@@ -101,8 +54,10 @@ function Stats(props) {
         } else {
           let finalDataCategory = [];
           let finalDataDifficulty = [];
+          let finalDataSolves = [];
 
           response.data.forEach((data) => {
+            finalDataSolves.push({ name: data.name, solves: data.solveCount });
             var result = finalDataCategory.find((obj) => {
               return obj.name == data.category;
             });
@@ -148,6 +103,7 @@ function Stats(props) {
             }
           });
 
+          setChallengeSolves(finalDataSolves);
           setChallengeStatsCategory(finalDataCategory);
           setChallengeStatsDifficulty(finalDataDifficulty);
         }
@@ -169,6 +125,18 @@ function Stats(props) {
       >
         STATS
       </h1>
+      <div className="row">
+        <div className="col-md-6 mb-3">
+          <h3>CTF Stats</h3>
+          <p>Total Users: {counts.usersCount}</p>
+          <p>Total Teams: {counts.teamsCount}</p>
+          <p>Total Challenges: {counts.challengesCount}</p>
+        </div>
+        <div className="col-md-6 mb-3">
+          <h3>Solve Counts</h3>
+          <ColumnChart data={challengeSolves} />
+        </div>
+      </div>
       <div className="row">
         <div className="col-md-6 mb-3">
           <div>
