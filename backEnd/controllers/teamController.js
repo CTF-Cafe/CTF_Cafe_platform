@@ -190,8 +190,6 @@ exports.getTeams = async function(req, res) {
                 res.send({ state: 'error', message: err.message });
             }
 
-            console.log(allTeams[0])
-
             res.send(allTeams);
         }
     }

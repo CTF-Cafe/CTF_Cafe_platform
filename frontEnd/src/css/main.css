@@ -804,14 +804,30 @@ a.text-light:focus {
     right: 0 !important;
     padding: 10px;
     text-align: right;
+    font-size: 0;
+}
+
+.tradeMark:hover {
+    font-size: 12px;
+}
+
+.tradeMark a {
+    display: flex;
+    align-items: flex-end;
+    text-decoration: none;
+}
+
+.tradeMark p {
+    margin: 0;
+    color: #dbebfb !important;
+}
+
+.tradeMark p:hover {
+    text-decoration: underline;
 }
 
 .tradeMark img {
-    max-width: 50px;
+    max-width: 75px;
     transform: scaleX(-1);
     cursor: pointer !important;
-}
-
-.tradeMark img:hover {
-    max-width: 100px;
 }
