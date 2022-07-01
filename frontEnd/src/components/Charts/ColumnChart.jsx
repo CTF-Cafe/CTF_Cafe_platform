@@ -7,9 +7,8 @@ function ColumnChart(props) {
     data,
     xField: "name",
     yField: "solves",
-    seriesField: "name",
-    legend: {
-      position: "bottom-left",
+    scrollbar: {
+      type: 'horizontal',
     },
   };
 
