@@ -25,7 +25,7 @@ function Hackerboard(props) {
     axios
       .get(process.env.REACT_APP_SERVER_URI + "/api/getEndTime")
       .then((response) => {
-        setEndTime(response.data);
+        setEndTime(response.data + "000");
       })
       .catch((err) => {
         console.log(err.message);
@@ -68,7 +68,6 @@ function Hackerboard(props) {
           globalData.alert.error(response.data.message);
           setLoading(false);
         } else {
-
           if (selectionScore == "down") {
             setTeams(response.data.reverse());
           } else {
@@ -224,18 +223,20 @@ function Hackerboard(props) {
               <p className="text-grey lead text-spacey text-center hackerFont">
                 Where the world 's greatest get ranked!
               </p>
-              {globalData.userData.team ? (
-                <div style={{textAlign: 'center'}}>
-                  <button
-                    className="btn btn-outline-danger btn-shadow"
-                    onClick={() => {
-                      downloadCert();
-                    }}
-                    style={{ marginBottom: "25px" }}
-                  >
-                    Download Certificate
-                  </button>
-                </div>
+              {new Date().getTime() > endTime ? (
+                globalData.userData.team ? (
+                  <div style={{ textAlign: "center" }}>
+                    <button
+                      className="btn btn-outline-danger btn-shadow"
+                      onClick={() => {
+                        downloadCert();
+                      }}
+                      style={{ marginBottom: "25px" }}
+                    >
+                      Download Certificate
+                    </button>
+                  </div>
+                ) : null
               ) : null}
             </div>
           </div>
