@@ -9,7 +9,6 @@ function ColumnChart(props) {
     yField: "solves",
     seriesField: "category", // or seriesField in some cases
     color: ({ category }) => {
-      console.log(category);
       switch (category) {
         case "crypto":
           return "#9966FF94";
