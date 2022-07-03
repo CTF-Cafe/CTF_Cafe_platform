@@ -20,6 +20,10 @@ var teamSchema = new Schema({
         validate: [teamLimit, '{PATH} exceeds the limit of 4'],
         required: true,
     },
+    teamCaptain: {
+        type: String,
+        required: false,
+    }
 
 });
 

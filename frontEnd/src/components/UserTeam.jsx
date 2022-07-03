@@ -1,18 +1,25 @@
 import { Outlet, Routes, Route, Link } from "react-router-dom";
 import axios from "axios";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import copy from "copy-to-clipboard";
 import AppContext from "./Data/AppContext";
 import Navbar from "./Global/Navbar";
+import ConfirmModal from "./Global/ConfirmModal";
 
 function UserTeam(props) {
   const globalData = useContext(AppContext);
+  const [action, setAction] = useState({});
+  const [userTeam, setUserTeam] = useState({});
 
   const getTeam = () => {
     axios
-      .post(process.env.REACT_APP_SERVER_URI + "/api/user/getUserTeam", {
-        teamId: globalData.userData.teamId,
-      }, { withCredentials: true })
+      .post(
+        process.env.REACT_APP_SERVER_URI + "/api/user/getUserTeam",
+        {
+          teamId: globalData.userData.teamId,
+        },
+        { withCredentials: true }
+      )
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -35,13 +42,14 @@ function UserTeam(props) {
 
           response.data.users = clubArray(response.data.users);
 
-          response.data.users.forEach(user => {
-            user.solved.forEach(solved => {
+          response.data.users.forEach((user) => {
+            user.solved.forEach((solved) => {
               user.score += solved.points;
-            })
-          })
+            });
+          });
 
           globalData.userData.team = response.data;
+          setUserTeam(response.data);
           globalData.setUserData(globalData.userData);
         }
       })
@@ -58,9 +66,13 @@ function UserTeam(props) {
     const teamName = document.getElementById("teamName").value;
 
     axios
-      .post(process.env.REACT_APP_SERVER_URI + "/api/user/registerTeam", {
-        teamName: teamName,
-      }, { withCredentials: true })
+      .post(
+        process.env.REACT_APP_SERVER_URI + "/api/user/registerTeam",
+        {
+          teamName: teamName,
+        },
+        { withCredentials: true }
+      )
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -71,13 +83,14 @@ function UserTeam(props) {
           globalData.alert.success("Team registered!");
           globalData.userData = response.data.user;
 
-          response.data.team.users.forEach(function(user) {
-            user.solved.forEach(function(solved) {
+          response.data.team.users.forEach(function (user) {
+            user.solved.forEach(function (solved) {
               user.score += solved.points;
-            })
+            });
           });
 
           globalData.userData.team = response.data.team;
+          setUserTeam(response.data.team);
           globalData.setUserData(globalData.userData);
         } else {
           globalData.alert.error(response.data.message);
@@ -92,9 +105,13 @@ function UserTeam(props) {
     const teamCode = document.getElementById("teamCode").value;
 
     axios
-      .post(process.env.REACT_APP_SERVER_URI + "/api/user/joinTeam", {
-        teamCode: teamCode,
-      }, { withCredentials: true })
+      .post(
+        process.env.REACT_APP_SERVER_URI + "/api/user/joinTeam",
+        {
+          teamCode: teamCode,
+        },
+        { withCredentials: true }
+      )
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -105,6 +122,7 @@ function UserTeam(props) {
           globalData.alert.success("Team joined!");
           globalData.userData = response.data.user;
           globalData.userData.team = response.data.team;
+          setUserTeam(response.data.team);
           globalData.setUserData(globalData.userData);
         } else {
           globalData.alert.error(response.data.message);
@@ -117,9 +135,13 @@ function UserTeam(props) {
 
   const copyCode = (e) => {
     axios
-      .post(process.env.REACT_APP_SERVER_URI + "/api/user/getTeamCode", {
-        teamName: globalData.userData.team.name,
-      }, { withCredentials: true })
+      .post(
+        process.env.REACT_APP_SERVER_URI + "/api/user/getTeamCode",
+        {
+          teamName: globalData.userData.team.name,
+        },
+        { withCredentials: true }
+      )
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -140,7 +162,9 @@ function UserTeam(props) {
 
   const leaveTeam = (e) => {
     axios
-      .get(process.env.REACT_APP_SERVER_URI + "/api/user/leaveTeam", { withCredentials: true })
+      .get(process.env.REACT_APP_SERVER_URI + "/api/user/leaveTeam", {
+        withCredentials: true,
+      })
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -162,12 +186,43 @@ function UserTeam(props) {
       });
   };
 
+  const kickUser = (e, userToKick) => {
+    axios
+      .post(
+        process.env.REACT_APP_SERVER_URI + "/api/user/kickUser",
+        {
+          userToKick: userToKick,
+        },
+        { withCredentials: true }
+      )
+      .then((response) => {
+        if (response.data.state == "sessionError") {
+          globalData.alert.error("Session expired!");
+          globalData.setUserData({});
+          globalData.setLoggedIn(false);
+          globalData.navigate("/", { replace: true });
+        } else if (response.data.state == "success") {
+          globalData.alert.success("Kicked user!");
+
+          globalData.userData.team = response.data.team;
+          setUserTeam(response.data.team);
+          globalData.setUserData(globalData.userData);
+        } else {
+          globalData.alert.error(response.data.message);
+        }
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+  };
+
   return (
     <div>
       <Navbar />
+      <ConfirmModal action={action} />
       <div className="jumbotron bg-transparent mb-0 pt-3 radius-0">
         <div className="container">
-          {!globalData.userData.team ? (
+          {!userTeam.name ? (
             <div className="jumbotron bg-transparent mb-0 pt-3 radius-0">
               <div className="container">
                 <div className="row">
@@ -233,7 +288,7 @@ function UserTeam(props) {
                   className="display-1 bold color_white"
                   style={{ textAlign: "center", marginBottom: "25px" }}
                 >
-                  {globalData.userData.team.name.toUpperCase()}
+                  {userTeam.name.toUpperCase()}
                 </h1>
                 <button
                   className="btn btn-outline-danger btn-shadow"
@@ -262,13 +317,31 @@ function UserTeam(props) {
                   </tr>
                 </thead>
                 <tbody>
-                  {globalData.userData.team.users.map((user, index) => {
+                  {userTeam.users.map((user, index) => {
                     return (
                       <tr key={user.username}>
                         <th scope="row" style={{ textAlign: "center" }}>
                           {index}
                         </th>
                         <td>
+                          {userTeam.teamCaptain ==
+                            globalData.userData.username &&
+                          globalData.userData.username != user.username ? (
+                            <button
+                              className="btn btn-outline-danger btn-shadow"
+                              data-toggle="modal"
+                              data-target="#confirmModal"
+                              onClick={(e) => {
+                                setAction({
+                                  function: kickUser,
+                                  e: e,
+                                  data: user.username,
+                                });
+                              }}
+                            >
+                              <span className="fa-solid fa-minus"></span>
+                            </button>
+                          ) : null}
                           <Link to={`/user/${user.username}`}>
                             <a className="p-3 text-decoration-none text-light bold">
                               {user.username}

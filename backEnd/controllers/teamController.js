@@ -22,7 +22,7 @@ exports.register = async function(req, res) {
             }
 
             if (!userTeamExists) {
-                await teams.create({ name: teamName, inviteCode: v4(), users: [{ username: userToCheck.username, score: userToCheck.score, solved: userToCheck.solved }] }).then(async function(team) {
+                await teams.create({ name: teamName, inviteCode: v4(), teamCaptain: userToCheck.username, users: [{ username: userToCheck.username, score: userToCheck.score, solved: userToCheck.solved }] }).then(async function(team) {
                     await users.findOneAndUpdate({ username: req.session.username }, { teamId: team.id }, { returnOriginal: false }).then(async function(user) {
                         res.send({ state: 'success', message: 'Registered team!', user: user, team: team });
                     });
@@ -134,6 +134,7 @@ exports.getTeams = async function(req, res) {
                             users: { $first: "$oldUsers" },
                             solved: { $push: "$users.solved" },
                             name: { $first: "$name" },
+                            teamCaptain: { $first: "$teamCaptain" },
                         }
                     },
                     {
@@ -182,6 +183,7 @@ exports.getTeams = async function(req, res) {
                             totalSolved: { $sum: 1 },
                             maxTimestamp: { $max: "$newSolved.timestamp" },
                             name: { $first: "$name" },
+                            teamCaptain: { $first: "$teamCaptain" },
                         }
                     },
                 ]).sort({ totalScore: -1, maxTimestamp: -1, _id: 1 }).skip((page - 1) * 100).limit(100);
@@ -244,6 +246,7 @@ exports.getUserTeam = async function(req, res) {
                         users: { $push: "$users" },
                         solved: { $first: "$users.solved" },
                         name: { $first: "$name" },
+                        teamCaptain: { $first: "$teamCaptain" },
                     }
                 },
                 {
@@ -292,6 +295,7 @@ exports.getUserTeam = async function(req, res) {
                         totalSolved: { $sum: 1 },
                         maxTimestamp: { $max: "$newSolved.timestamp" },
                         name: { $first: "$name" },
+                        teamCaptain: { $first: "$teamCaptain" },
                     }
                 },
             ])
@@ -386,6 +390,7 @@ exports.getTeam = async function(req, res) {
                 _id: "$_id",
                 users: { $push: "$users" },
                 name: { $first: "$name" },
+                teamCaptain: { $first: "$teamCaptain" },
             }
         },
     ])
@@ -396,5 +401,38 @@ exports.getTeam = async function(req, res) {
         res.send(team[0]);
     } else {
         res.send({ state: 'error', message: 'Team not found' })
+    }
+}
+
+exports.kickUser = async function(req, res) {
+
+    const userToCheck = await users.findOne({ username: req.body.userToKick });
+
+    let userTeamExists;
+    if (ObjectId.isValid(userToCheck.teamId)) {
+        userTeamExists = await teams.findById(userToCheck.teamId);
+    }
+
+    if (userTeamExists) {
+
+        if (userTeamExists.teamCaptain === req.session.username) {
+            let newTeamUsers = userTeamExists.users.filter(user => user.username != req.body.userToKick);
+            await teams.findOneAndUpdate({ _id: userTeamExists.id }, { $set: { users: newTeamUsers } }, { returnOriginal: false }).then(async function(team) {
+                await users.findOneAndUpdate({ username: req.body.userToKick }, { teamId: 'none' }, { returnOriginal: false }).then(async function(user) {
+                    if (team.users) {
+                        if (team.users.length <= 0) {
+                            await teams.findByIdAndRemove(team.id);
+                        }
+                    }
+
+                    res.send({ state: 'success', message: 'User kicked!', user: user, team: team });
+                });
+            });
+        } else {
+            res.send({ state: 'error', message: 'You are not a teamCaptain!' });
+        }
+
+    } else {
+        res.send({ state: 'error', message: 'Use is not in a team!' });
     }
 }

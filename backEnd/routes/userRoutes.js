@@ -22,6 +22,10 @@ router.get('/leaveTeam', (req, res) => {
     teamController.leaveTeam(req, res);
 });
 
+router.post('/kickUser', (req, res) => {
+    teamController.kickUser(req, res);
+});
+
 router.post('/updateUsername', (req, res) => {
     userController.updateUsername(req, res);
 });
