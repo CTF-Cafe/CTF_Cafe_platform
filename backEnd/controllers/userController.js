@@ -121,16 +121,26 @@ exports.updateUsername = async function(req, res) {
 
                 if (userTeamExists) {
                     let newUsers = userTeamExists.users;
+                    let captain = userTeamExists.teamCaptain;
                     newUsers.forEach(userInTeam => {
                         if (userInTeam.username == req.session.username) {
                             userInTeam.username = username;
                         }
                     });
 
-                    await teams.findByIdAndUpdate(user.teamId, { users: newUsers }, { returnOriginal: false }).then(async function(user) {
-                        req.session.username = username;
-                        res.send({ state: 'success', message: 'Username updated!', user: user, team: team });
-                    });
+                    if (captain === req.session.username) {
+
+                        await teams.findByIdAndUpdate(user.teamId, { users: newUsers, teamCaptain: username }, { returnOriginal: false }).then(async function(user) {
+                            req.session.username = username;
+                            res.send({ state: 'success', message: 'Username updated!', user: user, team: team });
+                        });
+                    } else {
+
+                        await teams.findByIdAndUpdate(user.teamId, { users: newUsers }, { returnOriginal: false }).then(async function(user) {
+                            req.session.username = username;
+                            res.send({ state: 'success', message: 'Username updated!', user: user, team: team });
+                        });
+                    }
                 }
 
             } else {

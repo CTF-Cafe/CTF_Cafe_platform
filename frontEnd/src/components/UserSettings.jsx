@@ -100,8 +100,6 @@ function User(props) {
                         {globalData.userData.team ? (
                           <li>Team: {globalData.userData.team.name}</li>
                         ) : null}
-                        <li># Solved: {globalData.userData.solved.length}</li>
-                        <li>Score: {globalData.userData.score}</li>
                       </ul>
                     </div>
                   </div>
