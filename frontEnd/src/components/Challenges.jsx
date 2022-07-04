@@ -267,27 +267,22 @@ function Challenges(props) {
                             }}
                           >
                             <div>
+                              {challenge.firstBlood ==
+                              globalData.userData.username ? (
+                                <div
+                                  style={{
+                                    display: "inline-flex",
+                                    color: "red",
+                                    marginRight: "10px",
+                                  }}
+                                >
+                                  <span
+                                    class="fa-solid fa-droplet"
+                                    style={{ fontSize: "22px" }}
+                                  ></span>
+                                </div>
+                              ) : null}
                               {challenge.name}{" "}
-                              <span
-                                className={
-                                  challenge.level == 0
-                                    ? "badge color_white color_easy align-self-end"
-                                    : challenge.level == 1
-                                    ? "badge color_white color_medium align-self-end"
-                                    : challenge.level == 2
-                                    ? "badge color_white color_hard align-self-end"
-                                    : "badge color_white color_ninja align-self-end"
-                                }
-                                style={{ marginLeft: "5px" }}
-                              >
-                                {challenge.level == 0
-                                  ? "Easy"
-                                  : challenge.level == 1
-                                  ? "Medium"
-                                  : challenge.level == 2
-                                  ? "Hard"
-                                  : "Ninja"}
-                              </span>
                             </div>
                             <div
                               style={{
@@ -299,27 +294,37 @@ function Challenges(props) {
                                 return obj._id == challenge._id;
                               }).length > 0 ? (
                                 <>
-                                  <span className="badge" style={{ marginRight: "5px" }}>solved</span>{" "}
+                                  <span
+                                    className="badge"
+                                    style={{ marginRight: "5px" }}
+                                  >
+                                    solved
+                                  </span>{" "}
                                 </>
                               ) : null}
+                              <span
+                                className={
+                                  challenge.level == 0
+                                    ? "badge color_white color_easy align-self-end"
+                                    : challenge.level == 1
+                                    ? "badge color_white color_medium align-self-end"
+                                    : challenge.level == 2
+                                    ? "badge color_white color_hard align-self-end"
+                                    : "badge color_white color_ninja align-self-end"
+                                }
+                                style={{ marginRight: "5px" }}
+                              >
+                                {challenge.level == 0
+                                  ? "Easy"
+                                  : challenge.level == 1
+                                  ? "Medium"
+                                  : challenge.level == 2
+                                  ? "Hard"
+                                  : "Ninja"}
+                              </span>
                               <span className="badge align-self-end">
                                 {challenge.points} points
                               </span>
-                              {challenge.firstBlood ==
-                              globalData.userData.username ? (
-                                <div
-                                  style={{
-                                    display: "inline-flex",
-                                    color: "red",
-                                    marginLeft: "10px",
-                                  }}
-                                >
-                                  <span
-                                    class="fa-solid fa-droplet"
-                                    style={{ fontSize: "22px" }}
-                                  ></span>
-                                </div>
-                              ) : null}
                             </div>
                           </div>
                           <div
