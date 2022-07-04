@@ -5,7 +5,7 @@ const ctfConfig = require('../models/ctfConfigModel.js');
 const ObjectId = require('mongoose').Types.ObjectId;
 
 exports.getChallenges = async function(req, res) {
-    let allChallenges = await challenges.find({});
+    let allChallenges = await challenges.find({}).sort({ points: 1 });
     const startTime = await ctfConfig.findOne({ name: 'startTime' });
     const endTime = await ctfConfig.findOne({ name: 'endTime' });
     let categories = [];

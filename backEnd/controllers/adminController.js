@@ -9,7 +9,7 @@ const axios = require('axios');
 const ObjectId = require('mongoose').Types.ObjectId;
 
 exports.getStats = async function(req, res) {
-    let allChallenges = await challenges.find({});
+    let allChallenges = await challenges.find({}).sort({ points: 1 });
 
     switch ((req.body.name)) {
         case 'counts':
