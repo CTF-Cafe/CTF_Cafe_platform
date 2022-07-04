@@ -128,15 +128,15 @@ exports.updateUsername = async function(req, res) {
                         }
                     });
 
-                    if (captain === req.session.username) {
+                    if (captain == req.session.username) {
 
-                        await teams.findByIdAndUpdate(user.teamId, { users: newUsers, teamCaptain: username }, { returnOriginal: false }).then(async function(user) {
+                        await teams.findByIdAndUpdate(user.teamId, { users: newUsers, teamCaptain: username }, { returnOriginal: false }).then(async function(team) {
                             req.session.username = username;
                             res.send({ state: 'success', message: 'Username updated!', user: user, team: team });
                         });
                     } else {
 
-                        await teams.findByIdAndUpdate(user.teamId, { users: newUsers }, { returnOriginal: false }).then(async function(user) {
+                        await teams.findByIdAndUpdate(user.teamId, { users: newUsers }, { returnOriginal: false }).then(async function(team) {
                             req.session.username = username;
                             res.send({ state: 'success', message: 'Username updated!', user: user, team: team });
                         });
@@ -148,6 +148,7 @@ exports.updateUsername = async function(req, res) {
                 res.send({ state: 'success', message: 'Username updated!', user: user });
             }
         }).catch(function(err) {
+            console.log(err.message);
             throw new Error('User update failed!');
         });
 

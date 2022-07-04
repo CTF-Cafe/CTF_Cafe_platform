@@ -195,11 +195,15 @@ body {
 }
 
 .category_misc {
-    border-top: 4px solid #ffce5694;
+    border-top: 4px solid #ffff00;
 }
 
 .category_crypt {
     border-top: 4px solid #9966FF94;
+}
+
+.category_machine {
+    border-top: 4px solid #ffa600a7;
 }
 
 .hackerFont {

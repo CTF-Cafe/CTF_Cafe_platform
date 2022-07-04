@@ -248,9 +248,7 @@ function Challenges(props) {
                                     (user) => {
                                       return (
                                         user.solved.filter((obj) => {
-                                          return (
-                                            obj._id == challenge._id
-                                          );
+                                          return obj._id == challenge._id;
                                         }).length > 0
                                       );
                                     }
@@ -268,25 +266,61 @@ function Challenges(props) {
                               justifyContent: "space-between",
                             }}
                           >
-                            {challenge.name}{" "}
                             <div>
+                              {challenge.name}{" "}
+                              <span
+                                className={
+                                  challenge.level == 0
+                                    ? "badge color_white color_easy align-self-end"
+                                    : challenge.level == 1
+                                    ? "badge color_white color_medium align-self-end"
+                                    : challenge.level == 2
+                                    ? "badge color_white color_hard align-self-end"
+                                    : "badge color_white color_ninja align-self-end"
+                                }
+                                style={{ marginLeft: "5px" }}
+                              >
+                                {challenge.level == 0
+                                  ? "Easy"
+                                  : challenge.level == 1
+                                  ? "Medium"
+                                  : challenge.level == 2
+                                  ? "Hard"
+                                  : "Ninja"}
+                              </span>
+                            </div>
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "flex-end",
+                              }}
+                            >
                               {globalData.userData.solved.filter((obj) => {
                                 return obj._id == challenge._id;
                               }).length > 0 ? (
                                 <>
-                                  <span className="badge">solved</span>{" "}
+                                  <span className="badge" style={{ marginRight: "5px" }}>solved</span>{" "}
                                 </>
                               ) : null}
                               <span className="badge align-self-end">
                                 {challenge.points} points
                               </span>
+                              {challenge.firstBlood ==
+                              globalData.userData.username ? (
+                                <div
+                                  style={{
+                                    display: "inline-flex",
+                                    color: "red",
+                                    marginLeft: "10px",
+                                  }}
+                                >
+                                  <span
+                                    class="fa-solid fa-droplet"
+                                    style={{ fontSize: "22px" }}
+                                  ></span>
+                                </div>
+                              ) : null}
                             </div>
-                            {challenge.firstBlood ==
-                            globalData.userData.username ? (
-                              <div style={{display: 'flex', color: "red"}}>
-                                <span class="fa-solid fa-droplet" style={{fontSize: "22px"}}></span>
-                              </div>
-                            ) : null}
                           </div>
                           <div
                             id={"problem_id_" + index}
@@ -424,36 +458,6 @@ function Challenges(props) {
               </div>
             );
           })}
-
-          {counter == 0 ? (
-            <div className="row hackerFont justify-content-center mt-5">
-              <div className="col-md-12">
-                <br />
-                Challenge Types:
-                <span className="p-1" style={{ backgroundColor: "#ef121b94" }}>
-                  Web
-                </span>
-                <span className="p-1" style={{ backgroundColor: "#b017a494" }}>
-                  Osint
-                </span>
-                <span className="p-1" style={{ backgroundColor: "#17b06b94" }}>
-                  Steganography
-                </span>
-                <span className="p-1" style={{ backgroundColor: "#36a2eb94" }}>
-                  Pwning
-                </span>
-                <span className="p-1" style={{ backgroundColor: "#0f329894" }}>
-                  Forensics
-                </span>
-                <span className="p-1" style={{ backgroundColor: "#9966FF94" }}>
-                  Cryptography
-                </span>
-                <span className="p-1" style={{ backgroundColor: "#ffce5694" }}>
-                  Misc
-                </span>
-              </div>
-            </div>
-          ) : null}
         </div>
         <div
           className="modal fade"
