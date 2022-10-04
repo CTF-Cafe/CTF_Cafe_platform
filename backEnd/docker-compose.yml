@@ -12,8 +12,8 @@ services:
   backend_1:
     build: .
     restart: always
-    ports: '3001:3001'
-    expose: '3001:3001'
+    ports: 
+      - '3001:3001'
     environment:
       MONGODB_CONNSTRING: mongodb://root:hello@mongo:27017/
     volumes:
