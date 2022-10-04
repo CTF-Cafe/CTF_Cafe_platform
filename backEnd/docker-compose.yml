@@ -1,0 +1,23 @@
+version: '3.1'
+
+services:
+
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: hello
+
+  backend_1:
+    build: .
+    restart: always
+    ports: '3001:3001'
+    expose: '3001:3001'
+    environment:
+      MONGODB_CONNSTRING: mongodb://root:hello@mongo:27017/
+    volumes:
+      - ~/CTF_Cafe/backEnd/assets:/server/assets
+      
+volumes:
+  backend_1:
