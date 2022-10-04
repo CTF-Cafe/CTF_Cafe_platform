@@ -18,7 +18,14 @@ const adminRouter = require('./routes/adminRoutes.js');
 const globalRouter = require('./routes/globalRoutes.js');
 const users = require('./models/userModel.js');
 
-mongoose.connect(process.env.MONGODB_CONNSTRING, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(process.env.MONGODB_CONNSTRING, {
+    poolSize: 10,
+    authSource: "admin",
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+    useFindAndModify: false, 
+});
 
 db.once("open", async function() {
     console.log("Database Connected successfully");
