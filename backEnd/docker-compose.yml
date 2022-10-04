@@ -9,7 +9,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: hello
 
-  backend_1:
+  server:
     build: .
     restart: always
     ports: 
@@ -20,4 +20,4 @@ services:
       - ~/CTF_Cafe/backEnd/assets:/server/assets
       
 volumes:
-  backend_1:
+  server:
