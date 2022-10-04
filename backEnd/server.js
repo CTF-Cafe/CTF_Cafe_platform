@@ -19,12 +19,11 @@ const globalRouter = require('./routes/globalRoutes.js');
 const users = require('./models/userModel.js');
 
 mongoose.connect(process.env.MONGODB_CONNSTRING, {
-    poolSize: 10,
     authSource: "admin",
+    user: process.env.MONGODB_USERNAME,
+    pass: process.env.MONGODB_PASSWORD,
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    useCreateIndex: true,
-    useFindAndModify: false, 
 });
 
 db.once("open", async function() {
