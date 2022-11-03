@@ -41,7 +41,7 @@ function User(props) {
               }
 
               setChallengeStatsCategory(finalDataCategory);
-              print(finalDataCategory); // REMOVE
+              console.log(finalDataCategory); // REMOVE
 
               var difficulty = finalDataDifficulty.find((obj) => {
                 return (
@@ -75,7 +75,7 @@ function User(props) {
               }
 
               setChallengeStatsDifficulty(finalDataDifficulty);
-              print(finalDataDifficulty); // REMOVE
+              console.log(finalDataDifficulty); // REMOVE
             });
           }
         }
