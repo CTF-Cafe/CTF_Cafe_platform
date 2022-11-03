@@ -3,9 +3,12 @@ import { useState, useEffect } from "react";
 
 function PieChart(props) {
   const [data, setData] = useState(props.data);
+  const [, updateState] = React.useState();
+  const forceUpdate = React.useCallback(() => updateState({}), []);
 
   useEffect(() => {
     setData(props.data);
+    forceUpdate();
   }, [props]);
 
   const config = {
