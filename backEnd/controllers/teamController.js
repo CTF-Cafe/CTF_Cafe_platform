@@ -190,7 +190,7 @@ exports.getTeams = async function(req, res) {
                         $group: {
                             _id: "$_id",
                             users: { $first: "$users" },
-                            totalScore: { $$ifNull: [{ $first: "$totalScore" }, 0] },
+                            totalScore: { $ifNull: [{ $first: "$totalScore" }, 0] },
                             totalSolved: { $ifNull: [{ $first: "$totalSolved" }, 0]},
                             maxTimestamp: { $ifNull: [{ $first: "$maxTimestamp" }, 0] },
                             name: { $first: "$name" },
