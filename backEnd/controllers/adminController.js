@@ -57,6 +57,31 @@ accentsTidy = function(s) {
 exports.saveChallenge = async function(req, res) {
     const challengeExists = await challenges.findById((req.body.id));
 
+    if(req.body.points < 0 || req.body.level < 0) {
+        res.send({ state: 'error', message: 'Points and level must be positive numbers' });
+        return;
+    }
+
+    if (req.body.name.length < 1) {
+        res.send({ state: 'error', message: 'Name cannot be empty' });
+        return;
+    }
+
+    if (req.body.info.length < 1) {
+        res.send({ state: 'error', message: 'Info cannot be empty' });
+        return;
+    }
+
+    if (req.body.flag.length < 1) {
+        res.send({ state: 'error', message: 'Flag cannot be empty' });
+        return;
+    }
+
+    if (req.body.category.length < 1) {
+        res.send({ state: 'error', message: 'Category cannot be empty' });
+        return;
+    }
+
     if (challengeExists) {
         await challenges.findByIdAndUpdate((req.body.id), {
             name: req.body.name.trim(),
@@ -102,7 +127,7 @@ exports.createChallenge = async function(req, res) {
     if (req.body.category.length < 1) {
         res.send({ state: 'error', message: 'Category cannot be empty' });
         return;
-    }
+    }   
 
     await challenges.create({
         name: req.body.name + Math.random().toString().substr(2, 4),
