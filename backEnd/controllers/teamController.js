@@ -180,7 +180,7 @@ exports.getTeams = async function(req, res) {
                             _id: "$_id",
                             users: { $first: "$users" },
                             totalScore: { $sum: "$newSolved.points" },
-                            totalSolved: { $sum: 0 }, // REMOVE
+                            totalSolved: { $sum: "$newSolved" }, // REMOVE
                             maxTimestamp: { $max: "$newSolved.timestamp" },
                             name: { $first: "$name" },
                             teamCaptain: { $first: "$teamCaptain" },
