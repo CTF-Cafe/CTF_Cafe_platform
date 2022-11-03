@@ -2,7 +2,7 @@ import { Pie } from "@ant-design/plots";
 import { useState, useEffect } from "react";
 
 function PieChart(props) {
-  let data, setData = useState(props.data);
+  const [data, setData] = useState(props.data);
 
   useEffect(() => {
     setData(props.data);
