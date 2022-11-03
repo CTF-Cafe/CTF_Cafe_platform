@@ -57,7 +57,7 @@ accentsTidy = function(s) {
 exports.saveChallenge = async function(req, res) {
     const challengeExists = await challenges.findById((req.body.id));
 
-    if(req.body.points < 0 || req.body.level < 0) {
+    if(parseInt(req.body.points) < 0 || parseInt(req.body.level) < 0) {
         res.send({ state: 'error', message: 'Points and level must be positive numbers' });
         return;
     }
@@ -104,7 +104,7 @@ exports.saveChallenge = async function(req, res) {
 
 exports.createChallenge = async function(req, res) {
 
-    if(req.body.points < 0 || req.body.level < 0) {
+    if(parseInt(req.body.points) < 0 || parseInt(req.body.level) < 0) {
         res.send({ state: 'error', message: 'Points and level must be positive numbers' });
         return;
     }
