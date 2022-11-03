@@ -172,7 +172,7 @@ exports.getTeams = async function(req, res) {
                     {
                         "$unwind": {
                             "path": "$newSolved",
-                            "preserveNullAndEmptyArrays": false
+                            "preserveNullAndEmptyArrays": true
                         }
                     },
                     {
@@ -180,27 +180,12 @@ exports.getTeams = async function(req, res) {
                             _id: "$_id",
                             users: { $first: "$users" },
                             totalScore: { $sum: "$newSolved.points" },
-                            totalSolved: { $sum: 1 },
+                            totalSolved: { $sum: "$newSolved.points"-"$newSolved.points"+1 },
                             maxTimestamp: { $max: "$newSolved.timestamp" },
                             name: { $first: "$name" },
                             teamCaptain: { $first: "$teamCaptain" },
                         }
                     },
-                    { // HERE
-                        $group: {
-                            _id: "$_id",
-                            users: { $first: "$users" },
-                            name: { $first: "$name" },
-                            teamCaptain: { $first: "$teamCaptain" },
-                        },
-                    },
-                    {
-                        $addFields: {
-                            totalScore: { $ifNull: [{ $first: "$totalScore" }, 0] },
-                            totalSolved: { $ifNull: [{ $first: "$totalSolved" }, 0]},
-                            maxTimestamp: { $ifNull: [{ $first: "$maxTimestamp" }, 0] }
-                        }
-                    }
                 ]).sort({ totalScore: -1, maxTimestamp: -1, _id: 1 }).skip((page - 1) * 100).limit(100);
 
             } catch (err) {
