@@ -150,6 +150,7 @@ exports.submitFlag = async function(req, res) {
             await challenges.updateOne({ flag: flag }, { $inc: { solveCount: 1 } });
         }
 
+        updatedUser.password = undefined;
         res.send({ state: 'success', user: updatedUser });
 
     } catch (err) {

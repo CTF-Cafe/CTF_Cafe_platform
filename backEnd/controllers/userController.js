@@ -19,6 +19,7 @@ exports.login = async function(req, res) {
 
             req.session.username = username;
             req.session.key = newKey;
+            user.password = undefined;
             await users.updateOne({ username: username }, { key: newKey.toString() });
             res.send({ state: 'success', message: 'Logged In', user: user });
         } else {
@@ -83,6 +84,7 @@ exports.register = async function(req, res) {
         await users.create({ username: username, password: password, key: newKey.toString(), isAdmin: false }).then(async function(user) {
             req.session.username = username;
             req.session.key = newKey;
+            user.password = undefined;
             res.send({ state: 'success', message: 'Registered!', user: user });
         }).catch(function(err) {
             throw new Error('User creation failed!');
@@ -132,12 +134,14 @@ exports.updateUsername = async function(req, res) {
 
                         await teams.findByIdAndUpdate(user.teamId, { users: newUsers, teamCaptain: username }, { returnOriginal: false }).then(async function(team) {
                             req.session.username = username;
+                            user.password = undefined;
                             res.send({ state: 'success', message: 'Username updated!', user: user, team: team });
                         });
                     } else {
 
                         await teams.findByIdAndUpdate(user.teamId, { users: newUsers }, { returnOriginal: false }).then(async function(team) {
                             req.session.username = username;
+                            user.password = undefined;
                             res.send({ state: 'success', message: 'Username updated!', user: user, team: team });
                         });
                     }
