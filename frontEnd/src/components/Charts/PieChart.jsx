@@ -1,10 +1,10 @@
 import { Pie } from "@ant-design/plots";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 function PieChart(props) {
   const [data, setData] = useState(props.data);
-  const [, updateState] = React.useState();
-  const forceUpdate = React.useCallback(() => updateState({}), []);
+  const [, updateState] = useState();
+  const forceUpdate = useCallback(() => updateState({}), []);
 
   useEffect(() => {
     setData(props.data);
