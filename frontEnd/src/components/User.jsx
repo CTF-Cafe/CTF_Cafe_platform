@@ -10,7 +10,6 @@ function User(props) {
   const [user, setUser] = useState({});
   const [challengeStatsCategory, setChallengeStatsCategory] = useState([]);
   const [challengeStatsDifficulty, setChallengeStatsDifficulty] = useState([]);
-  let doneFetching = false;
 
   const getUser = (username) => {
     axios
@@ -75,7 +74,6 @@ function User(props) {
               }
 
               setChallengeStatsDifficulty(finalDataDifficulty);
-              doneFetching = true;
             });
           }
         }
@@ -103,7 +101,7 @@ function User(props) {
                 {user.username.toUpperCase()}
               </h1>
 
-              {user.solved.length > 0 && doneFetching ? (
+              {user.solved.length > 0 ? (
                 <>
                   <div className="row" style={{ textAlign: "center" }}>
                     <div className="col-md-6 mb-3">
