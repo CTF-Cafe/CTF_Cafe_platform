@@ -24,8 +24,6 @@ mongoose.connect(process.env.MONGODB_CONNSTRING, {
     useUnifiedTopology: true,
 });
 
-console.log(process.env.MONGODB_CONNSTRING);
-
 db.once("open", async function() {
     console.log("Database Connected successfully");
     setup.setupDB();
