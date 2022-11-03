@@ -172,7 +172,7 @@ exports.getTeams = async function(req, res) {
                     {
                         "$unwind": {
                             "path": "$newSolved",
-                            "preserveNullAndEmptyArrays": true
+                            "preserveNullAndEmptyArrays": false
                         }
                     },
                     {
@@ -180,7 +180,7 @@ exports.getTeams = async function(req, res) {
                             _id: "$_id",
                             users: { $first: "$users" },
                             totalScore: { $sum: "$newSolved.points" },
-                            totalSolved: { $count: "$newSolved" },
+                            totalSolved: { $sum: 1 },
                             maxTimestamp: { $max: "$newSolved.timestamp" },
                             name: { $first: "$name" },
                             teamCaptain: { $first: "$teamCaptain" },
