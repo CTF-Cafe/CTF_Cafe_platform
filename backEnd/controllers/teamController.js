@@ -186,6 +186,17 @@ exports.getTeams = async function(req, res) {
                             teamCaptain: { $first: "$teamCaptain" },
                         }
                     },
+                    { // HERE
+                        $group: {
+                            _id: "$_id",
+                            users: { $first: "$users" },
+                            totalScore: { $$ifNull: [{ $first: "$totalScore" }, 0] },
+                            totalSolved: { $ifNull: [{ $first: "$totalSolved" }, 0]},
+                            maxTimestamp: { $ifNull: [{ $first: "$maxTimestamp" }, 0] },
+                            name: { $first: "$name" },
+                            teamCaptain: { $first: "$teamCaptain" },
+                        }
+                    },
                 ]).sort({ totalScore: -1, maxTimestamp: -1, _id: 1 }).skip((page - 1) * 100).limit(100);
 
             } catch (err) {
@@ -284,7 +295,7 @@ exports.getUserTeam = async function(req, res) {
                 {
                     "$unwind": {
                         "path": "$newSolved",
-                        "preserveNullAndEmptyArrays": true
+                        "preserveNullAndEmptyArrays": false
                     }
                 },
                 {
