@@ -292,7 +292,7 @@ exports.getUserTeam = async function(req, res) {
                         _id: "$_id",
                         users: { $first: "$users" },
                         totalScore: { $sum: "$newSolved.points" },
-                        totalSolved: { $sum: 1 },
+                        totalSolved: { $sum: { $cond: { if: "$newSolved.points", then: 1, else: 0 } } },
                         maxTimestamp: { $max: "$newSolved.timestamp" },
                         name: { $first: "$name" },
                         teamCaptain: { $first: "$teamCaptain" },
