@@ -421,7 +421,7 @@ function Hackerboard(props) {
                                 </a>
                               </Link>
                             </td>
-                            <td> {team.totalSolved-1} </td>
+                            <td> {team.totalSolved} </td>
                             <td> {team.totalScore} </td>
                           </tr>
                         );
