@@ -4,7 +4,7 @@ export domainSetup="true" # IF TRUE NEEDS TO BE RUN AFTER DNS SETUP
 export domainName="dev.ctf.cafe"
 export ctfName="TEST_CTF"
 export dbPass="password"
-export sessionKey="test-session"
+export sessionKey="$(uuidgen)"
 export devPassword="dev_password"
 
 # Installs
