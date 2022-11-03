@@ -134,6 +134,7 @@ function User(props) {
                       </thead>
                       <tbody>
                         {user.solved.map((solve, index) => {
+                          console.log(solve);
                           return (
                             <tr key={solve._id}>
                               <th scope="row" style={{ textAlign: "center" }}>
