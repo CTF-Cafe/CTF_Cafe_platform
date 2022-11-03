@@ -10,6 +10,7 @@ function User(props) {
   const [user, setUser] = useState({});
   const [challengeStatsCategory, setChallengeStatsCategory] = useState([]);
   const [challengeStatsDifficulty, setChallengeStatsDifficulty] = useState([]);
+  let doneFetching = false;
 
   const getUser = (username) => {
     axios
@@ -41,7 +42,6 @@ function User(props) {
               }
 
               setChallengeStatsCategory(finalDataCategory);
-              console.log(finalDataCategory); // REMOVE
 
               var difficulty = finalDataDifficulty.find((obj) => {
                 return (
@@ -75,7 +75,7 @@ function User(props) {
               }
 
               setChallengeStatsDifficulty(finalDataDifficulty);
-              console.log(finalDataDifficulty); // REMOVE
+              doneFetching = true;
             });
           }
         }
@@ -103,7 +103,7 @@ function User(props) {
                 {user.username.toUpperCase()}
               </h1>
 
-              {user.solved.length > 0 ? (
+              {user.solved.length > 0 && doneFetching ? (
                 <>
                   <div className="row" style={{ textAlign: "center" }}>
                     <div className="col-md-6 mb-3">
@@ -134,7 +134,6 @@ function User(props) {
                       </thead>
                       <tbody>
                         {user.solved.map((solve, index) => {
-                          console.log(solve);
                           return (
                             <tr key={solve._id}>
                               <th scope="row" style={{ textAlign: "center" }}>
