@@ -442,13 +442,19 @@ function Challenges(props) {
                                 }
                               </p>
 
+                              { challenge.dockerLaunchers.find(item => item.team === globalData.userData.team._id) != undefined ?
+                                (
+                                  <p>Port: {challenge.dockerLaunchers.find(item => item.team === globalData.userData.team._id).port}</p>
+                                ) : null
+                              }
+
                               {challenge.dockerCompose ? (
                                 <a
                                   href="#"
                                   className="btn btn-outline-danger btn-shadow"
                                   onClick={(e) => {
                                     e.preventDefault();
-                                    challenge.dockerLaunchers.find(item => item.team === globalData.userData.team.id) == undefined ? launchDocker(challenge) : stopDocker(challenge);
+                                    challenge.dockerLaunchers.find(item => item.team === globalData.userData.team._id) == undefined ? launchDocker(challenge) : stopDocker(challenge);
                                   }}
                                 >
                                   {challenge.dockerLoading ?
@@ -463,7 +469,7 @@ function Challenges(props) {
                                           <span className="fa-solid fa-spinner fa-spin mr-2"></span>
                                           Stopping
                                         </>
-                                      ) : challenge.dockerLaunchers.find(item => item.team === globalData.userData.team.id) == undefined ?
+                                      ) : challenge.dockerLaunchers.find(item => item.team === globalData.userData.team._id) == undefined ?
                                         (
                                           <>
                                             <span className="fa-solid fa-circle-play mr-2"></span>

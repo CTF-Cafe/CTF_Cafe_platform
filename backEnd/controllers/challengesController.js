@@ -65,7 +65,11 @@ exports.launchDocker = async function (req, res) {
                 // launch docker
                 await compose.upAll({ cwd: path.join(__dirname, "../dockers/", challenge.dockerCompose, "/"), composeOptions: [["--verbose"], ["-p", challenge.dockerCompose + "_" + team.id]] });
 
-                await challenges.updateOne({ _id: ObjectId(req.body.challengeId) }, { $push: { dockerLaunchers: { user: user.id, team: team.id } } });
+                var conatiners = await compose.ps({ cwd: path.join(__dirname, "../dockers/", challenge.dockerCompose, "/"), composeOptions: [["--verbose"], ["-p", challenge.dockerCompose + "_" + team.id]] });
+
+                port = conatiners.data.services[0].ports[0].mapped.port
+                console.log(port)
+                await challenges.updateOne({ _id: ObjectId(req.body.challengeId) }, { $push: { dockerLaunchers: { user: user.id, team: team.id, port: port } } });
             } catch (err) {
                 console.log(err);
                 throw new Error('Error launching docker!');
