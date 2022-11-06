@@ -49,6 +49,14 @@ function ChallengeCard(props) {
             id={"challenge-header" + props.challenge._id}
             style={{ display: "flex", justifyContent: "space-between" }}
           >
+            { props.challenge.dockerCompose.length > 0 ?
+              (
+                <span
+                  className="fa-brands fa-docker"
+                  style={{ fontSize: "32px" }}
+                ></span>
+              ) 
+            : null}
             <span
               contentEditable="true"
               style={{ outline: "none" }}
@@ -169,6 +177,12 @@ function ChallengeCard(props) {
               />
 
               <p hidden id={"code_snippet" + props.challenge._id}>{code}</p>
+              
+              <br />
+              <label>Docker-Compose ZIP:</label>
+
+              <input id={"dockerCompose" + props.challenge._id} type="file" />
+              <br /><br />
 
               <label>Flag:</label>
               <p

@@ -90,34 +90,49 @@ function Challenges(props) {
   }, []);
 
   const saveChallenge = (oldChallenge) => {
+    var formData = new FormData();
+
+    formData.append("id", oldChallenge._id);
+
     const name = document.getElementById("name" + oldChallenge._id).textContent;
+    formData.append("name", name);
+
     const points = document.getElementById(
       "points" + oldChallenge._id
     ).textContent;
+    formData.append("points", points);
+
     const level = document.getElementById("level" + oldChallenge._id).value;
+    formData.append("level", level);
+
     const info = document.getElementById("info" + oldChallenge._id).textContent;
+    formData.append("info", info);
+
     const hint = document.getElementById("hint" + oldChallenge._id).textContent;
+    formData.append("hint", hint);
+
     const file = document.getElementById("file" + oldChallenge._id).value;
+    formData.append("file", file);
+
     const codeSnippet = document.getElementById("code_snippet" + oldChallenge._id).textContent;
+    formData.append("codeSnippet", codeSnippet);
+
     const codeLanguage = document.getElementById("code_language" + oldChallenge._id).value;
+    formData.append("codeLanguage", codeLanguage);
 
     const flag = document.getElementById("flag" + oldChallenge._id).textContent;
+    formData.append("flag", flag);
+
+    const dockerCompose = document.getElementById("dockerCompose" + oldChallenge._id);
+    formData.append("dockerZip", dockerCompose.files[0]);
+
+    formData.append("dockerCompose", dockerCompose.files[0] ? true : false);
 
     axios
       .post(
         process.env.REACT_APP_SERVER_URI + "/api/admin/saveChallenge",
-        {
-          id: oldChallenge._id,
-          name: name,
-          points: points,
-          level: level,
-          info: info,
-          hint: hint,
-          file: file,
-          flag: flag,
-          codeSnippet: codeSnippet,
-          codeLanguage: codeLanguage
-        },
+        formData,
+        { headers: { 'Content-Type': 'multipart/form-data' } },
         { withCredentials: true }
       )
       .then((response) => {
@@ -207,7 +222,7 @@ function Challenges(props) {
       axios
         .post(
           process.env.REACT_APP_SERVER_URI +
-            "/api/admin/updateChallengeCategory",
+          "/api/admin/updateChallengeCategory",
           {
             id: challenge.id.replace("challenge-top", ""),
             category: newCategory.children[0].id,
@@ -249,6 +264,7 @@ function Challenges(props) {
           file: "",
           flag: "FLAG{H3LL0_W0RLD}",
           category: category,
+          dockerCompose: false,
         },
         { withCredentials: true }
       )
