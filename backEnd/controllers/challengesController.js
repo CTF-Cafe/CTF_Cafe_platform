@@ -3,8 +3,11 @@ const users = require('../models/userModel');
 const teams = require('../models/teamModel');
 const ctfConfig = require('../models/ctfConfigModel.js');
 const ObjectId = require('mongoose').Types.ObjectId;
+var Dockerode = require('dockerode');
+var DockerodeCompose = require('dockerode-compose');
+const path = require('path');
 
-exports.getChallenges = async function(req, res) {
+exports.getChallenges = async function (req, res) {
     let allChallenges = await challenges.find({}).sort({ points: 1 });
     const startTime = await ctfConfig.findOne({ name: 'startTime' });
     const endTime = await ctfConfig.findOne({ name: 'endTime' });
@@ -15,6 +18,7 @@ exports.getChallenges = async function(req, res) {
     } else {
         await allChallenges.forEach(challenge => {
             challenge.flag = 'Nice try XD'
+            challenge.dockerCompose = challenge.dockerCompose.length > 0 ? true : false;
             if (categories.indexOf(challenge.category) == -1) categories.push(challenge.category);
         });
 
@@ -23,7 +27,132 @@ exports.getChallenges = async function(req, res) {
 
 }
 
-accentsTidy = function(s) {
+var docker = new Dockerode();
+var dockers = {};
+
+exports.launchDocker = async function (req, res) {
+    try {
+        const user = await users.findOne({ username: req.session.username });
+
+        // Check teamId is valid
+        if (!ObjectId.isValid(user.teamId)) {
+            throw new Error('Not in a team!')
+        }
+
+        const team = await teams.findById(user.teamId);
+
+        // Check Team Exists
+        if (!team) {
+            throw new Error('Not in a team!')
+        }
+
+        // Check challengeId is valid
+        if (!ObjectId.isValid(req.body.challengeId)) {
+            throw new Error('Invalid challengeId!')
+        }
+
+        const challenge = await challenges.findOne({ _id: ObjectId(req.body.challengeId) });
+
+        if (!challenge) {
+            throw new Error('Challenge does not exist!');
+        }
+
+        // Check if challenge is dockerized
+        if (challenge.dockerCompose.length == 0) {
+            throw new Error('Challenge is not dockerized!');
+        }
+
+        // check if user has already launched this challenge
+        if (challenge.dockerLaunchers.indexOf(user._id) == -1 && challenge.dockerLaunchers.indexOf(team._id) == -1) {
+            await challenges.updateOne({ _id: ObjectId(req.body.challengeId) }, { $push: { dockerLaunchers: user._id } });
+            await challenges.updateOne({ _id: ObjectId(req.body.challengeId) }, { $push: { dockerLaunchers: team._id } });
+
+            try {
+                // launch docker
+                var compose = new DockerodeCompose(docker, path.join(__dirname, '../dockers/' + challenge.dockerCompose + '/docker-compose.yml'), challenge.dockerCompose + team._id);
+                
+                // await compose.pull();
+                await compose.up();
+
+                docker[challenge.dockerCompose + team._id] = compose;
+            } catch (err) {
+                console.log(err);
+                await challenges.updateOne({ _id: ObjectId(req.body.challengeId) }, { $pull: { dockerLaunchers: user._id } });
+                await challenges.updateOne({ _id: ObjectId(req.body.challengeId) }, { $pull: { dockerLaunchers: team._id } });
+                throw new Error('Error launching docker!');
+            }
+
+            res.send({ state: 'success' });
+        } else {
+            throw new Error('You have already launched this challenge!');
+        }
+
+    } catch (err) {
+        if (err) {
+            res.send({ state: 'error', message: err.message });
+        }
+    }
+}
+
+exports.stopDocker = async function (req, res) {
+    try {
+        const user = await users.findOne({ username: req.session.username });
+
+        // Check teamId is valid
+        if (!ObjectId.isValid(user.teamId)) {
+            throw new Error('Not in a team!')
+        }
+
+        const team = await teams.findById(user.teamId);
+        
+        // Check Team Exists
+        if (!team) {
+            throw new Error('Not in a team!')
+        }
+
+        // Check challengeId is valid
+        if (!ObjectId.isValid(req.body.challengeId)) {
+            throw new Error('Invalid challengeId!')
+        }
+
+        const challenge = await challenges.findOne({ _id: ObjectId(req.body.challengeId) });
+
+        if (!challenge) {
+            throw new Error('Challenge does not exist!');
+        }
+
+        // Check if challenge is dockerized
+        if (challenge.dockerCompose.length == 0) {
+            throw new Error('Challenge is not dockerized!');
+        }
+
+        // check if user has already launched this challenge
+        if (challenge.dockerLaunchers.indexOf(user._id) != -1 || challenge.dockerLaunchers.indexOf(team._id) != -1) {
+            await challenges.updateOne({ _id: ObjectId(req.body.challengeId) }, { $pull: { dockerLaunchers: user._id } });
+            await challenges.updateOne({ _id: ObjectId(req.body.challengeId) }, { $pull: { dockerLaunchers: team._id } });
+
+            try {
+                // stop docker
+                docker[challenge.dockerCompose + team._id].down();
+                delete docker[challenge.dockerCompose + team._id];
+            } catch (err) {
+                console.log(err);
+                throw new Error('Error stopping docker!');
+            }
+
+            res.send({ state: 'success' });
+        } else {
+            throw new Error('You have not launched this challenge!');
+        }
+
+    } catch (err) {
+        if (err) {
+            res.send({ state: 'error', message: err.message });
+        }
+    }
+}            
+
+accentsTidy = function (s) {
     var r = s.toLowerCase();
     r = r.replace(new RegExp("[àáâãäå]", 'g'), "a");
     r = r.replace(new RegExp("æ", 'g'), "ae");
@@ -41,7 +170,7 @@ accentsTidy = function(s) {
 let currentlySubmittingUsers = [];
 let currentlySubmittingTeams = [];
 
-exports.submitFlag = async function(req, res) {
+exports.submitFlag = async function (req, res) {
     let teamId = undefined;
     try {
 
@@ -115,10 +244,10 @@ exports.submitFlag = async function(req, res) {
         teamId = user.teamId;
 
         if (team.users.filter(user => {
-                return (user.solved.filter(obj => {
-                    return obj._id.equals(checkFlag._id)
-                }).length > 0)
-            }).length > 0) {
+            return (user.solved.filter(obj => {
+                return obj._id.equals(checkFlag._id)
+            }).length > 0)
+        }).length > 0) {
 
             throw new Error('Already Solved!')
         }

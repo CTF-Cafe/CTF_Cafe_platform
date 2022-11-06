@@ -55,6 +55,10 @@ var challengeSchema = new Schema({
         type: String,
         default: ''
     },
+    dockerLaunchers: {
+        type: Array,
+        default: []
+    },
 });
 
 module.exports = mongoose.model('Challenges', challengeSchema);
