@@ -106,6 +106,8 @@ exports.saveChallenge = async function(req, res) {
 
 exports.createChallenge = async function(req, res) {
 
+    console.log(req.body);
+
     if(parseInt(req.body.points) < 0 || parseInt(req.body.level) < 0) {
         res.send({ state: 'error', message: 'Points and level must be positive numbers' });
         return;
@@ -130,6 +132,8 @@ exports.createChallenge = async function(req, res) {
         res.send({ state: 'error', message: 'Category cannot be empty' });
         return;
     }
+
+    console.log(req.body.dockerCompose)
     
     dockerComposeId = '';
     if(req.file.mimetype != 'application/zip' && req.body.dockerCompose == true) {
