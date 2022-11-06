@@ -181,7 +181,7 @@ function ChallengeCard(props) {
               <br />
               <label>Docker-Compose ZIP:</label>
 
-              <input id={"dockerCompose" + props.challenge._id} type="file" value={props.challenge.dockerCompose} />
+              <input id={"dockerCompose" + props.challenge._id} type="file" value={props.challenge.dockerCompose.length > 0 ? props.challenge.dockerCompose : null} />
               <br /><br />
 
               <label>Flag:</label>
