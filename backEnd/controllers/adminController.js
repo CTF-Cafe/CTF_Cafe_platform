@@ -84,10 +84,10 @@ exports.saveChallenge = async function(req, res) {
     if(req.files) {
         dockerComposeId = '';
         console.log(req.files.dockerZip)
-        if(req.files.dockerZip.mimetype != 'application/zip' && req.body.dockerCompose == true) {
+        if(req.files.dockerZip.mimetype != 'application/zip' && req.body.dockerCompose == 'true') {
             res.send({ state: 'error', message: 'Docker compose file must be in a zip file' });
             return;
-        } else if (req.body.dockerCompose == true){
+        } else if (req.body.dockerCompose == 'true'){
             dockerComposeId = randomUUID();
             dockerComposePath = path.join(__dirname, '../dockers/' + dockerComposeId + '/docker.zip');
             fs.writeFileSync(dockerComposePath, req.files.dockerZip.data);
