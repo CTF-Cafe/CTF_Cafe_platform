@@ -3,8 +3,7 @@ const users = require('../models/userModel');
 const teams = require('../models/teamModel');
 const ctfConfig = require('../models/ctfConfigModel.js');
 const ObjectId = require('mongoose').Types.ObjectId;
-var Dockerode = require('dockerode');
-var DockerodeCompose = require('dockerode-compose');
+var compose = require('docker-compose');
 const path = require('path');
 
 exports.getChallenges = async function (req, res) {
@@ -26,9 +25,6 @@ exports.getChallenges = async function (req, res) {
     }
 
 }
-
-var docker = new Dockerode();
-var dockers = {};
 
 exports.launchDocker = async function (req, res) {
     try {
@@ -63,22 +59,15 @@ exports.launchDocker = async function (req, res) {
         }
 
         // check if user has already launched this challenge
-        if (challenge.dockerLaunchers.indexOf(user._id) == -1 && challenge.dockerLaunchers.indexOf(team._id) == -1) {
-            await challenges.updateOne({ _id: ObjectId(req.body.challengeId) }, { $push: { dockerLaunchers: user._id } });
-            await challenges.updateOne({ _id: ObjectId(req.body.challengeId) }, { $push: { dockerLaunchers: team._id } });
-
+        if (challenge.dockerLaunchers.find(item => item.team === team.id) == undefined && challenge.dockerLaunchers.find(item => item.user === user.id) == undefined) {
             try {
-                // launch docker
-                var compose = new DockerodeCompose(docker, path.join(__dirname, '../dockers/' + challenge.dockerCompose + '/docker-compose.yml'), challenge.dockerCompose + team._id);
-                
-                // await compose.pull();
-                await compose.up();
 
-                docker[challenge.dockerCompose + team._id] = compose;
+                // launch docker
+                await compose.upAll({ cwd: path.join(__dirname, "../dockers/", challenge.dockerCompose, "/"), composeOptions: [["--verbose"], ["-p", challenge.dockerCompose + "_" + team.id]] });
+
+                await challenges.updateOne({ _id: ObjectId(req.body.challengeId) }, { $push: { dockerLaunchers: { user: user.id, team: team.id } } });
             } catch (err) {
                 console.log(err);
-                await challenges.updateOne({ _id: ObjectId(req.body.challengeId) }, { $pull: { dockerLaunchers: user._id } });
-                await challenges.updateOne({ _id: ObjectId(req.body.challengeId) }, { $pull: { dockerLaunchers: team._id } });
                 throw new Error('Error launching docker!');
             }
 
@@ -127,14 +116,18 @@ exports.stopDocker = async function (req, res) {
         }
 
         // check if user has already launched this challenge
-        if (challenge.dockerLaunchers.indexOf(user._id) != -1 || challenge.dockerLaunchers.indexOf(team._id) != -1) {
-            await challenges.updateOne({ _id: ObjectId(req.body.challengeId) }, { $pull: { dockerLaunchers: user._id } });
-            await challenges.updateOne({ _id: ObjectId(req.body.challengeId) }, { $pull: { dockerLaunchers: team._id } });
-
+        if (challenge.dockerLaunchers.find(item => item.team === team.id) != undefined || challenge.dockerLaunchers.find(item => item.user === user.id) != undefined) {
+           
             try {
                 // stop docker
-                docker[challenge.dockerCompose + team._id].down();
-                delete docker[challenge.dockerCompose + team._id];
+                await compose.stop({ cwd: path.join(__dirname, "../dockers/", challenge.dockerCompose, "/"), composeOptions: [["--verbose"], ["-p", challenge.dockerCompose + "_" + team.id]] });
+                
+                if (challenge.dockerLaunchers.find(item => item.team === team.id) != undefined) {
+                    await challenges.updateOne({ _id: ObjectId(req.body.challengeId) }, { $pull: { dockerLaunchers: { team: team.id } } });
+                } else {
+                    await challenges.updateOne({ _id: ObjectId(req.body.challengeId) }, { $pull: { dockerLaunchers: { user: user.id } } });
+                }
+
             } catch (err) {
                 console.log(err);
                 throw new Error('Error stopping docker!');
