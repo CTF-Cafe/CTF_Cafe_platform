@@ -59,53 +59,6 @@ accentsTidy = function(s) {
 exports.saveChallenge = async function(req, res) {
     const challengeExists = await challenges.findById((req.body.id));
 
-    if(parseInt(req.body.points) < 0 || parseInt(req.body.level) < 0) {
-        res.send({ state: 'error', message: 'Points and level must be positive numbers' });
-        return;
-    }
-
-    if (req.body.name.length < 1) {
-        res.send({ state: 'error', message: 'Name cannot be empty' });
-        return;
-    }
-
-    if (req.body.info.length < 1) {
-        res.send({ state: 'error', message: 'Info cannot be empty' });
-        return;
-    }
-
-    if (req.body.flag.length < 1) {
-        res.send({ state: 'error', message: 'Flag cannot be empty' });
-        return;
-    }
-
-    if (req.body.category.length < 1) {
-        res.send({ state: 'error', message: 'Category cannot be empty' });
-        return;
-    }
-
-    if (challengeExists) {
-        await challenges.findByIdAndUpdate((req.body.id), {
-            name: req.body.name.trim(),
-            points: parseInt(req.body.points),
-            level: parseInt(req.body.level),
-            info: req.body.info,
-            hint: req.body.hint,
-            flag: accentsTidy(req.body.flag.trim()).toUpperCase(),
-            file: (req.body.file.length > 0 ? req.body.file : ''),
-            codeSnippet: (req.body.codeSnippet.length > 0 ? req.body.codeSnippet : ''),
-            codeLanguage: req.body.codeLanguage,
-        });
-
-        res.send({ state: 'success', message: 'Challenge updated!' });
-    } else {
-        res.send({ state: 'error', message: 'Challenge does not exist' });
-    }
-
-}
-
-exports.createChallenge = async function(req, res) {
-
     console.log(req.body);
 
     if(parseInt(req.body.points) < 0 || parseInt(req.body.level) < 0) {
@@ -133,7 +86,62 @@ exports.createChallenge = async function(req, res) {
         return;
     }
 
-    console.log(req.body.dockerCompose)
+    dockerComposeId = '';
+    if(req.file.mimetype != 'application/zip' && req.body.dockerCompose == true) {
+        res.send({ state: 'error', message: 'Docker compose file must be in a zip file' });
+        return;
+    } else {
+        dockerComposeId = randomUUID();
+        dockerComposePath = path.join(__dirname, '../dockers/' + dockerComposeId + '/docker.zip');
+        fs.writeFileSync(dockerComposePath, req.files.dockerZip.buffer);
+    }
+
+    if (challengeExists) {
+        await challenges.findByIdAndUpdate((req.body.id), {
+            name: req.body.name.trim(),
+            points: parseInt(req.body.points),
+            level: parseInt(req.body.level),
+            info: req.body.info,
+            hint: req.body.hint,
+            flag: accentsTidy(req.body.flag.trim()).toUpperCase(),
+            file: (req.body.file.length > 0 ? req.body.file : ''),
+            codeSnippet: (req.body.codeSnippet.length > 0 ? req.body.codeSnippet : ''),
+            codeLanguage: req.body.codeLanguage,
+        });
+
+        res.send({ state: 'success', message: 'Challenge updated!' });
+    } else {
+        res.send({ state: 'error', message: 'Challenge does not exist' });
+    }
+
+}
+
+exports.createChallenge = async function(req, res) {
+
+    if(parseInt(req.body.points) < 0 || parseInt(req.body.level) < 0) {
+        res.send({ state: 'error', message: 'Points and level must be positive numbers' });
+        return;
+    }
+
+    if (req.body.name.length < 1) {
+        res.send({ state: 'error', message: 'Name cannot be empty' });
+        return;
+    }
+
+    if (req.body.info.length < 1) {
+        res.send({ state: 'error', message: 'Info cannot be empty' });
+        return;
+    }
+
+    if (req.body.flag.length < 1) {
+        res.send({ state: 'error', message: 'Flag cannot be empty' });
+        return;
+    }
+
+    if (req.body.category.length < 1) {
+        res.send({ state: 'error', message: 'Category cannot be empty' });
+        return;
+    }
     
     dockerComposeId = '';
     if(req.file.mimetype != 'application/zip' && req.body.dockerCompose == true) {
