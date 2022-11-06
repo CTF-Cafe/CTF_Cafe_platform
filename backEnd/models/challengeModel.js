@@ -50,7 +50,11 @@ var challengeSchema = new Schema({
     firstBlood: {
         type: String,
         default: 'none'
-    }
+    },
+    dockerCompose: {
+        type: String,
+        default: ''
+    },
 });
 
 module.exports = mongoose.model('Challenges', challengeSchema);

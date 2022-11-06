@@ -6,7 +6,9 @@ const theme = require('../models/themeModel.js');
 const path = require('path');
 const fs = require('fs');
 const axios = require('axios');
+const { randomUUID } = require('crypto');
 const ObjectId = require('mongoose').Types.ObjectId;
+
 
 exports.getStats = async function(req, res) {
     let allChallenges = await challenges.find({}).sort({ points: 1 });
@@ -127,7 +129,17 @@ exports.createChallenge = async function(req, res) {
     if (req.body.category.length < 1) {
         res.send({ state: 'error', message: 'Category cannot be empty' });
         return;
-    }   
+    }
+    
+    dockerComposeId = '';
+    if(req.file.mimetype != 'application/zip' && req.body.dockerCompose == true) {
+        res.send({ state: 'error', message: 'Docker compose file must be in a zip file' });
+        return;
+    } else {
+        dockerComposeId = randomUUID();
+        dockerComposePath = path.join(__dirname, '../dockers/' + dockerComposeId + '/docker.zip');
+        fs.writeFileSync(dockerComposePath, req.files.dockerZip.buffer);
+    }
 
     await challenges.create({
         name: req.body.name + Math.random().toString().substr(2, 4),
@@ -140,6 +152,7 @@ exports.createChallenge = async function(req, res) {
         category: req.body.category,
         codeSnippet: '',
         codeLanguage: 'python',
+        dockerCompose: dockerComposeId,
     });
     res.send({ state: 'success', message: 'Challenge created!' });
 
