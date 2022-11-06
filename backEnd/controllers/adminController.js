@@ -81,14 +81,16 @@ exports.saveChallenge = async function(req, res) {
         return;
     }
 
-    dockerComposeId = '';
-    if(req.files.dockerZip.mimetype != 'application/zip' && req.body.dockerCompose == true) {
-        res.send({ state: 'error', message: 'Docker compose file must be in a zip file' });
-        return;
-    } else {
-        dockerComposeId = randomUUID();
-        dockerComposePath = path.join(__dirname, '../dockers/' + dockerComposeId + '/docker.zip');
-        fs.writeFileSync(dockerComposePath, req.files.dockerZip.buffer);
+    if(req.files) {
+        dockerComposeId = '';
+        if(req.files.dockerZip.mimetype != 'application/zip' && req.body.dockerCompose == true) {
+            res.send({ state: 'error', message: 'Docker compose file must be in a zip file' });
+            return;
+        } else {
+            dockerComposeId = randomUUID();
+            dockerComposePath = path.join(__dirname, '../dockers/' + dockerComposeId + '/docker.zip');
+            fs.writeFileSync(dockerComposePath, req.files.dockerZip.buffer);
+        }
     }
 
     if (challengeExists) {
@@ -138,14 +140,16 @@ exports.createChallenge = async function(req, res) {
         return;
     }
     
-    dockerComposeId = '';
-    if(req.file.mimetype != 'application/zip' && req.body.dockerCompose == true) {
-        res.send({ state: 'error', message: 'Docker compose file must be in a zip file' });
-        return;
-    } else {
-        dockerComposeId = randomUUID();
-        dockerComposePath = path.join(__dirname, '../dockers/' + dockerComposeId + '/docker.zip');
-        fs.writeFileSync(dockerComposePath, req.files.dockerZip.buffer);
+    if(req.files) {
+        dockerComposeId = '';
+        if(req.files.dockerZip.mimetype != 'application/zip' && req.body.dockerCompose == true) {
+            res.send({ state: 'error', message: 'Docker compose file must be in a zip file' });
+            return;
+        } else {
+            dockerComposeId = randomUUID();
+            dockerComposePath = path.join(__dirname, '../dockers/' + dockerComposeId + '/docker.zip');
+            fs.writeFileSync(dockerComposePath, req.files.dockerZip.buffer);
+        }
     }
 
     await challenges.create({
