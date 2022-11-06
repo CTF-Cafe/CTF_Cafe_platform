@@ -8,7 +8,7 @@ const fs = require('fs');
 const axios = require('axios');
 const { randomUUID } = require('crypto');
 const ObjectId = require('mongoose').Types.ObjectId;
-
+const unzipper = require("unzipper");
 
 exports.getStats = async function(req, res) {
     let allChallenges = await challenges.find({}).sort({ points: 1 });
@@ -32,7 +32,7 @@ exports.getStats = async function(req, res) {
                 if (categories.indexOf(challenge.category) == -1) categories.push(challenge.category);
             });
 
-            res.send({ categories: categories, challenges: allChallenges });
+            res.send({ categories: categories, challenges: allChallenges, state: 'success' });
             break;
         default:
             res.send([]);
@@ -94,6 +94,9 @@ exports.saveChallenge = async function(req, res) {
             }
 
             fs.writeFileSync(dockerComposePath, req.files.dockerZip.data);
+
+            fs.createReadStream(dockerComposePath).pipe(unzipper.Extract({ path: path.join(__dirname, '../dockers/' + dockerComposeId) }));
+
         }
     }
 
@@ -108,6 +111,7 @@ exports.saveChallenge = async function(req, res) {
             file: (req.body.file.length > 0 ? req.body.file : ''),
             codeSnippet: (req.body.codeSnippet.length > 0 ? req.body.codeSnippet : ''),
             codeLanguage: req.body.codeLanguage,
+            dockerCompose: dockerComposeId
         });
 
         res.send({ state: 'success', message: 'Challenge updated!' });
@@ -144,6 +148,7 @@ exports.createChallenge = async function(req, res) {
         return;
     }
     
+
     if(req.files) {
         dockerComposeId = '';
 
@@ -153,7 +158,15 @@ exports.createChallenge = async function(req, res) {
         } else if (req.body.dockerCompose == 'true'){
             dockerComposeId = randomUUID();
             dockerComposePath = path.join(__dirname, '../dockers/' + dockerComposeId + '/docker.zip');
+
+            if (!fs.existsSync(path.join(__dirname, '../dockers/' + dockerComposeId))){
+                fs.mkdirSync(path.join(__dirname, '../dockers/' + dockerComposeId));
+            }
+
             fs.writeFileSync(dockerComposePath, req.files.dockerZip.data);
+
+            fs.createReadStream(dockerComposePath).pipe(unzipper.Extract({ path: path.join(__dirname, '../dockers/' + dockerComposeId) }));
+
         }
     }
 
@@ -172,6 +185,23 @@ exports.createChallenge = async function(req, res) {
     });
     res.send({ state: 'success', message: 'Challenge created!' });
 
+}
+
+exports.removeDockerCompose = async function(req, res) {
+    const challenge = await challenges.findById(req.body.id);
+
+    if(challenge) {
+        if(challenge.dockerCompose != '') {
+            const dockerComposePath = path.join(__dirname, '../dockers/' + challenge.dockerCompose);
+            fs.rmdirSync(dockerComposePath, { recursive: true });
+            await challenges.findByIdAndUpdate(req.body.id, { dockerCompose: '', dockerLaunchers: [] });
+            res.send({ state: 'success', message: 'Docker compose removed!' });
+        } else {
+            res.send({ state: 'error', message: 'Challenge does not have a docker compose' });
+        }
+    } else {
+        res.send({ state: 'error', message: 'Challenge does not exist' });
+    }
 }
 
 exports.updateChallengeCategory = async function(req, res) {

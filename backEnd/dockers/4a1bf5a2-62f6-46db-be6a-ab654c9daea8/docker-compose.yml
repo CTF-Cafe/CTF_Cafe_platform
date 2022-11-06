@@ -1,0 +1,5 @@
+version: '3' # version of docker-composeservices: # defining service/s
+services:
+  web: # name of the service
+    build: . # directory what to build, here it is root directory
+    ports: ["8080"]
