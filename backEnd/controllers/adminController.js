@@ -80,12 +80,7 @@ exports.saveChallenge = async function(req, res) {
         res.send({ state: 'error', message: 'Flag cannot be empty' });
         return;
     }
-
-    if (req.body.category.length < 1) {
-        res.send({ state: 'error', message: 'Category cannot be empty' });
-        return;
-    }
-
+    
     dockerComposeId = '';
     if(req.file.mimetype != 'application/zip' && req.body.dockerCompose == true) {
         res.send({ state: 'error', message: 'Docker compose file must be in a zip file' });

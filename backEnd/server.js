@@ -132,7 +132,7 @@ app.use('/api/admin', checkAdminAuth, adminRouter)
 app.use('/api/assets', express.static('assets'));
 
 process.on('uncaughtException', function(err) {
-    console.log('Uncaught exception: ' + err);
+    console.log('Uncaught exception: ' + err.stack);
 });
 
 app.listen(port, () => {
