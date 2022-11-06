@@ -77,7 +77,6 @@ function Challenges(props) {
 
             return 0;
           });
-          console.log(response.data.challenges);
           setChallenges(response.data.challenges);
         }
       })
@@ -145,6 +144,34 @@ function Challenges(props) {
         } else {
           if (response.data.state == "success") {
             globalData.alert.success("Challenge updated!");
+            getChallenges();
+          } else {
+            globalData.alert.error(response.data.message);
+          }
+        }
+      })
+      .catch((error) => console.log(error.message));
+  };
+
+  const removeDockerCompose = (e, challenge) => {
+
+    axios
+      .post(
+        process.env.REACT_APP_SERVER_URI + "/api/admin/removeDockerCompose",
+        {
+          id: challenge._id,
+        },
+        { withCredentials: true }
+      )
+      .then((response) => {
+        if (response.data.state == "sessionError") {
+          globalData.alert.error("Session expired!");
+          globalData.setUserData({});
+          globalData.setLoggedIn(false);
+          globalData.navigate("/", { replace: true });
+        } else {
+          if (response.data.state == "success") {
+            globalData.alert.success("Docker compose removed!");
             getChallenges();
           } else {
             globalData.alert.error(response.data.message);
@@ -335,6 +362,7 @@ function Challenges(props) {
                     drag={drag}
                     saveChallenge={saveChallenge}
                     deleteChallenge={deleteChallenge}
+                    removeDockerCompose={removeDockerCompose}
                     key={challenge._id}
                     assets={assets}
                     setAction={setAction}
