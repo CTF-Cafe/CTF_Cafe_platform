@@ -77,6 +77,7 @@ function Challenges(props) {
 
             return 0;
           });
+          console.log(response.data.challenges);
           setChallenges(response.data.challenges);
         }
       })
@@ -153,6 +154,7 @@ function Challenges(props) {
       .catch((error) => console.log(error.message));
   };
 
+
   const deleteChallenge = (e, oldChallenge) => {
     axios
       .post(
@@ -222,7 +224,7 @@ function Challenges(props) {
       axios
         .post(
           process.env.REACT_APP_SERVER_URI +
-          "/api/admin/updateChallengeCategory",
+            "/api/admin/updateChallengeCategory",
           {
             id: challenge.id.replace("challenge-top", ""),
             category: newCategory.children[0].id,
@@ -264,7 +266,7 @@ function Challenges(props) {
           file: "",
           flag: "FLAG{H3LL0_W0RLD}",
           category: category,
-          dockerCompose: false,
+          dockerCompose: false
         },
         { withCredentials: true }
       )
