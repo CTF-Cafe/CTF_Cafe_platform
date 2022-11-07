@@ -5,6 +5,21 @@ const ctfConfig = require('../models/ctfConfigModel.js');
 const ObjectId = require('mongoose').Types.ObjectId;
 var compose = require('docker-compose');
 const path = require('path');
+var cron = require('node-cron');
+
+// Cron Job to check if docker containers should be stopped
+cron.schedule('*/5 * * * *', () => {
+    challenges.find({}).then((challenges) => {
+        challenges.forEach(challenge => {
+            challenge.dockerLaunchers.forEach(launcher => {
+                if (Date.now() - launcher.startTime >= 1000 * 60 * 60) {
+                    compose.down({ cwd: path.join(__dirname, "../dockers/", challenge.dockerCompose, "/"), composeOptions: [["--verbose"], ["-p", challenge.dockerCompose + "_" + launcher.team]] });
+                    challenges.updateOne({ _id: ObjectId(challenge._id) }, { $pull: { dockerLaunchers: { user: launcher.user, team: launcher.team } } });
+                }
+            });
+        });
+    });
+});
 
 exports.getChallenges = async function (req, res) {
     let allChallenges = await challenges.find({}).sort({ points: 1 });
@@ -69,7 +84,7 @@ exports.launchDocker = async function (req, res) {
 
                 port = conatiners.data.services[0].ports[0].mapped.port
                 console.log(port)
-                await challenges.updateOne({ _id: ObjectId(req.body.challengeId) }, { $push: { dockerLaunchers: { user: user.id, team: team.id, port: port } } });
+                await challenges.updateOne({ _id: ObjectId(req.body.challengeId) }, { $push: { dockerLaunchers: { user: user.id, team: team.id, port: port, startTime: Date.now() } } });
             } catch (err) {
                 console.log(err);
                 throw new Error('Error launching docker!');
