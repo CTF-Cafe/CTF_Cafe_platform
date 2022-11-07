@@ -15,8 +15,6 @@ serverSetup
 
 .env
 
-backEnd/dockers/*
-
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
