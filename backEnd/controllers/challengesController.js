@@ -9,12 +9,12 @@ var cron = require('node-cron');
 
 // Cron Job to check if docker containers should be stopped
 cron.schedule('*/5 * * * *', () => {
-    challenges.find({}).then((challenges) => {
-        challenges.forEach(challenge => {
-            challenge.dockerLaunchers.forEach(launcher => {
+    challenges.find({}).then((allChallenges) => {
+        allChallenges.forEach(challenge => {
+            challenge.dockerLaunchers.forEach(async launcher => {
                 if (Date.now() - launcher.startTime >= 1000 * 60 * 60) {
                     compose.down({ cwd: path.join(__dirname, "../dockers/", challenge.dockerCompose, "/"), composeOptions: [["--verbose"], ["-p", challenge.dockerCompose + "_" + launcher.team]] });
-                    challenges.updateOne({ _id: ObjectId(challenge._id) }, { $pull: { dockerLaunchers: { user: launcher.user, team: launcher.team } } });
+                    await challenges.updateOne({ _id: ObjectId(challenge._id) }, { $pull: { dockerLaunchers: { user: launcher.user, team: launcher.team } } });
                 }
             });
         });
@@ -41,9 +41,12 @@ exports.getChallenges = async function (req, res) {
 
 }
 
+currentlyLaunching = [];
+
 exports.launchDocker = async function (req, res) {
+    let user;
     try {
-        const user = await users.findOne({ username: req.session.username });
+        user = await users.findOne({ username: req.session.username });
 
         // Check teamId is valid
         if (!ObjectId.isValid(user.teamId)) {
@@ -72,6 +75,13 @@ exports.launchDocker = async function (req, res) {
         if (challenge.dockerCompose.length == 0) {
             throw new Error('Challenge is not dockerized!');
         }
+        
+        // check is challenge is already in the process of being launched
+        if (currentlyLaunching.find(item => item.user === user.id && item.challenge === challenge._id || item.team === team.id && item.challenge === challenge._id) != undefined) {
+            throw new Error('Please wait before launching another instance!');
+        }
+
+        currentlyLaunching.push({ user: user.id, team: team.id, challenge: challenge._id });
 
         // check if user has already launched this challenge
         if (challenge.dockerLaunchers.find(item => item.team === team.id) == undefined && challenge.dockerLaunchers.find(item => item.user === user.id) == undefined) {
@@ -83,7 +93,6 @@ exports.launchDocker = async function (req, res) {
                 var conatiners = await compose.ps({ cwd: path.join(__dirname, "../dockers/", challenge.dockerCompose, "/"), composeOptions: [["--verbose"], ["-p", challenge.dockerCompose + "_" + team.id]] });
 
                 port = conatiners.data.services[0].ports[0].mapped.port
-                console.log(port)
                 await challenges.updateOne({ _id: ObjectId(req.body.challengeId) }, { $push: { dockerLaunchers: { user: user.id, team: team.id, port: port, startTime: Date.now() } } });
             } catch (err) {
                 console.log(err);
@@ -98,6 +107,10 @@ exports.launchDocker = async function (req, res) {
     } catch (err) {
         if (err) {
             res.send({ state: 'error', message: err.message });
+        }
+    } finally {
+        if (user) {
+            currentlyLaunching = currentlyLaunching.filter(item => item.user !== user.id);
         }
     }
 }

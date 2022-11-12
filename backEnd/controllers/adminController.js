@@ -193,7 +193,11 @@ exports.removeDockerCompose = async function(req, res) {
     if(challenge) {
         if(challenge.dockerCompose != '') {
             const dockerComposePath = path.join(__dirname, '../dockers/' + challenge.dockerCompose);
-            fs.rmdirSync(dockerComposePath, { recursive: true });
+            try {
+                fs.rmdirSync(dockerComposePath, { recursive: true });
+            } catch (err) {
+                console.error(err);
+            }
             await challenges.findByIdAndUpdate(req.body.id, { dockerCompose: '', dockerLaunchers: [] });
             res.send({ state: 'success', message: 'Docker compose removed!' });
         } else {
