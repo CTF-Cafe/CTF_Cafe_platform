@@ -20,15 +20,6 @@ db.once("open", async function() {
 
     console.log("Users reset successfully");
 
-    await teams.updateMany({
-        users: { $elemMatch: { score: { $gt: 0 } } }
-    }, {
-        $set: {
-            "users.$.solved": [],
-            "users.$.score": 0,
-        }
-    });
-
     console.log("Teams reset successfully");
 
     await challenges.updateMany({ solveCount: { $gt: 0 } }, { solveCount: 0, firstBlood: 'none' });

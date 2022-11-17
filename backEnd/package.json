@@ -25,6 +25,7 @@
         "fs": "^0.0.1-security",
         "mongo-sanitize": "^1.1.0",
         "mongoose": "^6.2.8",
+        "node-cron": "^3.0.2",
         "passport": "^0.6.0",
         "passport-local": "^1.0.0",
         "path": "^0.12.7",
