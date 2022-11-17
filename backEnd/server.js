@@ -112,19 +112,17 @@ function checkAuth(req, res, next) {
 
 function checkAdminAuth(req, res, next) {
 
-    // users.findOne({ username: req.session.username }).then(function(user) {
-    //     if (!user) {
-    //         res.send({ state: 'sessionError' })
-    //     } else if (!(user.key == req.session.key)) {
-    //         res.send({ state: 'sessionError' })
-    //     } else if (!user.isAdmin) {
-    //         res.send({ state: 'sessionError' })
-    //     } else {
-    //         next();
-    //     }
-    // });
-
-    next();
+    users.findOne({ username: req.session.username }).then(function(user) {
+        if (!user) {
+            res.send({ state: 'sessionError' })
+        } else if (!(user.key == req.session.key)) {
+            res.send({ state: 'sessionError' })
+        } else if (!user.isAdmin) {
+            res.send({ state: 'sessionError' })
+        } else {
+            next();
+        }
+    });
 
 }
 
