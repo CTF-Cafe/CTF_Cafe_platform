@@ -195,7 +195,7 @@ function Challenges(props) {
       });
   };
 
-  const submitFlag = (index) => {
+  const submitFlag = (index, challenge) => {
     const flag = document.getElementById(`flag_id_${index}`).value;
 
     axios
@@ -203,6 +203,7 @@ function Challenges(props) {
         process.env.REACT_APP_SERVER_URI + "/api/user/submitFlag",
         {
           flag: flag,
+          challengeId: challenge._id
         },
         { withCredentials: true }
       )
@@ -232,11 +233,10 @@ function Challenges(props) {
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
 
-  const handleEnterSubmit = (event, index) => {
+  const handleEnterSubmit = (event, index, challenge) => {
     // look for the `Enter` keyCode
     if (event.key === "Enter") {
-      console.log(index);
-      submitFlag(index);
+      submitFlag(index, challenge);
     }
   };
 
@@ -443,7 +443,9 @@ function Challenges(props) {
 
                               { challenge.dockerLaunchers.find(item => item.team === globalData.userData.team._id) != undefined ?
                                 (
-                                  <p>Port: {challenge.dockerLaunchers.find(item => item.team === globalData.userData.team._id).port}</p>
+                                  <>  
+                                    <p>Port: {challenge.dockerLaunchers.find(item => item.team === globalData.userData.team._id).port}</p>
+                                  </>
                                 ) : null
                               }
 
@@ -549,7 +551,7 @@ function Challenges(props) {
                                   aria-describedby="basic-addon2"
                                   id={"flag_id_" + index}
                                   onKeyPress={(e) => {
-                                    handleEnterSubmit(e, index);
+                                    handleEnterSubmit(e, index, challenge);
                                   }}
                                 />
                                 <div className="input-group-append">
@@ -558,7 +560,7 @@ function Challenges(props) {
                                     className="btn btn-outline-danger"
                                     type="button"
                                     onClick={() => {
-                                      submitFlag(index);
+                                      submitFlag(index, challenge);
                                     }}
                                   >
                                     Go!

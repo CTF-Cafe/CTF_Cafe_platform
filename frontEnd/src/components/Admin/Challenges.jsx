@@ -124,9 +124,15 @@ function Challenges(props) {
     formData.append("flag", flag);
 
     const dockerCompose = document.getElementById("dockerCompose" + oldChallenge._id);
-    formData.append("dockerZip", dockerCompose.files[0]);
-
-    formData.append("dockerCompose", dockerCompose.files[0] ? true : false);
+    if(dockerCompose != null) {
+      formData.append("dockerZip", dockerCompose.files[0]);
+      formData.append("dockerCompose", dockerCompose.files[0] ? true : false);
+    } else {
+      formData.append("dockerCompose", oldChallenge.dockerCompose);
+    }
+    
+    const randomFlag = document.getElementById("randomFlag" + oldChallenge._id).value;
+    formData.append("randomFlag", randomFlag);
 
     axios
       .post(

@@ -111,7 +111,8 @@ exports.saveChallenge = async function(req, res) {
             file: (req.body.file.length > 0 ? req.body.file : ''),
             codeSnippet: (req.body.codeSnippet.length > 0 ? req.body.codeSnippet : ''),
             codeLanguage: req.body.codeLanguage,
-            dockerCompose: dockerComposeId
+            dockerCompose: req.files ? dockerComposeId : req.body.dockerCompose,
+            randomFlag: (req.body.randomFlag == 'true' ? true : false),
         });
 
         res.send({ state: 'success', message: 'Challenge updated!' });
