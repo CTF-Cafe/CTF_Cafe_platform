@@ -329,9 +329,9 @@ exports.submitFlag = async function (req, res) {
         });
 
         if (challenge.firstBlood == 'none' || challenge.firstBlood == username) {
-            await challenges.updateOne({ flag: flag }, { $inc: { solveCount: 1 }, firstBlood: updatedUser.username });
+            await challenges.updateOne({ _id: req.body.challengeId }, { $inc: { solveCount: 1 }, firstBlood: updatedUser.username });
         } else {
-            await challenges.updateOne({ flag: flag }, { $inc: { solveCount: 1 } });
+            await challenges.updateOne({ _id: req.body.challengeId }, { $inc: { solveCount: 1 } });
         }
 
         updatedUser.password = undefined;
