@@ -38,7 +38,7 @@ var sess = {
         mongoUrl: process.env.MONGODB_CONNSTRING,
         touchAfter: 24 * 3600 // time period in seconds
     }),
-    secret: process.env.SECRET_KEY,
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
