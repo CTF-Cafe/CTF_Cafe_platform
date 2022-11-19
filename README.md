@@ -17,29 +17,67 @@
 - And more...
 
 
-# Auto Infrastructure Setup
+# Auto Infrastructure Setup 
+
+*MAKE SURE TO RUN THIS ON A BLANK SERVER*
+*NOT FOR LOCAL DEVELOPMENT*
 
 [Script](https://github.com/CTF-Cafe/CTF_Cafe/blob/e39322de4278d190e9b7ec6908e59763b2588435/serverSetupScript.sh)
 
 Make sure to create a new account, promote him to admin and delete the admin:admin user after setup!
 
-# Manual Backend & Frontend Setup
+# Manual Backend & Frontend Setup ( Dockers )
+
+## Prerequisites
+- docker & docker-compose
+
+## Setup
+
+edit environment variables inside the main docker-compose, if you want to launch it all at once
+else edit in backEnd/frontEnd specific docker-compose files
+
+*mongo*
+```
+MONGO_INITDB_ROOT_USERNAME=<mongodb username>
+MONGO_INITDB_ROOT_PASSWORD=<mongodb password>
+```
+
+*backEnd*
+```
+MONGODB_CONNSTRING=<mongodb connect URI>
+SESSION_SECRET=<secure randomly generated session key for validating session cookies>
+NODE_ENV=<development/production>
+FRONTEND_URI=<frontend url>
+```
+
+*frontEnd*
+```
+REACT_APP_SERVER_URI=<your backend url that has the /api pages and functions, e.g. http://localhost:3001>
+REACT_APP_CTF_NAME=<ctf_name_formatted_like_this>
+GENERATE_SOURCEMAP=<true for dev | false for production>
+```
+
+## Startup
+
+simply run `docker-compose up --build` in the root of CTF_Cafe
+
+
+# Manual Backend & Frontend Setup ( No Dockers )
 
 ## Prerequisites
 - Node.JS
 - MongoDB
-- Visual Studio Code or another IDE (not Notepad)
 
 ## Setup
-- Make a `.env` file on /backEnd/ in this format:
+- Make a `.env` file in /backEnd/ in this format:
 ```
-SECRET_KEY=<secure randomly generated session key for validating session cookies>
+SESSION_SECRET=<secure randomly generated session key for validating session cookies>
 MONGODB_CONNSTRING=<mongodb connect URI, e.g. "mongodb://localhost:27017" - you may need to surround it in quotes if you experience glitches or formatting issues>
 NODE_ENV=<development/production>
 FRONTEND_URI=<frontend url>
 ```
 
-- Make a `.env` file on /frontEnd/ in this format:
+- Make a `.env` file in /frontEnd/ in this format:
 ```
 REACT_APP_SERVER_URI=<your backend url that has the /api pages and functions, e.g. http://localhost:3001>
 REACT_APP_CTF_NAME=<ctf_name_formatted_like_this>
