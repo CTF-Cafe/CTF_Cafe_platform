@@ -10,7 +10,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: jdHAKZ!172Lks
 
   backend:
-    build: .
+    build: ./backEnd/
     restart: always
     ports: 
       - '3001:3001'
@@ -20,6 +20,16 @@ services:
       - MONGODB_CONNSTRING=mongodb://raxo:jdHAKZ!172Lks@mongo:27017/ctfDB?authSource=admin
       - SESSION_SECRET=djbh28Y879U292dklkdjjd
     volumes:
-      - ./assets:/server/assets
+      - ./backEnd/assets:/server/assets
     depends_on:
       - mongo
+
+  frontend:
+    build: ./frontEnd/
+    restart: always
+    ports: 
+      - '3000:3000'
+    environment:
+      - REACT_APP_SERVER_URI=http://localhost:3001
+      - REACT_APP_CTF_NAME=TEST_CTF
+      - GENERATE_SOURCEMAP=false

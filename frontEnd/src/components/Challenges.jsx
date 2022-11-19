@@ -1,4 +1,3 @@
-import { Outlet, Routes, Route, Link } from "react-router-dom";
 import axios from "axios";
 import { useState, useEffect, useContext } from "react";
 import { saveAs } from "file-saver";
@@ -128,7 +127,75 @@ function Challenges(props) {
     getChallenges();
   }, []);
 
-  const submitFlag = (index) => {
+  const launchDocker = (challenge) => {
+    challenge.dockerLoading = true;
+    setChallenges([...challenges]);
+
+    axios
+      .post(
+        process.env.REACT_APP_SERVER_URI + "/api/user/launchDocker",
+        {
+          challengeId: challenge._id,
+        },
+        {
+          withCredentials: true,
+        }
+      )
+      .then((response) => {
+        if (response.data.state == "sessionError") {
+          globalData.alert.error("Session expired!");
+          globalData.setUserData({});
+          globalData.setLoggedIn(false);
+          globalData.navigate("/", { replace: true });
+        } else if (response.data.state == "error") {
+          globalData.alert.error(response.data.message);
+          challenge.dockerLoading = false;
+          setChallenges([...challenges]);
+        } else {
+          globalData.alert.success("Docker launched!");
+          getChallenges();
+        }
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+  };
+
+  const stopDocker = (challenge) => {
+    challenge.dockerStopping = true;
+    setChallenges([...challenges]);
+
+    axios
+      .post(
+        process.env.REACT_APP_SERVER_URI + "/api/user/stopDocker",
+        {
+          challengeId: challenge._id,
+        },
+        {
+          withCredentials: true,
+        }
+      )
+      .then((response) => {
+        if (response.data.state == "sessionError") {
+          globalData.alert.error("Session expired!");
+          globalData.setUserData({});
+          globalData.setLoggedIn(false);
+          globalData.navigate("/", { replace: true });
+        } else if (response.data.state == "error") {
+          globalData.alert.error(response.data.message);
+          challenge.dockerStopping = false;
+          setChallenges([...challenges]);
+        } else {
+          globalData.alert.success("Docker stopped!");
+          getChallenges();
+        }
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+  };
+
+  const submitFlag = (index, challenge) => {
     const flag = document.getElementById(`flag_id_${index}`).value;
 
     axios
@@ -136,6 +203,7 @@ function Challenges(props) {
         process.env.REACT_APP_SERVER_URI + "/api/user/submitFlag",
         {
           flag: flag,
+          challengeId: challenge._id
         },
         { withCredentials: true }
       )
@@ -165,11 +233,10 @@ function Challenges(props) {
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
 
-  const handleEnterSubmit = (event, index) => {
+  const handleEnterSubmit = (event, index, challenge) => {
     // look for the `Enter` keyCode
     if (event.key === "Enter") {
-      console.log(index);
-      submitFlag(index);
+      submitFlag(index, challenge);
     }
   };
 
@@ -225,16 +292,16 @@ function Challenges(props) {
                             challenge.category == "crypto"
                               ? "card category_crypt"
                               : challenge.category == "web"
-                              ? "card category_web"
-                              : challenge.category == "osint"
-                              ? "card category_osint"
-                              : challenge.category == "steganography"
-                              ? "card category_steg"
-                              : challenge.category == "pwn"
-                              ? "card category_pwning"
-                              : challenge.category == "forensics"
-                              ? "card category_forensics"
-                              : "card category_misc"
+                                ? "card category_web"
+                                : challenge.category == "osint"
+                                  ? "card category_osint"
+                                  : challenge.category == "steganography"
+                                    ? "card category_steg"
+                                    : challenge.category == "pwn"
+                                      ? "card category_pwning"
+                                      : challenge.category == "forensics"
+                                        ? "card category_forensics"
+                                        : "card category_misc"
                           }
                         >
                           <div
@@ -244,7 +311,7 @@ function Challenges(props) {
                               }).length > 0
                                 ? "card-header solved"
                                 : globalData.userData.team
-                                ? globalData.userData.team.users.filter(
+                                  ? globalData.userData.team.users.filter(
                                     (user) => {
                                       return (
                                         user.solved.filter((obj) => {
@@ -253,9 +320,9 @@ function Challenges(props) {
                                       );
                                     }
                                   ).length > 0
-                                  ? "card-header solved"
+                                    ? "card-header solved"
+                                    : "card-header"
                                   : "card-header"
-                                : "card-header"
                             }
                             data-target={"#problem_id_" + index}
                             data-toggle="collapse"
@@ -268,7 +335,7 @@ function Challenges(props) {
                           >
                             <div>
                               {challenge.firstBlood ==
-                              globalData.userData.username ? (
+                                globalData.userData.username ? (
                                 <div
                                   style={{
                                     display: "inline-flex",
@@ -307,20 +374,20 @@ function Challenges(props) {
                                   challenge.level == 0
                                     ? "badge color_white color_easy align-self-end"
                                     : challenge.level == 1
-                                    ? "badge color_white color_medium align-self-end"
-                                    : challenge.level == 2
-                                    ? "badge color_white color_hard align-self-end"
-                                    : "badge color_white color_ninja align-self-end"
+                                      ? "badge color_white color_medium align-self-end"
+                                      : challenge.level == 2
+                                        ? "badge color_white color_hard align-self-end"
+                                        : "badge color_white color_ninja align-self-end"
                                 }
                                 style={{ marginRight: "5px" }}
                               >
                                 {challenge.level == 0
                                   ? "Easy"
                                   : challenge.level == 1
-                                  ? "Medium"
-                                  : challenge.level == 2
-                                  ? "Hard"
-                                  : "Ninja"}
+                                    ? "Medium"
+                                    : challenge.level == 2
+                                      ? "Hard"
+                                      : "Ninja"}
                               </span>
                               <span className="badge align-self-end">
                                 {challenge.points} points
@@ -344,19 +411,19 @@ function Challenges(props) {
                                       challenge.level == 0
                                         ? "color_white color_easy"
                                         : challenge.level == 1
-                                        ? "color_white color_medium"
-                                        : challenge.level == 2
-                                        ? "color_white color_hard"
-                                        : "color_white color_ninja"
+                                          ? "color_white color_medium"
+                                          : challenge.level == 2
+                                            ? "color_white color_hard"
+                                            : "color_white color_ninja"
                                     }
                                   >
                                     {challenge.level == 0
                                       ? "Easy"
                                       : challenge.level == 1
-                                      ? "Medium"
-                                      : challenge.level == 2
-                                      ? "Hard"
-                                      : "Ninja"}
+                                        ? "Medium"
+                                        : challenge.level == 2
+                                          ? "Hard"
+                                          : "Ninja"}
                                   </span>
                                 </h6>
                               </div>
@@ -370,8 +437,55 @@ function Challenges(props) {
                                         <br />
                                       </span>
                                     );
-                                  })}
+                                  })
+                                }
                               </p>
+
+                              { challenge.dockerLaunchers.find(item => item.team === globalData.userData.team._id) != undefined ?
+                                (
+                                  <>  
+                                    <p>Port: {challenge.dockerLaunchers.find(item => item.team === globalData.userData.team._id).port}</p>
+                                  </>
+                                ) : null
+                              }
+
+                              {challenge.dockerCompose ? (
+                                <a
+                                  href="#"
+                                  className="btn btn-outline-danger btn-shadow"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    challenge.dockerLaunchers.find(item => item.team === globalData.userData.team._id) == undefined ? launchDocker(challenge) : stopDocker(challenge);
+                                  }}
+                                >
+                                  {challenge.dockerLoading ?
+                                    (
+                                      <>
+                                        <span className="fa-solid fa-spinner fa-spin mr-2"></span>
+                                        Loading
+                                      </>
+                                    ) : challenge.dockerStopping ?
+                                      (
+                                        <>
+                                          <span className="fa-solid fa-spinner fa-spin mr-2"></span>
+                                          Stopping
+                                        </>
+                                      ) : challenge.dockerLaunchers.find(item => item.team === globalData.userData.team._id) == undefined ?
+                                        (
+                                          <>
+                                            <span className="fa-solid fa-circle-play mr-2"></span>
+                                            Start
+                                          </>
+                                        ) :
+                                        (
+                                          <>
+                                            <span className="fa-solid fa-power-off mr-2"></span>
+                                            Stop
+                                          </>
+                                        )
+                                  }
+                                </a>
+                              ) : null}
 
                               {challenge.file ? (
                                 challenge.file.length > 0 ? (
@@ -437,7 +551,7 @@ function Challenges(props) {
                                   aria-describedby="basic-addon2"
                                   id={"flag_id_" + index}
                                   onKeyPress={(e) => {
-                                    handleEnterSubmit(e, index);
+                                    handleEnterSubmit(e, index, challenge);
                                   }}
                                 />
                                 <div className="input-group-append">
@@ -446,7 +560,7 @@ function Challenges(props) {
                                     className="btn btn-outline-danger"
                                     type="button"
                                     onClick={() => {
-                                      submitFlag(index);
+                                      submitFlag(index, challenge);
                                     }}
                                   >
                                     Go!

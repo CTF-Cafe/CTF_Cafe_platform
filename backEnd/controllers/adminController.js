@@ -6,7 +6,9 @@ const theme = require('../models/themeModel.js');
 const path = require('path');
 const fs = require('fs');
 const axios = require('axios');
+const { randomUUID } = require('crypto');
 const ObjectId = require('mongoose').Types.ObjectId;
+const unzipper = require("unzipper");
 
 exports.getStats = async function(req, res) {
     let allChallenges = await challenges.find({}).sort({ points: 1 });
@@ -30,7 +32,7 @@ exports.getStats = async function(req, res) {
                 if (categories.indexOf(challenge.category) == -1) categories.push(challenge.category);
             });
 
-            res.send({ categories: categories, challenges: allChallenges });
+            res.send({ categories: categories, challenges: allChallenges, state: 'success' });
             break;
         default:
             res.send([]);
@@ -57,6 +59,47 @@ accentsTidy = function(s) {
 exports.saveChallenge = async function(req, res) {
     const challengeExists = await challenges.findById((req.body.id));
 
+    if(parseInt(req.body.points) < 0 || parseInt(req.body.level) < 0) {
+        res.send({ state: 'error', message: 'Points and level must be positive numbers' });
+        return;
+    }
+
+    if (req.body.name.length < 1) {
+        res.send({ state: 'error', message: 'Name cannot be empty' });
+        return;
+    }
+
+    if (req.body.info.length < 1) {
+        res.send({ state: 'error', message: 'Info cannot be empty' });
+        return;
+    }
+
+    if (req.body.flag.length < 1) {
+        res.send({ state: 'error', message: 'Flag cannot be empty' });
+        return;
+    }
+
+    if(req.files) {
+        dockerComposeId = '';
+
+        if(req.files.dockerZip.mimetype != 'application/zip' && req.body.dockerCompose == 'true') {
+            res.send({ state: 'error', message: 'Docker compose file must be in a zip file' });
+            return;
+        } else if (req.body.dockerCompose == 'true'){
+            dockerComposeId = randomUUID();
+            dockerComposePath = path.join(__dirname, '../dockers/' + dockerComposeId + '/docker.zip');
+
+            if (!fs.existsSync(path.join(__dirname, '../dockers/' + dockerComposeId))){
+                fs.mkdirSync(path.join(__dirname, '../dockers/' + dockerComposeId));
+            }
+
+            fs.writeFileSync(dockerComposePath, req.files.dockerZip.data);
+
+            fs.createReadStream(dockerComposePath).pipe(unzipper.Extract({ path: path.join(__dirname, '../dockers/' + dockerComposeId) }));
+
+        }
+    }
+
     if (challengeExists) {
         await challenges.findByIdAndUpdate((req.body.id), {
             name: req.body.name.trim(),
@@ -68,6 +111,8 @@ exports.saveChallenge = async function(req, res) {
             file: (req.body.file.length > 0 ? req.body.file : ''),
             codeSnippet: (req.body.codeSnippet.length > 0 ? req.body.codeSnippet : ''),
             codeLanguage: req.body.codeLanguage,
+            dockerCompose: req.files ? dockerComposeId : req.body.dockerCompose,
+            randomFlag: (req.body.randomFlag == 'true' ? true : false),
         });
 
         res.send({ state: 'success', message: 'Challenge updated!' });
@@ -78,6 +123,53 @@ exports.saveChallenge = async function(req, res) {
 }
 
 exports.createChallenge = async function(req, res) {
+
+    if(parseInt(req.body.points) < 0 || parseInt(req.body.level) < 0) {
+        res.send({ state: 'error', message: 'Points and level must be positive numbers' });
+        return;
+    }
+
+    if (req.body.name.length < 1) {
+        res.send({ state: 'error', message: 'Name cannot be empty' });
+        return;
+    }
+
+    if (req.body.info.length < 1) {
+        res.send({ state: 'error', message: 'Info cannot be empty' });
+        return;
+    }
+
+    if (req.body.flag.length < 1) {
+        res.send({ state: 'error', message: 'Flag cannot be empty' });
+        return;
+    }
+
+    if (req.body.category.length < 1) {
+        res.send({ state: 'error', message: 'Category cannot be empty' });
+        return;
+    }
+    
+
+    if(req.files) {
+        dockerComposeId = '';
+
+        if(req.files.dockerZip.mimetype != 'application/zip' && req.body.dockerCompose == 'true') {
+            res.send({ state: 'error', message: 'Docker compose file must be in a zip file' });
+            return;
+        } else if (req.body.dockerCompose == 'true'){
+            dockerComposeId = randomUUID();
+            dockerComposePath = path.join(__dirname, '../dockers/' + dockerComposeId + '/docker.zip');
+
+            if (!fs.existsSync(path.join(__dirname, '../dockers/' + dockerComposeId))){
+                fs.mkdirSync(path.join(__dirname, '../dockers/' + dockerComposeId));
+            }
+
+            fs.writeFileSync(dockerComposePath, req.files.dockerZip.data);
+
+            fs.createReadStream(dockerComposePath).pipe(unzipper.Extract({ path: path.join(__dirname, '../dockers/' + dockerComposeId) }));
+
+        }
+    }
 
     await challenges.create({
         name: req.body.name + Math.random().toString().substr(2, 4),
@@ -90,9 +182,31 @@ exports.createChallenge = async function(req, res) {
         category: req.body.category,
         codeSnippet: '',
         codeLanguage: 'python',
+        dockerCompose: dockerComposeId,
     });
     res.send({ state: 'success', message: 'Challenge created!' });
 
+}
+
+exports.removeDockerCompose = async function(req, res) {
+    const challenge = await challenges.findById(req.body.id);
+
+    if(challenge) {
+        if(challenge.dockerCompose != '') {
+            const dockerComposePath = path.join(__dirname, '../dockers/' + challenge.dockerCompose);
+            try {
+                fs.rmdirSync(dockerComposePath, { recursive: true });
+            } catch (err) {
+                console.error(err);
+            }
+            await challenges.findByIdAndUpdate(req.body.id, { dockerCompose: '', dockerLaunchers: [] });
+            res.send({ state: 'success', message: 'Docker compose removed!' });
+        } else {
+            res.send({ state: 'error', message: 'Challenge does not have a docker compose' });
+        }
+    } else {
+        res.send({ state: 'error', message: 'Challenge does not exist' });
+    }
 }
 
 exports.updateChallengeCategory = async function(req, res) {
