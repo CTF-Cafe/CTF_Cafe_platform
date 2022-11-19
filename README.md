@@ -3,15 +3,18 @@
 - Create your own challenges, files, hints, code snippets and flags from the admin dashboard
   - File uploads to the server
   - Flag submit bruteforce protection
+  - Docker challenges
+  - Dynamic flags for each team
 - Individual and Team based competitions
   - Have users play on their own or form teams to play together
   - First blood's
+  - Docker's launched by team
 - Scoreboard with automatic tie resolution
   - See global user, team and challenge stats
   - See indivudal team & user stats
 - Automatic competition starting and ending
   - Easily set endTime & startTime from the admin dashboard
-- Team and user management, and banning
+- Team and user management ( promoting, banning, ect )
 - Customize site colors, background, rules & frontpage
 - Importing and Exporting of CTF scoreboards into json
 - And more...
