@@ -25,16 +25,16 @@ function ChallengeCard(props) {
             props.challenge.category == "crypto"
               ? "card category_crypt"
               : props.challenge.category == "web"
-              ? "card category_web"
-              : props.challenge.category == "osint"
-              ? "card category_osint"
-              : props.challenge.category == "steganography"
-              ? "card category_steg"
-              : props.challenge.category == "pwn"
-              ? "card category_pwning"
-              : props.challenge.category == "forensics"
-              ? "card category_forensics"
-              : "card category_misc"
+                ? "card category_web"
+                : props.challenge.category == "osint"
+                  ? "card category_osint"
+                  : props.challenge.category == "steganography"
+                    ? "card category_steg"
+                    : props.challenge.category == "pwn"
+                      ? "card category_pwning"
+                      : props.challenge.category == "forensics"
+                        ? "card category_forensics"
+                        : "card category_misc"
           }
           id={"challenge" + props.challenge._id}
         >
@@ -49,13 +49,23 @@ function ChallengeCard(props) {
             id={"challenge-header" + props.challenge._id}
             style={{ display: "flex", justifyContent: "space-between" }}
           >
-            <span
-              contentEditable="true"
-              style={{ outline: "none" }}
-              id={"name" + props.challenge._id}
-            >
-              {props.challenge.name}{" "}
-            </span>
+            <div>
+              {props.challenge.dockerCompose.length > 0 ?
+                (
+                  <span
+                    className="fa-brands fa-docker"
+                    style={{ fontSize: "18px" }}
+                  ></span>
+                )
+                : null}
+              <span
+                contentEditable="true"
+                style={{ outline: "none" }}
+                id={"name" + props.challenge._id}
+              >
+                {props.challenge.name}{" "}
+              </span>
+            </div>
             <span className="badge align-self-end">
               <span
                 contentEditable="true"
@@ -136,12 +146,12 @@ function ChallengeCard(props) {
 
               <label>Code Snippet:</label>
               <select
-                  defaultValue={props.challenge.codeLanguage || codeLanguage}
-                  id={"code_language" + props.challenge._id}
-                  onChange={(e) => setCodeLanguage(e.target.value) }
-                >
-                  <option value="python">Python</option>
-                  <option value="javascript">Javascript</option>
+                defaultValue={props.challenge.codeLanguage || codeLanguage}
+                id={"code_language" + props.challenge._id}
+                onChange={(e) => setCodeLanguage(e.target.value)}
+              >
+                <option value="python">Python</option>
+                <option value="javascript">Javascript</option>
               </select>
               <AceEditor
                 style={{
@@ -169,6 +179,43 @@ function ChallengeCard(props) {
               />
 
               <p hidden id={"code_snippet" + props.challenge._id}>{code}</p>
+
+              <br />
+              <label>Docker-Compose ZIP:</label>
+              {props.challenge.dockerCompose.length > 0 ? (
+                <>
+                  <button
+                    className="btn btn-outline-danger btn-shadow"
+                    data-toggle="modal"
+                    data-target="#confirmModal"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      props.setAction({
+                        function: props.removeDockerCompose,
+                        e: e,
+                        data: props.challenge,
+                      });
+                    }}
+                    style={{ marginRight: "10px" }}
+                  >
+                    <span className="fa-solid fa-minus"></span>
+                  </button>
+                  {props.challenge.dockerCompose.slice(0, 8)}...
+                  
+                  <br />
+                  <label for={"#randomFlag" + props.challenge._id}>Random Flag: </label>
+                  <select id={"randomFlag" + props.challenge._id} defaultValue={props.challenge.randomFlag}>
+                    <option value="true">True</option>
+                    <option value="false">False</option>
+                  </select>
+                </>
+              ) : (
+                <>
+                  <select id={"randomFlag" + props.challenge._id} value="false" style={{ "display": "none" }}/>
+                  <input id={"dockerCompose" + props.challenge._id} type="file" />
+                </>
+              )}
+              <br /><br />
 
               <label>Flag:</label>
               <p

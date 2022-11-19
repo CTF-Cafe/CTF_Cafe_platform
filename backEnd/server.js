@@ -38,7 +38,7 @@ var sess = {
         mongoUrl: process.env.MONGODB_CONNSTRING,
         touchAfter: 24 * 3600 // time period in seconds
     }),
-    secret: process.env.SECRET_KEY,
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -123,6 +123,7 @@ function checkAdminAuth(req, res, next) {
             next();
         }
     });
+
 }
 
 app.use('/api', globalRouter)
@@ -132,7 +133,7 @@ app.use('/api/admin', checkAdminAuth, adminRouter)
 app.use('/api/assets', express.static('assets'));
 
 process.on('uncaughtException', function(err) {
-    console.log('Uncaught exception: ' + err);
+    console.log('Uncaught exception: ' + err.stack);
 });
 
 app.listen(port, () => {

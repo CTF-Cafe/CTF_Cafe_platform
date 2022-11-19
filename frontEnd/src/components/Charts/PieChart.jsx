@@ -1,6 +1,15 @@
 import { Pie } from "@ant-design/plots";
+import { useState, useEffect, useCallback } from "react";
+
 function PieChart(props) {
-  let data = props.data;
+  const [data, setData] = useState(props.data);
+  const [, updateState] = useState();
+  const forceUpdate = useCallback(() => updateState({}), []);
+
+  useEffect(() => {
+    setData(props.data);
+    forceUpdate();
+  }, [props]);
 
   const config = {
     appendPadding: 10,
