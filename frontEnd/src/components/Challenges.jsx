@@ -449,7 +449,7 @@ function Challenges(props) {
                                 ) : null
                               }
 
-                              {challenge.dockerCompose ? (
+                              {challenge.dockerCompose == "true" ? (
                                 <a
                                   href="#"
                                   className="btn btn-outline-danger btn-shadow"
