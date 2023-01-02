@@ -331,8 +331,8 @@ function Challenges(props) {
         className="display-1 bold color_white"
         style={{ textAlign: "center", marginBottom: "50px" }}
       >
-        CHALLENGES{" "}
-      </h1>{" "}
+        CHALLENGES
+      </h1>
       {categories.map((category, index) => {
         return (
           <div
@@ -347,9 +347,9 @@ function Challenges(props) {
               style={{ marginBottom: "10px" }}
             >
               <h4 style={{ display: "inline-block" }}>
-                {" "}
-                {capitalize(category)}{" "}
-              </h4>{" "}
+                
+                {capitalize(category)}
+              </h4>
               <a
                 href="#"
                 className="btn btn-outline-danger btn-shadow"
@@ -357,8 +357,8 @@ function Challenges(props) {
                   createChallenge(e, category);
                 }}
               >
-                <span className="fa-solid fa-plus"> </span>{" "}
-              </a>{" "}
+                <span className="fa-solid fa-plus"> </span>
+              </a>
             </div>
             {challenges.map((challenge, index) => {
               if (challenge.category === category) {
@@ -375,7 +375,7 @@ function Challenges(props) {
                   />
                 );
               }
-            })}{" "}
+            })}
           </div>
         );
       })}
@@ -384,28 +384,28 @@ function Challenges(props) {
           <br />
           Challenge Types:
           <span className="p-1" style={{ backgroundColor: "#ef121b94" }}>
-            Web{" "}
-          </span>{" "}
+            Web
+          </span>
           <span className="p-1" style={{ backgroundColor: "#b017a494" }}>
-            Osint{" "}
-          </span>{" "}
+            Osint
+          </span>
           <span className="p-1" style={{ backgroundColor: "#17b06b94" }}>
-            Steganography{" "}
-          </span>{" "}
+            Steganography
+          </span>
           <span className="p-1" style={{ backgroundColor: "#36a2eb94" }}>
-            Pwning{" "}
-          </span>{" "}
+            Pwning
+          </span>
           <span className="p-1" style={{ backgroundColor: "#0f329894" }}>
-            Forensics{" "}
-          </span>{" "}
+            Forensics
+          </span>
           <span className="p-1" style={{ backgroundColor: "#9966FF94" }}>
-            Cryptography{" "}
-          </span>{" "}
+            Cryptography
+          </span>
           <span className="p-1" style={{ backgroundColor: "#ffce5694" }}>
-            Misc{" "}
-          </span>{" "}
-        </div>{" "}
-      </div>{" "}
+            Misc
+          </span>
+        </div>
+      </div>
     </div>
   );
 }

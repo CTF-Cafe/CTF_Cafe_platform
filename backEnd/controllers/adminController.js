@@ -79,8 +79,8 @@ exports.saveChallenge = async function(req, res) {
         return;
     }
 
+    let dockerComposeId = '';
     if(req.files) {
-        dockerComposeId = '';
 
         if(req.files.dockerZip.mimetype != 'application/zip' && req.body.dockerCompose == 'true') {
             res.send({ state: 'error', message: 'Docker compose file must be in a zip file' });
@@ -111,7 +111,7 @@ exports.saveChallenge = async function(req, res) {
             file: (req.body.file.length > 0 ? req.body.file : ''),
             codeSnippet: (req.body.codeSnippet.length > 0 ? req.body.codeSnippet : ''),
             codeLanguage: req.body.codeLanguage,
-            dockerCompose: req.files ? dockerComposeId : req.body.dockerCompose,
+            dockerCompose: req.files ? dockerComposeId : req.body.dockerCompose == 'false' ? '' : req.body.dockerCompose,
             randomFlag: (req.body.randomFlag == 'true' ? true : false),
         });
 
@@ -150,9 +150,8 @@ exports.createChallenge = async function(req, res) {
     }
     
 
+    let dockerComposeId = '';
     if(req.files) {
-        dockerComposeId = '';
-
         if(req.files.dockerZip.mimetype != 'application/zip' && req.body.dockerCompose == 'true') {
             res.send({ state: 'error', message: 'Docker compose file must be in a zip file' });
             return;
@@ -181,7 +180,7 @@ exports.createChallenge = async function(req, res) {
         file: (req.body.file.length > 0 ? req.body.file : ''),
         category: req.body.category,
         codeSnippet: '',
-        codeLanguage: 'python',
+        codeLanguage: 'none',
         dockerCompose: dockerComposeId,
     });
     res.send({ state: 'success', message: 'Challenge created!' });
