@@ -284,7 +284,7 @@ exports.getUserTeam = async function(req, res) {
                 {
                     "$unwind": {
                         "path": "$newSolved",
-                        "preserveNullAndEmptyArrays": false
+                        "preserveNullAndEmptyArrays": true
                     }
                 },
                 {
