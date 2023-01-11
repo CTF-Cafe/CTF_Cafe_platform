@@ -27,16 +27,16 @@ function ChallengeCard(props) {
             props.challenge.category == "crypto"
               ? "card category_crypt"
               : props.challenge.category == "web"
-              ? "card category_web"
-              : props.challenge.category == "osint"
-              ? "card category_osint"
-              : props.challenge.category == "steganography"
-              ? "card category_steg"
-              : props.challenge.category == "pwn"
-              ? "card category_pwning"
-              : props.challenge.category == "forensics"
-              ? "card category_forensics"
-              : "card category_misc"
+                ? "card category_web"
+                : props.challenge.category == "osint"
+                  ? "card category_osint"
+                  : props.challenge.category == "steganography"
+                    ? "card category_steg"
+                    : props.challenge.category == "pwn"
+                      ? "card category_pwning"
+                      : props.challenge.category == "forensics"
+                        ? "card category_forensics"
+                        : "card category_misc"
           }
           id={"challenge" + props.challenge._id}
         >
@@ -231,6 +231,25 @@ function ChallengeCard(props) {
                 </>
               )}
               <br />
+
+              {props.dynamicScoring ? <><label>Minimum:</label> <p
+                contentEditable="true"
+                style={{
+                  backgroundColor: "rgb(30, 32, 55)",
+                  outline: "none",
+                }}
+                id={"minimum" + props.challenge._id}
+              >
+                {props.challenge.minimum}
+              </p></> : <p
+                style={{
+                  display: "none",
+                }}
+                id={"minimum" + props.challenge._id}
+              >
+                {props.challenge.minimum}
+              </p>}
+
               <br />
 
               <label>Flag:</label>
