@@ -258,7 +258,7 @@ exports.submitFlag = async function (req, res) {
             throw new Error('Invalid challengeId!')
         }
 
-        const challenge = await challenges.findOne({ _id: ObjectId(req.body.challengeId) });
+        let challenge = await challenges.findOne({ _id: ObjectId(req.body.challengeId) });
 
         if(challenge.randomFlag) {
             if (challenge.dockerLaunchers.find(launcher => launcher.team == user.teamId).flag != flag) {
@@ -292,7 +292,7 @@ exports.submitFlag = async function (req, res) {
 
         // Check if team is currently submitting
         if (currentlySubmittingTeams.includes(user.teamId)) {
-            throw new Error('Submiting to fast!')
+            throw new Error('Submiting too fast!')
         }
 
         currentlySubmittingTeams.push(user.teamId);
@@ -313,8 +313,16 @@ exports.submitFlag = async function (req, res) {
             challenge.firstBlood = username;
         }
 
+        const dynamicScoring = await ctfConfig.findOne({ name: 'dynamicScoring' });
+
+        if(dynamicScoring) {
+            const dynamicPoints = math.ceil((((challenge.minimumPoints - challenge.initialPoints)/(10**2)) * (challenge.solveCount**2)) + challenge.initialPoints)
+
+            await challenges.updateOne({ _id: ObjectId(req.body.challengeId) }, { $set: { points: dynamicPoints } });
+            challenge = await challenges.findOne({ _id: ObjectId(req.body.challengeId) });
+        }
+
         await users.updateOne({ username: username }, { $push: { solved: { _id: challenge._id, timestamp: timestamp } } });
-        // await users.updateOne({ username: username }, { $inc: { score: challenge.points } });
 
         const updatedUser = await users.findOne({ username: username });
 

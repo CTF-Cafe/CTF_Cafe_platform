@@ -104,6 +104,8 @@ exports.saveChallenge = async function(req, res) {
         await challenges.findByIdAndUpdate((req.body.id), {
             name: req.body.name.trim(),
             points: parseInt(req.body.points),
+            initialPoints: parseInt(req.body.points),
+            minimumPoints: parseInt(req.body.minimumPoints),
             level: parseInt(req.body.level),
             info: req.body.info,
             hint: req.body.hint,
@@ -173,6 +175,8 @@ exports.createChallenge = async function(req, res) {
     await challenges.create({
         name: req.body.name + Math.random().toString().substr(2, 4),
         points: parseInt(req.body.points),
+        initialPoints: parseInt(req.body.points),
+        minimumPoints: parseInt(req.body.minimumPoints),
         level: req.body.level,
         info: req.body.info,
         hint: req.body.hint,
