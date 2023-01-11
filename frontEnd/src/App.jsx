@@ -69,7 +69,7 @@ function App() {
                 setSponsors(config.value);
                 break;
               case "dynamicScoring":
-                setDynamicScoring(true);
+                setDynamicScoring(config.value);
                 break;
               default:
                 break;
@@ -173,9 +173,7 @@ function App() {
           }
           setLoading(false);
         })
-        .catch((err) => {
-          console.error(err);
-        });
+        .catch(console.log);
     }
   }, []);
 

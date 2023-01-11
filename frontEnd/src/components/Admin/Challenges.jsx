@@ -99,10 +99,10 @@ function Challenges(props) {
     ).textContent;
     formData.append("points", points);
 
-    const minimum = document.getElementById(
-      "minimum" + oldChallenge._id
+    const minimumPoints = document.getElementById(
+      "minimumPoints" + oldChallenge._id
     ).textContent;
-    formData.append("minimum", minimum);
+    formData.append("minimumPoints", minimumPoints);
 
     const level = document.getElementById("level" + oldChallenge._id).value;
     formData.append("level", level);
@@ -295,7 +295,7 @@ function Challenges(props) {
         {
           name: "Challenge",
           points: 100,
-          minimum: 50,
+          minimumPoints: 50,
           level: 0,
           info: "I am a challenge!",
           hint: "Easy Peasy Lemon Squeezy!",

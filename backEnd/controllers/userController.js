@@ -253,8 +253,10 @@ exports.getUser = async function(req, res) {
 
         for (let i = 0; i < user.solved.length; i++) {
             let challenge = await challenges.findById(user.solved[i]._id);
-            user.solved[i].challenge = challenge;
-            user.score += challenge.points;
+            if(challenge) {
+                user.solved[i].challenge = challenge;
+                user.score += challenge.points;
+            }
         }
 
         res.send(user);
