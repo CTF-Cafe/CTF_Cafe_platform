@@ -78,5 +78,14 @@ exports.setupDB = async function() {
         console.log('Created default admin. admin:admin');
     }
 
+    const dynamicScoringConfig = await ctfConfig.findOne({ name: 'dynamicScoring' });
+
+    if(!dynamicScoringConfig) {
+        await ctfConfig.create({
+            name: 'dynamicScoring',
+            value: false,
+        });
+    }
+
     console.log("Database Setup successfully");
 }
