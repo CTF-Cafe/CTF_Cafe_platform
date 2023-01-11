@@ -1,21 +1,18 @@
 import { Outlet, Routes, Route, Link } from "react-router-dom";
 import { useState, useEffect, useContext } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import AppContext from "../Data/AppContext";
 import ChallengeCard from "./components/ChallengeCard";
 
 function Challenges(props) {
   const globalData = useContext(AppContext);
-  const navigate = useNavigate();
   const [challenges, setChallenges] = useState([]);
   const [categories, setCategories] = useState([
     "crypto",
     "web",
-    "osint",
-    "steganography",
     "forensics",
     "pwn",
+    "reverse",
     "misc",
   ]);
   const [assets, setAssets] = useState([]);
@@ -102,6 +99,11 @@ function Challenges(props) {
     ).textContent;
     formData.append("points", points);
 
+    const minimum = document.getElementById(
+      "minimum" + oldChallenge._id
+    ).textContent;
+    formData.append("minimum", minimum);
+
     const level = document.getElementById("level" + oldChallenge._id).value;
     formData.append("level", level);
 
@@ -124,13 +126,13 @@ function Challenges(props) {
     formData.append("flag", flag);
 
     const dockerCompose = document.getElementById("dockerCompose" + oldChallenge._id);
-    if(dockerCompose != null) {
+    if (dockerCompose != null) {
       formData.append("dockerZip", dockerCompose.files[0]);
       formData.append("dockerCompose", dockerCompose.files[0] ? true : false);
     } else {
       formData.append("dockerCompose", oldChallenge.dockerCompose);
     }
-    
+
     const randomFlag = document.getElementById("randomFlag" + oldChallenge._id).value;
     formData.append("randomFlag", randomFlag);
 
@@ -257,7 +259,7 @@ function Challenges(props) {
       axios
         .post(
           process.env.REACT_APP_SERVER_URI +
-            "/api/admin/updateChallengeCategory",
+          "/api/admin/updateChallengeCategory",
           {
             id: challenge.id.replace("challenge-top", ""),
             category: newCategory.children[0].id,
@@ -293,6 +295,7 @@ function Challenges(props) {
         {
           name: "Challenge",
           points: 100,
+          minimum: 50,
           level: 0,
           info: "I am a challenge!",
           hint: "Easy Peasy Lemon Squeezy!",
@@ -347,7 +350,7 @@ function Challenges(props) {
               style={{ marginBottom: "10px" }}
             >
               <h4 style={{ display: "inline-block" }}>
-                
+
                 {capitalize(category)}
               </h4>
               <a
@@ -372,6 +375,7 @@ function Challenges(props) {
                     key={challenge._id}
                     assets={assets}
                     setAction={setAction}
+                    dynamicScoring={globalData.dynamicScoring}
                   />
                 );
               }
