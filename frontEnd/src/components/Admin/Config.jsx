@@ -2,7 +2,7 @@ import { Outlet, Routes, Route, Link } from "react-router-dom";
 import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import AppContext from "../Data/AppContext";
-const configsToShow = ["endTime", "startTime", "dynamicScoring", "rules", "sponsors"];
+const configsToShow = ["endTime", "startTime", "dynamicScoring", "rules", "sponsors", "categories"];
 
 function Config(props) {
   const globalData = useContext(AppContext);

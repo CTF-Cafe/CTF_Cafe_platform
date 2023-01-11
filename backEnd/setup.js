@@ -78,6 +78,15 @@ exports.setupDB = async function() {
         console.log('Created default admin. admin:admin');
     }
 
+    const categoriesConfig = await ctfConfig.findOne({ name: 'categories' });
+
+    if(!categoriesConfig) {
+        await ctfConfig.create({
+            name: 'categories',
+            value: ["web", "crypto", "reverse", "pwn", "forensics"],
+        });
+    }
+
     const dynamicScoringConfig = await ctfConfig.findOne({ name: 'dynamicScoring' });
 
     if(!dynamicScoringConfig) {

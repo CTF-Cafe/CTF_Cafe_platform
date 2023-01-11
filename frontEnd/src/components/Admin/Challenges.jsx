@@ -7,14 +7,7 @@ import ChallengeCard from "./components/ChallengeCard";
 function Challenges(props) {
   const globalData = useContext(AppContext);
   const [challenges, setChallenges] = useState([]);
-  const [categories, setCategories] = useState([
-    "crypto",
-    "web",
-    "forensics",
-    "pwn",
-    "reverse",
-    "misc",
-  ]);
+  const [categories, setCategories] = useState(globalData.categories);
   const [assets, setAssets] = useState([]);
 
   const getChallenges = () => {
@@ -394,7 +387,7 @@ function Challenges(props) {
             Osint
           </span>
           <span className="p-1" style={{ backgroundColor: "#17b06b94" }}>
-            Steganography
+            Reverse
           </span>
           <span className="p-1" style={{ backgroundColor: "#36a2eb94" }}>
             Pwning

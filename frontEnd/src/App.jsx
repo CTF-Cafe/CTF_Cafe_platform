@@ -31,6 +31,7 @@ function App() {
   const [theme, setTheme] = useState({});
   const [rules, setRules] = useState([]);
   const [dynamicScoring, setDynamicScoring] = useState(false);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sponsors, setSponsors] = useState([]);
   const alert = useAlert();
@@ -42,6 +43,7 @@ function App() {
     theme: theme,
     rules: rules,
     dynamicScoring: dynamicScoring,
+    categories: categories,
     sponsors: sponsors,
     setTheme,
     setLoggedIn,
@@ -71,6 +73,9 @@ function App() {
               case "dynamicScoring":
                 setDynamicScoring(config.value);
                 break;
+              case "categories":
+                  setCategories(config.value);
+                  break;
               default:
                 break;
             }
