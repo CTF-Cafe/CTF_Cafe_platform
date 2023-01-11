@@ -315,8 +315,9 @@ exports.submitFlag = async function (req, res) {
 
         const dynamicScoring = await ctfConfig.findOne({ name: 'dynamicScoring' });
 
-        if(dynamicScoring) {
-            const dynamicPoints = math.ceil((((challenge.minimumPoints - challenge.initialPoints)/(10**2)) * (challenge.solveCount**2)) + challenge.initialPoints)
+        if(dynamicScoring.value.toString() == "true") {
+            const decay = 15;
+            const dynamicPoints = Math.ceil((((challenge.minimumPoints - challenge.initialPoints)/(decay**2)) * ((challenge.solveCount+1)**2)) + challenge.initialPoints)
 
             await challenges.updateOne({ _id: ObjectId(req.body.challengeId) }, { $set: { points: dynamicPoints } });
             challenge = await challenges.findOne({ _id: ObjectId(req.body.challengeId) });

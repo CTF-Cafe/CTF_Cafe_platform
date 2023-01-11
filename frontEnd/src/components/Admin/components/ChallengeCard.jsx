@@ -231,26 +231,24 @@ function ChallengeCard(props) {
                 </>
               )}
               <br />
-
-              {props.dynamicScoring ? <><label>Minimum:</label> <p
+              <br />
+              {props.dynamicScoring.toString() == "true" ? <><label>Minimum Points:</label> <p
                 contentEditable="true"
                 style={{
                   backgroundColor: "rgb(30, 32, 55)",
                   outline: "none",
                 }}
-                id={"minimum" + props.challenge._id}
+                id={"minimumPoints" + props.challenge._id}
               >
-                {props.challenge.minimum}
+                {props.challenge.minimumPoints}
               </p></> : <p
                 style={{
                   display: "none",
                 }}
-                id={"minimum" + props.challenge._id}
+                id={"minimumPoints" + props.challenge._id}
               >
-                {props.challenge.minimum}
+                {props.challenge.minimumPoints}
               </p>}
-
-              <br />
 
               <label>Flag:</label>
               <p
