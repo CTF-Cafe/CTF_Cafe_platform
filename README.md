@@ -5,6 +5,7 @@
   - Flag submit bruteforce protection
   - Docker challenges
   - Dynamic flags for each team
+  - Dynamic scoring possible with a decay of 15
 - Individual and Team based competitions
   - Have users play on their own or form teams to play together
   - First blood's
