@@ -392,17 +392,16 @@ exports.getUsers = async function(req, res) {
                         }
                     }
                 ]).sort({ score: -1, _id: 1 }).skip((page - 1) * 100).limit(100);
+
+                await allUsers.forEach(user => {
+                    user.key = 'Nice try XD';
+                });
+    
+                res.send(allUsers);
+                
             } catch (err) {
                 res.send({ state: 'error', message: err.message })
             }
-
-            // allUsers.splice(0, ((page - 1) * 100));
-
-            await allUsers.forEach(user => {
-                user.key = 'Nice try XD';
-            });
-
-            res.send(allUsers);
         }
     }
 }

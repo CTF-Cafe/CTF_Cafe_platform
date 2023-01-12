@@ -234,13 +234,13 @@ exports.getUsers = async function(req, res) {
                     }
                 ]).sort({ score: -1, _id: 1 }).skip((page - 1) * 100).limit(100);
 
+                res.send(allUsers);
+
                 // allUsers = await users.find({}).sort({ score: -1, _id: 1 }).skip((page - 1) * 100).limit(100);
             } catch (err) {
                 console.log(err);
                 res.send({ state: 'error', message: err.message });
             }
-
-            res.send(allUsers);
         }
     }
 
