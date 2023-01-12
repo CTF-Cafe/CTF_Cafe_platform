@@ -6,7 +6,7 @@ const theme = require('../models/themeModel.js');
 const path = require('path');
 const fs = require('fs');
 const axios = require('axios');
-const { randomUUID } = require('crypto');
+const { v4 } = require('uuid');
 const ObjectId = require('mongoose').Types.ObjectId;
 const unzipper = require("unzipper");
 
@@ -86,7 +86,7 @@ exports.saveChallenge = async function(req, res) {
             res.send({ state: 'error', message: 'Docker compose file must be in a zip file' });
             return;
         } else if (req.body.dockerCompose == 'true'){
-            dockerComposeId = randomUUID();
+            dockerComposeId = v4();
             dockerComposePath = path.join(__dirname, '../dockers/' + dockerComposeId + '/docker.zip');
 
             if (!fs.existsSync(path.join(__dirname, '../dockers/' + dockerComposeId))){
@@ -158,7 +158,7 @@ exports.createChallenge = async function(req, res) {
             res.send({ state: 'error', message: 'Docker compose file must be in a zip file' });
             return;
         } else if (req.body.dockerCompose == 'true'){
-            dockerComposeId = randomUUID();
+            dockerComposeId = v4();
             dockerComposePath = path.join(__dirname, '../dockers/' + dockerComposeId + '/docker.zip');
 
             if (!fs.existsSync(path.join(__dirname, '../dockers/' + dockerComposeId))){
