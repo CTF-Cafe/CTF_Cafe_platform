@@ -19,6 +19,10 @@ router.post('/register', (req, res) => {
     userController.register(req, res);
 });
 
+router.get("/verify/:id/:token", async (req, res) => {
+    userController.verifyMail(req, res);
+});
+
 router.post('/getUsers', (req, res) => {
     userController.getUsers(req, res);
 });

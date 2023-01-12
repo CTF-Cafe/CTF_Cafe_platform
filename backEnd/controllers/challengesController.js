@@ -114,10 +114,22 @@ exports.launchDocker = async function (req, res) {
                     await compose.upAll({ cwd: path.join(__dirname, "../dockers/", challenge.dockerCompose, "/"), composeOptions: [["--verbose"], ["-p", challenge.dockerCompose + "_" + team.id]] });
                 }
 
-                var conatiners = await compose.ps({ cwd: path.join(__dirname, "../dockers/", challenge.dockerCompose, "/"), composeOptions: [["--verbose"], ["-p", challenge.dockerCompose + "_" + team.id]] });
+                var containers = await compose.ps({ cwd: path.join(__dirname, "../dockers/", challenge.dockerCompose, "/"), composeOptions: [["--verbose"], ["-p", challenge.dockerCompose + "_" + team.id]] });
 
-                var port = conatiners.data.services[0].ports[0].mapped.port
-                await challenges.updateOne({ _id: ObjectId(req.body.challengeId) }, { $push: { dockerLaunchers: { user: user.id, team: team.id, port: port, startTime: Date.now(), flag: random_flag } } });
+                let i=0;
+                try {
+                    while(!containers.data.services[i].ports[0].hasOwnProperty('mapped')) {
+                        i+=1;
+                    }
+                    
+                    var port = containers.data.services[i].ports[0].mapped.port;
+                    await challenges.updateOne({ _id: ObjectId(req.body.challengeId) }, { $push: { dockerLaunchers: { user: user.id, team: team.id, port: port, startTime: Date.now(), flag: random_flag } } });
+
+                } catch (err) {
+                    await compose.stop({ cwd: path.join(__dirname, "../dockers/", challenge.dockerCompose, "/"), composeOptions: [["--verbose"], ["-p", challenge.dockerCompose + "_" + team.id]] });
+                    throw new Error('Error launching docker!');
+                }
+
             } catch (err) {
                 console.log(err);
                 throw new Error('Error launching docker!');
@@ -141,7 +153,7 @@ exports.launchDocker = async function (req, res) {
 
 exports.stopDocker = async function (req, res) {
     try {
-        const user = await users.findOne({ username: req.session.username });
+        const user = await users.findOne({ username: req.session.username, verified: true });
 
         // Check teamId is valid
         if (!ObjectId.isValid(user.teamId)) {
@@ -246,7 +258,7 @@ exports.submitFlag = async function (req, res) {
 
         const username = (req.session.username);
         const flag = accentsTidy(req.body.flag.trim()).toUpperCase();
-        const user = await users.findOne({ username: username });
+        const user = await users.findOne({ username: username, verified: true });
 
         // Check if user exists
         if (!user) {
@@ -329,9 +341,9 @@ exports.submitFlag = async function (req, res) {
             challenge = await challenges.findOne({ _id: ObjectId(req.body.challengeId) });
         }
 
-        await users.updateOne({ username: username }, { $push: { solved: { _id: challenge._id, timestamp: timestamp } } });
+        await users.updateOne({ username: username, verified: true }, { $push: { solved: { _id: challenge._id, timestamp: timestamp } } });
 
-        const updatedUser = await users.findOne({ username: username });
+        const updatedUser = await users.findOne({ username: username, verified: true });
 
         await teams.updateOne({
             _id: team._id,

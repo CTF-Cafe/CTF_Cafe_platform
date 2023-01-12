@@ -36,7 +36,12 @@
 SESSION_SECRET=<secure randomly generated session key for validating session cookies>
 MONGODB_CONNSTRING=<mongodb connect URI, e.g. "mongodb://localhost:27017" - you may need to surround it in quotes if you experience glitches or formatting issues>
 NODE_ENV=<development/production>
-FRONTEND_URI=<frontend url>
+FRONTEND_URI=<frontend url if local usually http://localhost:3000 >
+BACKEND_URI=<backend url same as frontend unless testing locally, will then be port 3001 >
+HOST=<mail server>
+MAIL_PORT=<mail server port>
+MAIL=<mail address to send emails>
+PASS=<mail password to send emails>
 ```
 
 - Make a `.env` file in /frontEnd/ in this format:
