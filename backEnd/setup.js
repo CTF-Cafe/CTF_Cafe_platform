@@ -74,8 +74,26 @@ exports.setupDB = async function() {
     if (!adminExists) {
         const password = await encryptionController.encrypt('admin');
 
-        await users.create({ username: 'admin', password: password, key: 'none', isAdmin: true });
+        await users.create({ username: 'admin', password: password, email: "admin@admin.com", verified: true, key: 'none', isAdmin: true });
         console.log('Created default admin. admin:admin');
+    }
+
+    const categoriesConfig = await ctfConfig.findOne({ name: 'categories' });
+
+    if(!categoriesConfig) {
+        await ctfConfig.create({
+            name: 'categories',
+            value: ["web", "crypto", "reverse", "pwn", "forensics"],
+        });
+    }
+
+    const dynamicScoringConfig = await ctfConfig.findOne({ name: 'dynamicScoring' });
+
+    if(!dynamicScoringConfig) {
+        await ctfConfig.create({
+            name: 'dynamicScoring',
+            value: false,
+        });
     }
 
     console.log("Database Setup successfully");

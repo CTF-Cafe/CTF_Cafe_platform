@@ -19,8 +19,13 @@ function Hackerboard(props) {
   const [selectionMain, setSelectionMain] = useState("Team");
   const [selectionScore, setSelectionScore] = useState("up");
   const [page, setPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
   const [endTime, setEndTime] = useState(2651526762);
   const [teamCount, setTeamCount] = useState(0);
+
+  useEffect(() => {
+    selectionMain == "Team" ? getTeams(page) : getUsers(page);
+  }, [searchQuery]);
 
   const getData = (index) => {
     axios
@@ -49,6 +54,7 @@ function Hackerboard(props) {
     axios
       .post(process.env.REACT_APP_SERVER_URI + "/api/getUsers", {
         page: index,
+        search: searchQuery,
       })
       .then((response) => {
         if (response.data.state == "error") {
@@ -72,6 +78,7 @@ function Hackerboard(props) {
     axios
       .post(process.env.REACT_APP_SERVER_URI + "/api/getTeams", {
         page: index,
+        search: searchQuery,
       })
       .then((response) => {
         if (response.data.state == "error") {
@@ -267,6 +274,18 @@ function Hackerboard(props) {
                 >
                   {selectionMain == "Users" ? "View Teams" : "View Users"}
                 </button>
+                <div>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="searchQuery"
+                    placeholder="Search"
+                    onChange={(e) => {
+                      setPage(1);
+                      setSearchQuery(e.target.value);
+                    }}
+                  />
+                </div>
                 {/* Pagination Div */}
                 <div>
                   <button

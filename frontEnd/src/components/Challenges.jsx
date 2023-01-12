@@ -295,8 +295,8 @@ function Challenges(props) {
                                 ? "card category_web"
                                 : challenge.category == "osint"
                                   ? "card category_osint"
-                                  : challenge.category == "steganography"
-                                    ? "card category_steg"
+                                  : challenge.category == "reverse"
+                                    ? "card category_reverse"
                                     : challenge.category == "pwn"
                                       ? "card category_pwning"
                                       : challenge.category == "forensics"
@@ -449,7 +449,7 @@ function Challenges(props) {
                                 ) : null
                               }
 
-                              {challenge.dockerCompose ? (
+                              {challenge.dockerCompose == "true" ? (
                                 <a
                                   href="#"
                                   className="btn btn-outline-danger btn-shadow"

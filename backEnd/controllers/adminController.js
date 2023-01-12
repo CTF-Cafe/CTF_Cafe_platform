@@ -6,7 +6,7 @@ const theme = require('../models/themeModel.js');
 const path = require('path');
 const fs = require('fs');
 const axios = require('axios');
-const { randomUUID } = require('crypto');
+const { v4 } = require('uuid');
 const ObjectId = require('mongoose').Types.ObjectId;
 const unzipper = require("unzipper");
 
@@ -79,14 +79,14 @@ exports.saveChallenge = async function(req, res) {
         return;
     }
 
+    let dockerComposeId = '';
     if(req.files) {
-        dockerComposeId = '';
 
         if(req.files.dockerZip.mimetype != 'application/zip' && req.body.dockerCompose == 'true') {
             res.send({ state: 'error', message: 'Docker compose file must be in a zip file' });
             return;
         } else if (req.body.dockerCompose == 'true'){
-            dockerComposeId = randomUUID();
+            dockerComposeId = v4();
             dockerComposePath = path.join(__dirname, '../dockers/' + dockerComposeId + '/docker.zip');
 
             if (!fs.existsSync(path.join(__dirname, '../dockers/' + dockerComposeId))){
@@ -104,6 +104,8 @@ exports.saveChallenge = async function(req, res) {
         await challenges.findByIdAndUpdate((req.body.id), {
             name: req.body.name.trim(),
             points: parseInt(req.body.points),
+            initialPoints: parseInt(req.body.points),
+            minimumPoints: parseInt(req.body.minimumPoints),
             level: parseInt(req.body.level),
             info: req.body.info,
             hint: req.body.hint,
@@ -111,7 +113,7 @@ exports.saveChallenge = async function(req, res) {
             file: (req.body.file.length > 0 ? req.body.file : ''),
             codeSnippet: (req.body.codeSnippet.length > 0 ? req.body.codeSnippet : ''),
             codeLanguage: req.body.codeLanguage,
-            dockerCompose: req.files ? dockerComposeId : req.body.dockerCompose,
+            dockerCompose: req.files ? dockerComposeId : req.body.dockerCompose == 'false' ? '' : req.body.dockerCompose,
             randomFlag: (req.body.randomFlag == 'true' ? true : false),
         });
 
@@ -150,14 +152,13 @@ exports.createChallenge = async function(req, res) {
     }
     
 
+    let dockerComposeId = '';
     if(req.files) {
-        dockerComposeId = '';
-
         if(req.files.dockerZip.mimetype != 'application/zip' && req.body.dockerCompose == 'true') {
             res.send({ state: 'error', message: 'Docker compose file must be in a zip file' });
             return;
         } else if (req.body.dockerCompose == 'true'){
-            dockerComposeId = randomUUID();
+            dockerComposeId = v4();
             dockerComposePath = path.join(__dirname, '../dockers/' + dockerComposeId + '/docker.zip');
 
             if (!fs.existsSync(path.join(__dirname, '../dockers/' + dockerComposeId))){
@@ -174,6 +175,8 @@ exports.createChallenge = async function(req, res) {
     await challenges.create({
         name: req.body.name + Math.random().toString().substr(2, 4),
         points: parseInt(req.body.points),
+        initialPoints: parseInt(req.body.points),
+        minimumPoints: parseInt(req.body.minimumPoints),
         level: req.body.level,
         info: req.body.info,
         hint: req.body.hint,
@@ -181,7 +184,7 @@ exports.createChallenge = async function(req, res) {
         file: (req.body.file.length > 0 ? req.body.file : ''),
         category: req.body.category,
         codeSnippet: '',
-        codeLanguage: 'python',
+        codeLanguage: 'none',
         dockerCompose: dockerComposeId,
     });
     res.send({ state: 'success', message: 'Challenge created!' });
@@ -321,6 +324,7 @@ exports.saveConfigs = async function(req, res) {
 
 exports.getUsers = async function(req, res) {
     let page = (req.body.page);
+    let search = (req.body.search);
 
     if (page <= 0) {
         res.send({ state: 'error', message: 'Page cannot be less than 1!' });
@@ -335,7 +339,11 @@ exports.getUsers = async function(req, res) {
 
             let allUsers = [];
             try {
-                allUsers = await users.aggregate([{
+                allUsers = await users.aggregate([
+                    {
+                        "$match": { username: new RegExp(search, "i") }
+                    }, 
+                    {
                         "$unwind": {
                             "path": "$solved",
                             "preserveNullAndEmptyArrays": true
@@ -384,17 +392,16 @@ exports.getUsers = async function(req, res) {
                         }
                     }
                 ]).sort({ score: -1, _id: 1 }).skip((page - 1) * 100).limit(100);
+
+                await allUsers.forEach(user => {
+                    user.key = 'Nice try XD';
+                });
+    
+                res.send(allUsers);
+                
             } catch (err) {
                 res.send({ state: 'error', message: err.message })
             }
-
-            // allUsers.splice(0, ((page - 1) * 100));
-
-            await allUsers.forEach(user => {
-                user.key = 'Nice try XD';
-            });
-
-            res.send(allUsers);
         }
     }
 }

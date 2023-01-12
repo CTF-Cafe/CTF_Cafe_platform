@@ -14,7 +14,7 @@ exports.register = async function(req, res) {
 
         if (!teamNameExists) {
 
-            const userToCheck = await users.findOne({ username: (req.session.username) });
+            const userToCheck = await users.findOne({ username: (req.session.username), verified: true });
 
             let userTeamExists;
             if (ObjectId.isValid(userToCheck.teamId)) {
@@ -23,7 +23,7 @@ exports.register = async function(req, res) {
 
             if (!userTeamExists) {
                 await teams.create({ name: teamName, inviteCode: v4(), teamCaptain: userToCheck.username, users: [{ username: userToCheck.username, score: userToCheck.score, solved: userToCheck.solved }] }).then(async function(team) {
-                    await users.findOneAndUpdate({ username: req.session.username }, { teamId: team.id }, { returnOriginal: false }).then(async function(user) {
+                    await users.findOneAndUpdate({ username: req.session.username, verified: true }, { teamId: team.id }, { returnOriginal: false }).then(async function(user) {
                         res.send({ state: 'success', message: 'Registered team!', user: user, team: team });
                     });
                 }).catch(function(err) {
@@ -45,7 +45,7 @@ exports.getCode = async function(req, res) {
     const teamNameExists = await teams.findOne({ name: teamName });
 
     if (teamNameExists) {
-        const userHasTeam = await users.findOne({ username: (req.session.username) });
+        const userHasTeam = await users.findOne({ username: (req.session.username), verified: true });
         if (userHasTeam.teamId == teamNameExists.id) {
             res.send({ state: 'success', code: teamNameExists.inviteCode })
         }
@@ -54,14 +54,13 @@ exports.getCode = async function(req, res) {
     }
 }
 
-
 exports.joinTeam = async function(req, res) {
     const teamCode = (req.body.teamCode);
 
     const teamCodeExists = await teams.findOne({ inviteCode: teamCode });
 
     if (teamCodeExists) {
-        const userToCheck = await users.findOne({ username: (req.session.username) });
+        const userToCheck = await users.findOne({ username: (req.session.username), verified: true });
 
         let userTeamExists;
         if (ObjectId.isValid(userToCheck.teamId)) {
@@ -71,7 +70,7 @@ exports.joinTeam = async function(req, res) {
         if (!userTeamExists) {
             if (teamCodeExists.users.length < 4) {
                 await teams.findOneAndUpdate({ inviteCode: teamCode }, { $push: { users: { username: userToCheck.username, score: userToCheck.score, solved: userToCheck.solved } } }, { returnOriginal: false }).then(async function(team) {
-                    await users.findOneAndUpdate({ username: req.session.username }, { teamId: team.id }, { returnOriginal: false }).then(async function(user) {
+                    await users.findOneAndUpdate({ username: req.session.username, verified: true }, { teamId: team.id }, { returnOriginal: false }).then(async function(user) {
                         res.send({ state: 'success', message: 'Joined team!', user: user, team: team });
                     });
                 }).catch(error => {
@@ -96,6 +95,7 @@ function max(input) {
 
 exports.getTeams = async function(req, res) {
     let page = (req.body.page);
+    let search = (req.body.search);
 
     if (page <= 0) {
         res.send({ state: 'error', message: 'Page cannot be less than 1!' });
@@ -111,7 +111,11 @@ exports.getTeams = async function(req, res) {
             let allTeams = [];
             try {
 
-                allTeams = await teams.aggregate([{
+                allTeams = await teams.aggregate([
+                    {
+                        "$match": { name: new RegExp(search, "i") }
+                    },
+                    {
                         $addFields: {
                             oldUsers: "$users",
                         }
@@ -188,11 +192,11 @@ exports.getTeams = async function(req, res) {
                     },
                 ]).sort({ totalScore: -1, maxTimestamp: -1, _id: 1 }).skip((page - 1) * 100).limit(100);
 
+                res.send(allTeams);
+
             } catch (err) {
                 res.send({ state: 'error', message: err.message });
             }
-
-            res.send(allTeams);
         }
     }
 }
@@ -284,7 +288,7 @@ exports.getUserTeam = async function(req, res) {
                 {
                     "$unwind": {
                         "path": "$newSolved",
-                        "preserveNullAndEmptyArrays": false
+                        "preserveNullAndEmptyArrays": true
                     }
                 },
                 {
@@ -318,7 +322,7 @@ exports.getUserTeam = async function(req, res) {
 
 exports.leaveTeam = async function(req, res) {
 
-    const userToCheck = await users.findOne({ username: req.session.username });
+    const userToCheck = await users.findOne({ username: req.session.username, verified: true });
 
     let userTeamExists;
     if (ObjectId.isValid(userToCheck.teamId)) {
@@ -329,7 +333,7 @@ exports.leaveTeam = async function(req, res) {
 
         let newTeamUsers = userTeamExists.users.filter(user => user.username != req.session.username);
         await teams.findOneAndUpdate({ _id: userTeamExists.id }, { $set: { users: newTeamUsers } }, { returnOriginal: false }).then(async function(team) {
-            await users.findOneAndUpdate({ username: req.session.username }, { teamId: 'none' }, { returnOriginal: false }).then(async function(user) {
+            await users.findOneAndUpdate({ username: req.session.username, verified: true }, { teamId: 'none' }, { returnOriginal: false }).then(async function(user) {
                 if (team.users) {
                     if (team.users.length <= 0) {
                         await teams.findByIdAndRemove(team.id);
@@ -406,7 +410,7 @@ exports.getTeam = async function(req, res) {
 
 exports.kickUser = async function(req, res) {
 
-    const userToCheck = await users.findOne({ username: req.body.userToKick });
+    const userToCheck = await users.findOne({ username: req.body.userToKick, verified: true });
 
     let userTeamExists;
     if (ObjectId.isValid(userToCheck.teamId)) {
@@ -418,7 +422,7 @@ exports.kickUser = async function(req, res) {
         if (userTeamExists.teamCaptain === req.session.username) {
             let newTeamUsers = userTeamExists.users.filter(user => user.username != req.body.userToKick);
             await teams.findOneAndUpdate({ _id: userTeamExists.id }, { $set: { users: newTeamUsers } }, { returnOriginal: false }).then(async function(team) {
-                await users.findOneAndUpdate({ username: req.body.userToKick }, { teamId: 'none' }, { returnOriginal: false }).then(async function(user) {
+                await users.findOneAndUpdate({ username: req.body.userToKick, verified: true }, { teamId: 'none' }, { returnOriginal: false }).then(async function(user) {
                     if (team.users) {
                         if (team.users.length <= 0) {
                             await teams.findByIdAndRemove(team.id);
