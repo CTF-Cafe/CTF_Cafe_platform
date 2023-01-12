@@ -74,7 +74,7 @@ exports.setupDB = async function() {
     if (!adminExists) {
         const password = await encryptionController.encrypt('admin');
 
-        await users.create({ username: 'admin', password: password, key: 'none', isAdmin: true });
+        await users.create({ username: 'admin', password: password, email: "", verified: true, key: 'none', isAdmin: true });
         console.log('Created default admin. admin:admin');
     }
 
