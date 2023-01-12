@@ -22,6 +22,7 @@
         "express-session": "^1.17.2",
         "mongoose": "^6.2.8",
         "node-cron": "^3.0.2",
+        "nodemailer": "^6.9.0",
         "unzipper": "^0.10.11",
         "uuid": "^9.0.0",
         "xss-clean": "^0.1.1"
