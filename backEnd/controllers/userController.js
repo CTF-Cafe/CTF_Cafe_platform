@@ -156,7 +156,7 @@ exports.verifyMail = async function (req, res) {
     const user = await users.findOne({ _id: req.params.id });
     if (!user) throw new Error("Invalid Link");
 
-    if (!user.token == req.params.token) throw new Error("Invalid Link");
+    if (user.token != req.params.token) throw new Error("Invalid Link");
 
     await users.updateOne({ _id: user._id }, { verified: true, token: "" });
 
