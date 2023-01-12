@@ -23,6 +23,14 @@ var challengeSchema = new Schema({
         type: Number,
         default: 100
     },
+    initialPoints: {
+        type: Number,
+        default: 100
+    },
+    minimumPoints: {
+        type: Number,
+        default: 50
+    },
     info: {
         type: String,
         required: true

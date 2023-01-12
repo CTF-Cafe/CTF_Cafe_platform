@@ -7,6 +7,10 @@ var userSchema = new Schema({
         type: String,
         required: true
     },
+    email: {
+        type: String,
+        required: true
+    },
     discordId: {
         type: String,
         default: 'none'
@@ -34,6 +38,13 @@ var userSchema = new Schema({
     teamId: {
         type: String,
         default: 'none'
+    },
+    verified: {
+        type: Boolean,
+        default: false
+    },
+    token: {
+        type: String,
     }
 });
 

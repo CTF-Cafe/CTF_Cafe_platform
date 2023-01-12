@@ -1,23 +1,13 @@
 import { Outlet, Routes, Route, Link } from "react-router-dom";
 import { useState, useEffect, useContext } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import AppContext from "../Data/AppContext";
 import ChallengeCard from "./components/ChallengeCard";
 
 function Challenges(props) {
   const globalData = useContext(AppContext);
-  const navigate = useNavigate();
   const [challenges, setChallenges] = useState([]);
-  const [categories, setCategories] = useState([
-    "crypto",
-    "web",
-    "osint",
-    "steganography",
-    "forensics",
-    "pwn",
-    "misc",
-  ]);
+  const [categories, setCategories] = useState(globalData.categories);
   const [assets, setAssets] = useState([]);
 
   const getChallenges = () => {
@@ -102,6 +92,11 @@ function Challenges(props) {
     ).textContent;
     formData.append("points", points);
 
+    const minimumPoints = document.getElementById(
+      "minimumPoints" + oldChallenge._id
+    ).textContent;
+    formData.append("minimumPoints", minimumPoints);
+
     const level = document.getElementById("level" + oldChallenge._id).value;
     formData.append("level", level);
 
@@ -124,13 +119,13 @@ function Challenges(props) {
     formData.append("flag", flag);
 
     const dockerCompose = document.getElementById("dockerCompose" + oldChallenge._id);
-    if(dockerCompose != null) {
+    if (dockerCompose != null) {
       formData.append("dockerZip", dockerCompose.files[0]);
       formData.append("dockerCompose", dockerCompose.files[0] ? true : false);
     } else {
       formData.append("dockerCompose", oldChallenge.dockerCompose);
     }
-    
+
     const randomFlag = document.getElementById("randomFlag" + oldChallenge._id).value;
     formData.append("randomFlag", randomFlag);
 
@@ -257,7 +252,7 @@ function Challenges(props) {
       axios
         .post(
           process.env.REACT_APP_SERVER_URI +
-            "/api/admin/updateChallengeCategory",
+          "/api/admin/updateChallengeCategory",
           {
             id: challenge.id.replace("challenge-top", ""),
             category: newCategory.children[0].id,
@@ -293,6 +288,7 @@ function Challenges(props) {
         {
           name: "Challenge",
           points: 100,
+          minimumPoints: 50,
           level: 0,
           info: "I am a challenge!",
           hint: "Easy Peasy Lemon Squeezy!",
@@ -331,8 +327,8 @@ function Challenges(props) {
         className="display-1 bold color_white"
         style={{ textAlign: "center", marginBottom: "50px" }}
       >
-        CHALLENGES{" "}
-      </h1>{" "}
+        CHALLENGES
+      </h1>
       {categories.map((category, index) => {
         return (
           <div
@@ -347,9 +343,9 @@ function Challenges(props) {
               style={{ marginBottom: "10px" }}
             >
               <h4 style={{ display: "inline-block" }}>
-                {" "}
-                {capitalize(category)}{" "}
-              </h4>{" "}
+
+                {capitalize(category)}
+              </h4>
               <a
                 href="#"
                 className="btn btn-outline-danger btn-shadow"
@@ -357,8 +353,8 @@ function Challenges(props) {
                   createChallenge(e, category);
                 }}
               >
-                <span className="fa-solid fa-plus"> </span>{" "}
-              </a>{" "}
+                <span className="fa-solid fa-plus"> </span>
+              </a>
             </div>
             {challenges.map((challenge, index) => {
               if (challenge.category === category) {
@@ -372,10 +368,11 @@ function Challenges(props) {
                     key={challenge._id}
                     assets={assets}
                     setAction={setAction}
+                    dynamicScoring={globalData.dynamicScoring}
                   />
                 );
               }
-            })}{" "}
+            })}
           </div>
         );
       })}
@@ -384,28 +381,28 @@ function Challenges(props) {
           <br />
           Challenge Types:
           <span className="p-1" style={{ backgroundColor: "#ef121b94" }}>
-            Web{" "}
-          </span>{" "}
+            Web
+          </span>
           <span className="p-1" style={{ backgroundColor: "#b017a494" }}>
-            Osint{" "}
-          </span>{" "}
+            Osint
+          </span>
           <span className="p-1" style={{ backgroundColor: "#17b06b94" }}>
-            Steganography{" "}
-          </span>{" "}
+            Reverse
+          </span>
           <span className="p-1" style={{ backgroundColor: "#36a2eb94" }}>
-            Pwning{" "}
-          </span>{" "}
+            Pwning
+          </span>
           <span className="p-1" style={{ backgroundColor: "#0f329894" }}>
-            Forensics{" "}
-          </span>{" "}
+            Forensics
+          </span>
           <span className="p-1" style={{ backgroundColor: "#9966FF94" }}>
-            Cryptography{" "}
-          </span>{" "}
+            Cryptography
+          </span>
           <span className="p-1" style={{ backgroundColor: "#ffce5694" }}>
-            Misc{" "}
-          </span>{" "}
-        </div>{" "}
-      </div>{" "}
+            Misc
+          </span>
+        </div>
+      </div>
     </div>
   );
 }

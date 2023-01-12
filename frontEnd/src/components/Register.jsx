@@ -9,18 +9,17 @@ function Register(props) {
   const register = () => {
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
+    const email = document.getElementById("email").value;
 
     axios
       .post(process.env.REACT_APP_SERVER_URI + "/api/register", {
         username: username,
         password: password,
+        email: email
       }, { withCredentials: true })
       .then((response) => {
         if (response.data.state == "success") {
-          globalData.alert.success("Registered!");
-          globalData.setUserData(response.data.user);
-          globalData.setLoggedIn(true);
-          globalData.navigate("/", { replace: true });
+          globalData.alert.success("Registered! Now check email");
         } else {
           globalData.alert.error(response.data.message);
         }
@@ -60,6 +59,14 @@ function Register(props) {
                       className="form-control"
                       id="username"
                       placeholder="Username"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <input
+                      type="email"
+                      className="form-control"
+                      id="email"
+                      placeholder="Email"
                     />
                   </div>
                   <div className="form-group">

@@ -19,6 +19,10 @@ router.post('/register', (req, res) => {
     userController.register(req, res);
 });
 
+router.get("/verify/:id/:token", async (req, res) => {
+    userController.verifyMail(req, res);
+});
+
 router.post('/getUsers', (req, res) => {
     userController.getUsers(req, res);
 });
@@ -156,12 +160,15 @@ router.get('/checkSession', (req, res) => {
 
                 if (team[0]) {
                     team[0].inviteCode = 'Nice try XD';
+                    user.password = undefined;
 
                     res.send({ state: 'success', user: user, team: team[0] });
                 } else {
+                    user.password = undefined;
                     res.send({ state: 'success', user: user })
                 }
             } else {
+                user.password = undefined;
                 res.send({ state: 'success', user: user })
             }
         }
