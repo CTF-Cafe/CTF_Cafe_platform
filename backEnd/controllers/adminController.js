@@ -324,6 +324,7 @@ exports.saveConfigs = async function(req, res) {
 
 exports.getUsers = async function(req, res) {
     let page = (req.body.page);
+    let search = (req.body.search);
 
     if (page <= 0) {
         res.send({ state: 'error', message: 'Page cannot be less than 1!' });
@@ -338,7 +339,11 @@ exports.getUsers = async function(req, res) {
 
             let allUsers = [];
             try {
-                allUsers = await users.aggregate([{
+                allUsers = await users.aggregate([
+                    {
+                        "$match": { username: new RegExp(search, "i") }
+                    }, 
+                    {
                         "$unwind": {
                             "path": "$solved",
                             "preserveNullAndEmptyArrays": true

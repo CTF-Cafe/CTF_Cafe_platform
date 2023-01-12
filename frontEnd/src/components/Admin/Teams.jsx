@@ -7,12 +7,22 @@ function Teams(props) {
   const globalData = useContext(AppContext);
   const [teams, setTeams] = useState([]);
   const [page, setPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    getTeams(page);
+  }, [searchQuery]);
 
   const getTeams = (index) => {
     axios
-      .post(process.env.REACT_APP_SERVER_URI + "/api/getTeams", {
-        page: index,
-      }, { withCredentials: true })
+      .post(
+        process.env.REACT_APP_SERVER_URI + "/api/getTeams",
+        {
+          page: index,
+          search: searchQuery
+        },
+        { withCredentials: true }
+      )
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -37,9 +47,13 @@ function Teams(props) {
 
   const deleteTeam = (e, team) => {
     axios
-      .post(process.env.REACT_APP_SERVER_URI + "/api/admin/deleteTeam", {
-        team: team,
-      }, { withCredentials: true })
+      .post(
+        process.env.REACT_APP_SERVER_URI + "/api/admin/deleteTeam",
+        {
+          team: team,
+        },
+        { withCredentials: true }
+      )
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -69,7 +83,6 @@ function Teams(props) {
     getTeams(page + 1);
   };
 
-
   return (
     <div>
       <h1
@@ -78,19 +91,39 @@ function Teams(props) {
       >
         TEAMS
       </h1>
-      <div style={{marginBottom: '25px'}}>
-        <button
-          className="btn btn-outline-danger btn-shadow"
-          onClick={previousPage}
-        >
-          <span className="fa-solid fa-arrow-left"></span>
-        </button>
-        <button
-          className="btn btn-outline-danger btn-shadow"
-          onClick={nextPage}
-        >
-          <span className="fa-solid fa-arrow-right"></span>
-        </button>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: "25px",
+        }}
+      >
+        <div>
+          <button
+            className="btn btn-outline-danger btn-shadow"
+            onClick={previousPage}
+          >
+            <span className="fa-solid fa-arrow-left"></span>
+          </button>
+          <button
+            className="btn btn-outline-danger btn-shadow"
+            onClick={nextPage}
+          >
+            <span className="fa-solid fa-arrow-right"></span>
+          </button>
+        </div>
+        <div>
+          <input
+            type="text"
+            className="form-control"
+            id="searchQuery"
+            placeholder="Search"
+            onChange={(e) => {
+              setPage(1);
+              setSearchQuery(e.target.value);
+            }}
+          />
+        </div>
       </div>
       <table className="table table-hover table-striped">
         <thead className="thead-dark hackerFont">
@@ -109,7 +142,7 @@ function Teams(props) {
             return (
               <tr key={team.name}>
                 <th scope="row" style={{ textAlign: "center" }}>
-                  {(index + ((page - 1) * 100))}
+                  {index + (page - 1) * 100}
                 </th>
                 <td>
                   <button

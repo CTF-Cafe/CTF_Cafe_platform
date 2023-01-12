@@ -96,6 +96,7 @@ function max(input) {
 
 exports.getTeams = async function(req, res) {
     let page = (req.body.page);
+    let search = (req.body.search);
 
     if (page <= 0) {
         res.send({ state: 'error', message: 'Page cannot be less than 1!' });
@@ -111,7 +112,11 @@ exports.getTeams = async function(req, res) {
             let allTeams = [];
             try {
 
-                allTeams = await teams.aggregate([{
+                allTeams = await teams.aggregate([
+                    {
+                        "$match": { name: new RegExp(search, "i") }
+                    },
+                    {
                         $addFields: {
                             oldUsers: "$users",
                         }
