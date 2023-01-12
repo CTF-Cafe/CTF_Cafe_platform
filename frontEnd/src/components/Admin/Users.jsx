@@ -7,12 +7,22 @@ function Users(props) {
   const globalData = useContext(AppContext);
   const [users, setUsers] = useState([]);
   const [page, setPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    getUsers(page);
+  }, [searchQuery]);
 
   const getUsers = (index) => {
     axios
-      .post(process.env.REACT_APP_SERVER_URI + "/api/admin/getUsers", {
-        page: index,
-      }, { withCredentials: true })
+      .post(
+        process.env.REACT_APP_SERVER_URI + "/api/admin/getUsers",
+        {
+          page: index,
+          search: searchQuery,
+        },
+        { withCredentials: true }
+      )
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -49,9 +59,13 @@ function Users(props) {
 
   const deleteUser = (e, user) => {
     axios
-      .post(process.env.REACT_APP_SERVER_URI + "/api/admin/deleteUser", {
-        user: user,
-      }, { withCredentials: true })
+      .post(
+        process.env.REACT_APP_SERVER_URI + "/api/admin/deleteUser",
+        {
+          user: user,
+        },
+        { withCredentials: true }
+      )
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -75,9 +89,13 @@ function Users(props) {
 
   const addAdmin = (e, user) => {
     axios
-      .post(process.env.REACT_APP_SERVER_URI + "/api/admin/addAdmin", {
-        user: user,
-      }, { withCredentials: true })
+      .post(
+        process.env.REACT_APP_SERVER_URI + "/api/admin/addAdmin",
+        {
+          user: user,
+        },
+        { withCredentials: true }
+      )
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -101,9 +119,13 @@ function Users(props) {
 
   const removeAdmin = (e, user) => {
     axios
-      .post(process.env.REACT_APP_SERVER_URI + "/api/admin/removeAdmin", {
-        user: user,
-      }, { withCredentials: true })
+      .post(
+        process.env.REACT_APP_SERVER_URI + "/api/admin/removeAdmin",
+        {
+          user: user,
+        },
+        { withCredentials: true }
+      )
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -141,19 +163,39 @@ function Users(props) {
       >
         USERS
       </h1>
-      <div style={{marginBottom: '25px'}}>
-        <button
-          className="btn btn-outline-danger btn-shadow"
-          onClick={previousPage}
-        >
-          <span className="fa-solid fa-arrow-left"></span>
-        </button>
-        <button
-          className="btn btn-outline-danger btn-shadow"
-          onClick={nextPage}
-        >
-          <span className="fa-solid fa-arrow-right"></span>
-        </button>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: "25px",
+        }}
+      >
+        <div>
+          <button
+            className="btn btn-outline-danger btn-shadow"
+            onClick={previousPage}
+          >
+            <span className="fa-solid fa-arrow-left"></span>
+          </button>
+          <button
+            className="btn btn-outline-danger btn-shadow"
+            onClick={nextPage}
+          >
+            <span className="fa-solid fa-arrow-right"></span>
+          </button>
+        </div>
+        <div>
+          <input
+            type="text"
+            className="form-control"
+            id="searchQuery"
+            placeholder="Search"
+            onChange={(e) => {
+              setPage(1);
+              setSearchQuery(e.target.value);
+            }}
+          />
+        </div>
       </div>
       <table className="table table-hover table-striped">
         <thead className="thead-dark hackerFont">
@@ -172,7 +214,7 @@ function Users(props) {
             return (
               <tr key={user.username}>
                 <th scope="row" style={{ textAlign: "center" }}>
-                  {(index + ((page - 1) * 100))}
+                  {index + (page - 1) * 100}
                 </th>
                 <td>
                   <button
