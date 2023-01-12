@@ -328,7 +328,7 @@ exports.submitFlag = async function (req, res) {
         const dynamicScoring = await ctfConfig.findOne({ name: 'dynamicScoring' });
 
         if(dynamicScoring.value.toString() == "true") {
-            const decay = (await users.countDocuments()) * 0.18;
+            const decay = (await teams.countDocuments()) * 0.18;
             let dynamicPoints = Math.ceil((((challenge.minimumPoints - challenge.initialPoints)/((decay**2)+1)) * ((challenge.solveCount+1)**2)) + challenge.initialPoints)
             if(dynamicPoints < challenge.minimumPoints) { dynamicPoints = challenge.minimumPoints }
 
