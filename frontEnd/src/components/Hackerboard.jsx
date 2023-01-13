@@ -241,7 +241,7 @@ function Hackerboard(props) {
               <p className="text-grey lead text-spacey text-center hackerFont">
                 Where the world 's greatest get ranked!
               </p>
-              {new Date().getTime() > endTime ? (
+              {/* {new Date().getTime() > endTime ? (
                 globalData.userData.team ? (
                   <div style={{ textAlign: "center" }}>
                     <button
@@ -255,7 +255,7 @@ function Hackerboard(props) {
                     </button>
                   </div>
                 ) : null
-              ) : null}
+              ) : null} */}
             </div>
           </div>
           <div className="row mt-5  justify-content-center">
