@@ -32,7 +32,7 @@ function Hackerboard(props) {
     axios
       .get(process.env.REACT_APP_SERVER_URI + "/api/getEndTime")
       .then((response) => {
-        setEndTime(response.data + "000");
+        setEndTime(response.data);
       })
       .catch((err) => {
         console.log(err.message);

@@ -81,10 +81,10 @@ function App() {
                 setCategories(config.value);
                 break;
               case "startTime":
-                setStartTime(parseInt(config.value + "000"));
+                setStartTime(parseInt(config.value));
                 break;
               case "endTime":
-                setEndTime(parseInt(config.value + "000"));
+                setEndTime(parseInt(config.value));
                 break;
               default:
                 break;

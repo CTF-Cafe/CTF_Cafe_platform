@@ -2,7 +2,14 @@ import { Outlet, Routes, Route, Link } from "react-router-dom";
 import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import AppContext from "../Data/AppContext";
-const configsToShow = ["endTime", "startTime", "dynamicScoring", "rules", "sponsors", "categories"];
+const configsToShow = [
+  "endTime",
+  "startTime",
+  "dynamicScoring",
+  "rules",
+  "sponsors",
+  "categories",
+];
 
 function Config(props) {
   const globalData = useContext(AppContext);
@@ -37,7 +44,8 @@ function Config(props) {
       if (configsToShow.includes(config.name)) {
         configsArray.push({
           name: config.name,
-          value: document.getElementById("config-data" + config._id)
+          value: ["startTime", "endTime"].includes(config.name) ? new Date(document.getElementById("config-data" + config._id)
+          .value).getTime() : document.getElementById("config-data" + config._id)
             .textContent,
         });
       }
@@ -93,9 +101,15 @@ function Config(props) {
               return (
                 <tr key={config._id}>
                   <td> {config.name} </td>
-                  <td contentEditable="true" id={"config-data" + config._id}>
-                    {JSON.stringify(config.value)}
-                  </td>
+                  {["startTime", "endTime"].includes(config.name) ? (
+                    <td>
+                      <input type="datetime-local" id={"config-data" + config._id} defaultValue={new Date(config.value).toISOString().split(".")[0].slice(0, -3)}/>
+                    </td>
+                  ) : (
+                    <td contentEditable="true" id={"config-data" + config._id}>
+                      {JSON.stringify(config.value)}
+                    </td>
+                  )}
                 </tr>
               );
             }
