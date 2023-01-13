@@ -132,14 +132,18 @@ exports.register = async function (req, res) {
         email: email,
         key: newKey.toString(),
         isAdmin: false,
-        verified: false,
-        token: v4()
+        verified: process.env.MAIL_VERIFICATION == "true" ? false : true,
+        token: process.env.MAIL_VERIFICATION == "true" ? v4() : ""
       })
       .then(async function (user) {
-        const message = `Verify your email : ${process.env.BACKEND_URI}/api/verify/${user._id}/${user.token}`;
-        await sendEmail(user.email, "Verify Email CTF", message);
-
-        res.send({ state: "success", message: "Registered! Now verify email!" });
+        if(process.env.MAIL_VERIFICATION == "true") {
+          const message = `Verify your email : ${process.env.BACKEND_URI}/api/verify/${user._id}/${user.token}`;
+          await sendEmail(user.email, "Verify Email CTF", message);
+  
+          res.send({ state: "success", message: "Registered! Now verify email!" });
+        } else {
+          res.send({ state: "success", message: "Registered" });
+        }
       })
       .catch(function (err) {
         throw new Error("User creation failed!");
