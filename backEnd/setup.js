@@ -9,7 +9,7 @@ exports.setupDB = async function() {
     if (!endTimeConfig) {
         await ctfConfig.create({
             name: 'endTime',
-            value: 0
+            value: new Date().getTime()
         });
     }
 
@@ -18,7 +18,7 @@ exports.setupDB = async function() {
     if (!startTimeConfig) {
         await ctfConfig.create({
             name: 'startTime',
-            value: 0
+            value: new Date().getTime()
         });
     }
 

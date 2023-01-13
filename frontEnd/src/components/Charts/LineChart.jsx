@@ -48,7 +48,51 @@ const LineChart = (props) => {
         });
       });
 
-      structuredData.sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      structuredData.sort(
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+      );
+    } else {
+      rawData.forEach((team) => {
+        let currentPoints = 0;
+        let d = new Date(props.startTime);
+        let dformat =
+          [d.getMonth() + 1, d.getDate(), d.getFullYear()].join("/") +
+          " " +
+          [d.getHours(), d.getMinutes(), d.getSeconds()].join(":");
+        structuredData.push({
+          date: dformat,
+          points: 0,
+          name: team.name,
+        });
+
+        d = new Date(props.endTime);
+        dformat =
+          [d.getMonth() + 1, d.getDate(), d.getFullYear()].join("/") +
+          " " +
+          [d.getHours(), d.getMinutes(), d.getSeconds()].join(":");
+        structuredData.push({
+          date: dformat,
+          points: team.totalScore,
+          name: team.name,
+        });
+        team.solved.forEach((solve) => {
+          currentPoints += solve.points;
+          d = new Date(solve.timestamp);
+          dformat =
+            [d.getMonth() + 1, d.getDate(), d.getFullYear()].join("/") +
+            " " +
+            [d.getHours(), d.getMinutes(), d.getSeconds()].join(":");
+          structuredData.push({
+            date: dformat,
+            points: currentPoints,
+            name: team.name,
+          });
+        });
+      });
+
+      structuredData.sort(
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+      );
     }
 
     setData(structuredData);
@@ -61,11 +105,11 @@ const LineChart = (props) => {
     xField: "date",
     yField: "points",
     seriesField: "name",
-    point: {
-      shape: "circle",
-    },
+    // point: {
+    //   shape: "circle",
+    // },
     smooth: true,
-    theme: 'dark',
+    theme: "dark",
     padding: 50,
   };
 
