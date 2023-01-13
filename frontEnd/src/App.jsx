@@ -34,6 +34,8 @@ function App() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sponsors, setSponsors] = useState([]);
+  const [endTime, setEndTime] = useState(0);
+  const [startTime, setStartTime] = useState(0);
   const alert = useAlert();
   const navigate = useNavigate();
 
@@ -45,6 +47,8 @@ function App() {
     dynamicScoring: dynamicScoring,
     categories: categories,
     sponsors: sponsors,
+    startTime: startTime,
+    endTime: endTime,
     setTheme,
     setLoggedIn,
     setUserData,
@@ -74,8 +78,14 @@ function App() {
                 setDynamicScoring(config.value);
                 break;
               case "categories":
-                  setCategories(config.value);
-                  break;
+                setCategories(config.value);
+                break;
+              case "startTime":
+                setStartTime(parseInt(config.value + "000"));
+                break;
+              case "endTime":
+                setEndTime(parseInt(config.value + "000"));
+                break;
               default:
                 break;
             }

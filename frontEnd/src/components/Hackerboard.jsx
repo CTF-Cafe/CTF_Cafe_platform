@@ -7,6 +7,7 @@ import bronzeMask from "./img/bronzeMask.png";
 import LoadingScreen from "react-loading-screen";
 import AppContext from "./Data/AppContext";
 import Navbar from "./Global/Navbar";
+import LineChart from "./Charts/LineChart";
 
 const now = new Date();
 now.setHours(0, 0, 0, 0);
@@ -259,6 +260,9 @@ function Hackerboard(props) {
           </div>
           <div className="row mt-5  justify-content-center">
             <div className="col-xl-10">
+              <div style={{ marginBottom: "25px" }}>
+                <LineChart startTime={globalData.startTime} endTime={globalData.endTime} data={selectionMain == "Users" ? users : teams} selection={selectionMain} />
+              </div>
               <div
                 style={{
                   display: "flex",

@@ -106,10 +106,6 @@
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap');
-* {
-    transition: all 0.3s ease;
-    letter-spacing: 0.125em;
-}
 
 p,
 td,
