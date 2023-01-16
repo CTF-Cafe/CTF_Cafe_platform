@@ -11,6 +11,59 @@ const configsToShow = [
   "categories",
 ];
 
+function ArrayEdit(props) {
+  const config = props.config;
+  const [array, setArray] = useState(config.value);
+
+  const removeFromArray = (item) => {
+    setArray([ ...array.filter((x) => x != item)]);
+  };
+
+  const addToArray = () => {
+    setArray([...array, "example"]);
+  };
+
+  const updateArray = (e, item) => {
+    let tmpArray = array;
+    e.target.style = 'width: ' + (e.target.value.length + 2) + "ch;"
+    tmpArray[tmpArray.indexOf(item)] = e.target.value;
+    setArray([...tmpArray]);
+  };
+
+  return (
+    <td value={JSON.stringify(array)} id={"config-data" + config._id}>
+      <button
+        className="btn btn-outline-danger"
+        style={{ border: "1px solid gray", margin: "5px" }}
+        onClick={addToArray}
+      >
+        +
+      </button>
+      {array.map((item) => {
+        return (
+          <span style={{ margin: "5px", border: "1px solid var(--color-1)", whiteSpace: "pre-wrap" }}>
+            <input
+              onChange={(e) => updateArray(e, item)}
+              className="min-input"
+              defaultValue={item}
+              type="text"
+              style={{ width: (item.length + 2) + "ch" }}
+              key={array.length}
+            />
+            <button
+              className="btn min-btn"
+              style={{ padding: "0px 10px" }}
+              onClick={() => removeFromArray(item)}
+            >
+              -
+            </button>
+          </span>
+        );
+      })}
+    </td>
+  );
+}
+
 function Config(props) {
   const globalData = useContext(AppContext);
   const [configs, setConfigs] = useState([]);
@@ -44,9 +97,14 @@ function Config(props) {
       if (configsToShow.includes(config.name)) {
         configsArray.push({
           name: config.name,
-          value: ["startTime", "endTime"].includes(config.name) ? new Date(document.getElementById("config-data" + config._id)
-          .value).getTime() : document.getElementById("config-data" + config._id)
-            .textContent,
+          value: ["startTime", "endTime"].includes(config.name)
+            ? new Date(
+                document.getElementById("config-data" + config._id).value
+              ).getTime()
+            : config.name == "categories"
+            ? document.getElementById("config-data" + config._id).attributes.value
+                .nodeValue
+            : document.getElementById("config-data" + config._id).textContent,
         });
       }
     });
@@ -103,8 +161,17 @@ function Config(props) {
                   <td> {config.name} </td>
                   {["startTime", "endTime"].includes(config.name) ? (
                     <td>
-                      <input type="datetime-local" id={"config-data" + config._id} defaultValue={new Date(config.value).toISOString().split(".")[0].slice(0, -3)}/>
+                      <input
+                        type="datetime-local"
+                        id={"config-data" + config._id}
+                        defaultValue={new Date(config.value)
+                          .toISOString()
+                          .split(".")[0]
+                          .slice(0, -3)}
+                      />
                     </td>
+                  ) : config.name == "categories" ? (
+                    <ArrayEdit config={config} />
                   ) : (
                     <td contentEditable="true" id={"config-data" + config._id}>
                       {JSON.stringify(config.value)}

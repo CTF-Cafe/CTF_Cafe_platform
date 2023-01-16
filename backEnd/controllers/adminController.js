@@ -388,6 +388,7 @@ exports.getUsers = async function(req, res) {
                             username: { $first: "$username" },
                             score: { $sum: "$solved.points" },
                             solved: { $push: "$solved" },
+                            verified: { $first: "$verified" },
                             isAdmin: { $first: "$isAdmin" }
                         }
                     }

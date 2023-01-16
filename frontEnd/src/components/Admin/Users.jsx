@@ -206,6 +206,7 @@ function Users(props) {
             <th scope="col">Username</th>
             <th scope="col">User Score</th>
             <th scope="col">User Solves</th>
+            <th scope="col">Verified</th>
             <th scope="col">Admin</th>
           </tr>
         </thead>
@@ -236,6 +237,7 @@ function Users(props) {
                 </td>
                 <td>{user.score}</td>
                 <td>{user.solved.length}</td>
+                <td>{user.verified.toString()}</td>
                 <td>
                   {user.isAdmin.toString()}{" "}
                   <button
