@@ -5,6 +5,7 @@ const theme = require("../models/themeModel.js");
 const teams = require("../models/teamModel.js");
 const challenges = require("../models/challengeModel.js");
 const encryptionController = require("./encryptionController.js");
+const logController = require("./logController.js");
 const ObjectId = require("mongoose").Types.ObjectId;
 const nodemailer = require("nodemailer");
 
@@ -26,8 +27,19 @@ exports.login = async function (req, res) {
           { username: username },
           { key: newKey.toString() }
         );
+
+        logController.createLog(req, user, {
+          state: "success",
+          message: "Logged In",
+        });
+
         res.send({ state: "success", message: "Logged In", user: user });
       } else {
+        logController.createLog(req, user, {
+          state: "error",
+          message: "Wrong Credentials",
+        });
+
         res.send({ state: "error", message: "Wrong Credentials" });
       }
     } else {
@@ -62,12 +74,10 @@ const sendEmail = async (email, subject, text) => {
       subject: subject,
       text: text,
     });
-
   } catch (error) {
     console.log(error);
   }
 };
-
 
 exports.register = async function (req, res) {
   try {
@@ -98,7 +108,11 @@ exports.register = async function (req, res) {
       throw new Error("Password is to short 8 characters minimum!!");
     }
 
-    if (!email.match(/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)) {
+    if (
+      !email.match(
+        /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      )
+    ) {
       throw new Error("Invalid email!");
     }
 
@@ -133,14 +147,17 @@ exports.register = async function (req, res) {
         key: newKey.toString(),
         isAdmin: false,
         verified: process.env.MAIL_VERIFICATION == "true" ? false : true,
-        token: process.env.MAIL_VERIFICATION == "true" ? v4() : ""
+        token: process.env.MAIL_VERIFICATION == "true" ? v4() : "",
       })
       .then(async function (user) {
-        if(process.env.MAIL_VERIFICATION == "true") {
+        if (process.env.MAIL_VERIFICATION == "true") {
           const message = `Verify your email : ${process.env.BACKEND_URI}/api/verify/${user._id}/${user.token}`;
           await sendEmail(user.email, "Verify Email CTF", message);
-  
-          res.send({ state: "success", message: "Registered! Now verify email!" });
+
+          res.send({
+            state: "success",
+            message: "Registered! Now verify email!",
+          });
         } else {
           res.send({ state: "success", message: "Registered" });
         }
@@ -170,7 +187,7 @@ exports.verifyMail = async function (req, res) {
       res.send(err.message);
     }
   }
-}
+};
 
 exports.updateUsername = async function (req, res) {
   try {
@@ -408,11 +425,6 @@ exports.getTheme = async function (req, res) {
     res.send({ state: "error", message: "No Theme!" });
   }
 };
-
-function max(input) {
-  if (toString.call(input) !== "[object Array]") return false;
-  return Math.max.apply(null, input);
-}
 
 exports.getScoreboard = async function (req, res) {
   let allTeams = await teams
