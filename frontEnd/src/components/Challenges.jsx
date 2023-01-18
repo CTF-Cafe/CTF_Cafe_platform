@@ -73,7 +73,7 @@ function Challenges(props) {
           globalData.navigate("/", { replace: true });
         } else if (response.data.state == "error") {
           var startDate = new Date();
-          var endDate = new Date(parseInt(response.data.startTime + "000"));
+          var endDate = new Date(parseInt(response.data.startTime));
           var secondsTillStart = parseInt(
             (endDate.getTime() - startDate.getTime()) / 1000
           );
@@ -261,11 +261,11 @@ function Challenges(props) {
             </div>
           </div>
 
-          {counter != 0 ? (
+          {counter > 0 ? (
             <div style={{ textAlign: "center" }}>
               <h2>CTF NOT STARTED YET!</h2>
               <p>
-                {counter === 0 ? (
+                {counter < 0 ? (
                   "Refresh :)"
                 ) : (
                   <div>
