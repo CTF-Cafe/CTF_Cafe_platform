@@ -2,6 +2,10 @@ const express = require('express')
 const router = express.Router()
 const adminController = require('../controllers/adminController.js');
 
+router.post('/getLogs', (req, res) => {
+    adminController.getLogs(req, res);
+});
+
 router.post('/getUsers', (req, res) => {
     adminController.getUsers(req, res);
 });
