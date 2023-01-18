@@ -76,10 +76,20 @@ function Navbar() {
                       Logout
                     </a>
                   </Link>
+                  <a>
+                    <span
+                      className="fa-solid fa-bell text-light bold"
+                      style={{
+                        fontSize: "18px",
+                        paddingRight: "10px",
+                        cursor: "pointer",
+                      }}
+                    ></span>
+                  </a>
                   <Link to={`/user/${globalData.userData.username}`}>
                     <span
                       className="fa-solid fa-user-ninja text-light bold"
-                      style={{ fontSize: "18px", paddingRight: "10px"}}
+                      style={{ fontSize: "18px", paddingRight: "10px" }}
                     ></span>
                   </Link>
                   <Link to={`/usersettings`}>
