@@ -2,6 +2,7 @@ const challenges = require('../models/challengeModel');
 const users = require('../models/userModel');
 const teams = require('../models/teamModel');
 const ctfConfig = require('../models/ctfConfigModel.js');
+const logController = require("./logController")
 const ObjectId = require('mongoose').Types.ObjectId;
 const compose = require('docker-compose');
 const path = require('path');
@@ -274,11 +275,13 @@ exports.submitFlag = async function (req, res) {
 
         if(challenge.randomFlag) {
             if (challenge.dockerLaunchers.find(launcher => launcher.team == user.teamId).flag != flag) {
+                logController.createLog(req, user, { state: 'error', message: 'Wrong Flag :(' });
                 throw new Error('Wrong Flag :(');
             }
         } else {
             // check flag
             if (challenge.flag != flag) {
+                logController.createLog(req, user, { state: 'error', message: 'Wrong Flag :(' });
                 throw new Error('Wrong Flag :(');
             }
         }
@@ -304,6 +307,7 @@ exports.submitFlag = async function (req, res) {
 
         // Check if team is currently submitting
         if (currentlySubmittingTeams.includes(user.teamId)) {
+            logController.createLog(req, user, { state: 'error', message: 'Submiting too fast!' });
             throw new Error('Submiting too fast!')
         }
 
@@ -360,6 +364,10 @@ exports.submitFlag = async function (req, res) {
         } else {
             await challenges.updateOne({ _id: req.body.challengeId }, { $inc: { solveCount: 1 } });
         }
+
+        logController.createLog(req, updatedUser, {
+            state: "success",
+        });
 
         updatedUser.password = undefined;
         res.send({ state: 'success', user: updatedUser });
