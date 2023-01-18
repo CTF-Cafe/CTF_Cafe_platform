@@ -7,6 +7,7 @@ import Users from "./Users";
 import Teams from "./Teams";
 import Theme from "./Theme";
 import Tools from "./Tools";
+import Logs from "./Logs";
 import ConfirmModal from "../Global/ConfirmModal";
 import { useState } from "react";
 
@@ -90,6 +91,11 @@ function Admin(props) {
                     Tools
                   </a>
                 </Link>
+                <Link to={`/admin/logs`}>
+                  <a className="p-3 text-decoration-none text-light bold">
+                    Logs
+                  </a>
+                </Link>
               </div>
             </div>
           </nav>
@@ -113,6 +119,8 @@ function Admin(props) {
             <Theme />
           ) : pathName == "/tools/" || pathName == "/tools" ? (
             <Tools />
+          ) : pathName == "/logs/" || pathName == "/logs" ? (
+            <Logs />
           ) : (
             <h1 className="display-1 bold color_white content__title">
               404<span className="vim-caret">&nbsp;</span>

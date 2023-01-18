@@ -3,6 +3,7 @@ const teams = require('../models/teamModel');
 const challenges = require('../models/challengeModel.js');
 const ctfConfig = require('../models/ctfConfigModel.js');
 const theme = require('../models/themeModel.js');
+const log = require('../models/logModel.js')
 const path = require('path');
 const fs = require('fs');
 const axios = require('axios');
@@ -500,4 +501,9 @@ exports.sendGlobalMessage = async function(req, res) {
     } else {
         res.send({ state: 'error', message: 'Global message document not found!' })
     }
+}
+
+exports.getLogs = async function(req, res) {
+    const logs = await log.find({});
+    res.send(logs);
 }
