@@ -30,7 +30,7 @@ exports.getChallenges = async function (req, res) {
     const endTime = await ctfConfig.findOne({ name: 'endTime' });
     let categories = [];
 
-    if (parseInt(startTime.value) - (Math.floor((new Date()).getTime() / 1000)) >= 0) {
+    if (parseInt(startTime.value) - (Math.floor((new Date()).getTime())) >= 0) {
         res.send({ state: 'error', message: 'CTF has not started!', startTime: startTime.value });
     } else {
         users.findOne({ username: req.session.username }).then((user) => {
