@@ -108,7 +108,6 @@ function App() {
       })
       .then((response) => {
         if (response.data.state === "success") {
-          console.log(response.data)
           setNotifications([...notifications, ...response.data.notifications]);
           localStorage.setItem('notifications', JSON.stringify([...notifications, ...response.data.notifications]))
         }
