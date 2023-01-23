@@ -39,15 +39,12 @@ exports.setupDB = async function() {
         });
     }
 
-    const globalMessageConfig = await ctfConfig.findOne({ name: 'globalMessage' });
+    const notificationsConfig = await ctfConfig.findOne({ name: 'notifications' });
 
-    if (!globalMessageConfig) {
+    if (!notificationsConfig) {
         await ctfConfig.create({
-            name: 'globalMessage',
-            value: {
-                message: '',
-                seenBy: []
-            }
+            name: 'notifications',
+            value: [{ message: "Welcome to CTFCafe!", type: "admin", seenBy: [] }]
         });
     }
 
