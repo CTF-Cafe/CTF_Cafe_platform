@@ -125,7 +125,74 @@ function Challenges(props) {
 
   useEffect(() => {
     getChallenges();
+    setInterval(() => {
+      getChallenges();
+    }, 3500);
   }, []);
+
+  const shutdownDocker = (challenge) => {
+    challenge.dockerStopping = true;
+
+    axios
+      .post(
+        process.env.REACT_APP_SERVER_URI + "/api/user/shutdownDocker",
+        {
+          challengeId: challenge._id,
+        },
+        {
+          withCredentials: true,
+        }
+      )
+      .then((response) => {
+        if (response.data.state == "sessionError") {
+          globalData.alert.error("Session expired!");
+          globalData.setUserData({});
+          globalData.setLoggedIn(false);
+          globalData.navigate("/", { replace: true });
+        } else if (response.data.state == "error") {
+          globalData.alert.error(response.data.message);
+          challenge.dockerStopping = false;
+        } else {
+          globalData.alert.success("Challenge is stopping..");
+          getChallenges();
+        }
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+  };
+
+  const createDocker = (challenge) => {
+    challenge.dockerLoading = true;
+
+    axios
+      .post(
+        process.env.REACT_APP_SERVER_URI + "/api/user/deployDocker",
+        {
+          challengeId: challenge._id,
+        },
+        {
+          withCredentials: true,
+        }
+      )
+      .then((response) => {
+        if (response.data.state == "sessionError") {
+          globalData.alert.error("Session expired!");
+          globalData.setUserData({});
+          globalData.setLoggedIn(false);
+          globalData.navigate("/", { replace: true });
+        } else if (response.data.state == "error") {
+          globalData.alert.error(response.data.message);
+          challenge.dockerLoading = false;
+        } else {
+          globalData.alert.success("Challenge is starting..");
+          getChallenges();
+        }
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+  };
 
   const launchDocker = (challenge) => {
     challenge.dockerLoading = true;
@@ -487,6 +554,39 @@ function Challenges(props) {
                                 </a>
                               ) : null}
 
+                              {challenge.isInstance ? (
+                                <a
+                                  className="btn btn-outline-danger btn-shadow"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    !challenge.progress ? createDocker(challenge) : shutdownDocker(challenge);
+                                  }}
+                                >
+                                  {!challenge.progress ?
+                                        (
+                                          <>
+                                            <span className="fa-solid fa-circle-play mr-2"></span>
+                                            Start
+                                          </>
+                                        ) :
+                                        (challenge.progress === 'finished' ? (
+                                          <>
+                                            <span className="fa-solid fa-power-off mr-2"></span>
+                                            Stop
+                                          </>
+                                        ) : 
+                                        (
+                                          <>
+                                            <span className="fa-solid fa-spinner fa-spin mr-2"></span>
+                                            Building..
+                                          </>
+                                        )
+                                        )
+                                        
+                                  }
+                                </a>
+                              ) : null}
+
                               {challenge.file ? (
                                 challenge.file.length > 0 ? (
                                   <a
@@ -567,6 +667,16 @@ function Challenges(props) {
                                   </button>
                                 </div>
                               </div>
+
+                                {challenge.url ? (
+                                    <a
+                                      href={`http://${challenge.url}`}
+                                      target="_blank"
+                                      className="btn btn-outline-danger btn-shadow mt-3" rel="noreferrer"
+                                    >
+                                      {challenge.url}
+                                    </a>
+                                ) : null}
                             </blockquote>
                           </div>
                         </div>

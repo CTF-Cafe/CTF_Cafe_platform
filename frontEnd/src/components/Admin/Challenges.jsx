@@ -211,6 +211,12 @@ function Challenges(props) {
       formData.append("dockerCompose", oldChallenge.dockerCompose);
     }
 
+    const githubUrl = document.getElementById("githubUrl" + oldChallenge._id).textContent;
+    formData.append("githubUrl", githubUrl);
+
+    const isInstance = document.getElementById("isInstance" + oldChallenge._id).value;
+    formData.append("isInstance", isInstance);
+
     const randomFlag = document.getElementById(
       "randomFlag" + oldChallenge._id
     ).value;
