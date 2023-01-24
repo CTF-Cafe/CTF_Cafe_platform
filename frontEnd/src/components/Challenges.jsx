@@ -194,74 +194,6 @@ function Challenges(props) {
       });
   };
 
-  const launchDocker = (challenge) => {
-    challenge.dockerLoading = true;
-    setChallenges([...challenges]);
-
-    axios
-      .post(
-        process.env.REACT_APP_SERVER_URI + "/api/user/launchDocker",
-        {
-          challengeId: challenge._id,
-        },
-        {
-          withCredentials: true,
-        }
-      )
-      .then((response) => {
-        if (response.data.state == "sessionError") {
-          globalData.alert.error("Session expired!");
-          globalData.setUserData({});
-          globalData.setLoggedIn(false);
-          globalData.navigate("/", { replace: true });
-        } else if (response.data.state == "error") {
-          globalData.alert.error(response.data.message);
-          challenge.dockerLoading = false;
-          setChallenges([...challenges]);
-        } else {
-          globalData.alert.success("Docker launched!");
-          getChallenges();
-        }
-      })
-      .catch((err) => {
-        console.log(err.message);
-      });
-  };
-
-  const stopDocker = (challenge) => {
-    challenge.dockerStopping = true;
-    setChallenges([...challenges]);
-
-    axios
-      .post(
-        process.env.REACT_APP_SERVER_URI + "/api/user/stopDocker",
-        {
-          challengeId: challenge._id,
-        },
-        {
-          withCredentials: true,
-        }
-      )
-      .then((response) => {
-        if (response.data.state == "sessionError") {
-          globalData.alert.error("Session expired!");
-          globalData.setUserData({});
-          globalData.setLoggedIn(false);
-          globalData.navigate("/", { replace: true });
-        } else if (response.data.state == "error") {
-          globalData.alert.error(response.data.message);
-          challenge.dockerStopping = false;
-          setChallenges([...challenges]);
-        } else {
-          globalData.alert.success("Docker stopped!");
-          getChallenges();
-        }
-      })
-      .catch((err) => {
-        console.log(err.message);
-      });
-  };
-
   const submitFlag = (index, challenge) => {
     const flag = document.getElementById(`flag_id_${index}`).value;
 
@@ -507,52 +439,6 @@ function Challenges(props) {
                                   })
                                 }
                               </p>
-
-                              { challenge.dockerLaunchers.find(item => item.team === globalData.userData.team._id) != undefined ?
-                                (
-                                  <>  
-                                    <p>Port: {challenge.dockerLaunchers.find(item => item.team === globalData.userData.team._id).port}</p>
-                                  </>
-                                ) : null
-                              }
-
-                              {challenge.dockerCompose == "true" ? (
-                                <a
-                                  href="#"
-                                  className="btn btn-outline-danger btn-shadow"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    challenge.dockerLaunchers.find(item => item.team === globalData.userData.team._id) == undefined ? launchDocker(challenge) : stopDocker(challenge);
-                                  }}
-                                >
-                                  {challenge.dockerLoading ?
-                                    (
-                                      <>
-                                        <span className="fa-solid fa-spinner fa-spin mr-2"></span>
-                                        Loading
-                                      </>
-                                    ) : challenge.dockerStopping ?
-                                      (
-                                        <>
-                                          <span className="fa-solid fa-spinner fa-spin mr-2"></span>
-                                          Stopping
-                                        </>
-                                      ) : challenge.dockerLaunchers.find(item => item.team === globalData.userData.team._id) == undefined ?
-                                        (
-                                          <>
-                                            <span className="fa-solid fa-circle-play mr-2"></span>
-                                            Start
-                                          </>
-                                        ) :
-                                        (
-                                          <>
-                                            <span className="fa-solid fa-power-off mr-2"></span>
-                                            Stop
-                                          </>
-                                        )
-                                  }
-                                </a>
-                              ) : null}
 
                               {challenge.isInstance ? (
                                 <a

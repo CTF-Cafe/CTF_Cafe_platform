@@ -58,14 +58,6 @@ var challengeSchema = new Schema({
         type: String,
         default: 'none'
     },
-    dockerCompose: {
-        type: String,
-        default: ''
-    },
-    dockerLaunchers: {
-        type: Array,
-        default: []
-    },
     githubUrl: {
         type: String,
         default: null
