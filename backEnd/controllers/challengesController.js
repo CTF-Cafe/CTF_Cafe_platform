@@ -123,7 +123,6 @@ async function getDocker(teamId) {
             return c
         })
     } catch (error) {
-        console.error('Challenge deployer is not accessible');
         return []
     }
 }       
