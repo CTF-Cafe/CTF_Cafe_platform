@@ -185,6 +185,26 @@ function ChallengeCard(props) {
               </p>
 
               <br />
+              <label>Github URL:</label>
+              <p
+                contentEditable="true"
+                style={{
+                  backgroundColor: "rgb(30, 32, 55)",
+                  outline: "none",
+                }}
+                id={"githubUrl" + props.challenge._id}
+              >
+                {props.challenge.githubUrl}
+              </p>
+              <br />
+              <label>isInstance:</label>
+              <select
+                id={"isInstance" + props.challenge._id}
+                defaultValue={props.challenge.isInstance}
+              >
+                <option value="true">True</option>
+                <option value="false">False</option>
+              </select>
               <label>Docker-Compose ZIP:</label>
               {props.challenge.dockerCompose.length > 0 ? (
                 <>

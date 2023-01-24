@@ -113,6 +113,8 @@ exports.saveChallenge = async function(req, res) {
             flag: accentsTidy(req.body.flag.trim()).toUpperCase(),
             file: (req.body.file.length > 0 ? req.body.file : ''),
             codeSnippet: (req.body.codeSnippet.length > 0 ? req.body.codeSnippet : ''),
+            githubUrl: req.body.githubUrl.trim(),
+            isInstance: req.body.isInstance == 'true',
             codeLanguage: req.body.codeLanguage,
             dockerCompose: req.files ? dockerComposeId : req.body.dockerCompose == 'false' ? '' : req.body.dockerCompose,
             randomFlag: (req.body.randomFlag == 'true' ? true : false),

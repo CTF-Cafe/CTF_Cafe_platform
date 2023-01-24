@@ -66,6 +66,14 @@ var challengeSchema = new Schema({
         type: Array,
         default: []
     },
+    githubUrl: {
+        type: String,
+        default: null
+    },
+    isInstance: {
+        type: Boolean,
+        default: false
+    },
     randomFlag: {
         type: Boolean,
         default: false
