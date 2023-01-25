@@ -104,6 +104,18 @@ function Challenges(props) {
 
             return 0;
           });
+
+          response.data.challenges.forEach(c => {
+            
+          })
+          for(let c of response.data.challenges){
+            if(c.progress && c.progress !== 'finish') {
+              setTimeout(() => {
+                getChallenges()
+              }, 500);
+              break
+            }
+          }
           setChallenges(response.data.challenges);
           setCategories(response.data.categories);
           setEndTime(response.data.endTime);
@@ -125,9 +137,6 @@ function Challenges(props) {
 
   useEffect(() => {
     getChallenges();
-    setInterval(() => {
-      getChallenges();
-    }, 3500);
   }, []);
 
   const shutdownDocker = (challenge) => {
@@ -154,7 +163,9 @@ function Challenges(props) {
           challenge.dockerStopping = false;
         } else {
           globalData.alert.success("Challenge is stopping..");
-          getChallenges();
+          setTimeout(() => {
+            getChallenges();
+          }, 250);
         }
       })
       .catch((err) => {
@@ -186,7 +197,9 @@ function Challenges(props) {
           challenge.dockerLoading = false;
         } else {
           globalData.alert.success("Challenge is starting..");
-          getChallenges();
+          setTimeout(() => {
+            getChallenges();
+          }, 250);
         }
       })
       .catch((err) => {
@@ -438,7 +451,7 @@ function Challenges(props) {
                                     );
                                   })
                                 }
-                              </p>
+                              </p>  
 
                               {challenge.isInstance ? (
                                 <a
