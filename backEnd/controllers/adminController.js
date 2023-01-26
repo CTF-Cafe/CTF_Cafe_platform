@@ -6,7 +6,6 @@ const theme = require('../models/themeModel.js');
 const log = require('../models/logModel.js')
 const path = require('path');
 const fs = require('fs');
-const axios = require('axios');
 const { v4 } = require('uuid');
 const ObjectId = require('mongoose').Types.ObjectId;
 const unzipper = require("unzipper");
@@ -495,13 +494,13 @@ exports.saveTheme = async function(req, res) {
 }
 
 exports.sendGlobalMessage = async function(req, res) {
-    const currentGlobalMessage = await ctfConfig.findOne({ name: 'globalMessage' });
+    const currentNotifications = await ctfConfig.findOne({ name: 'notifications' });
 
-    if (currentGlobalMessage) {
-        await ctfConfig.findOneAndUpdate({ name: 'globalMessage' }, { value: { message: req.body.globalMessage, seenBy: [] } });
+    if (currentNotifications) {
+        await ctfConfig.findOneAndUpdate({ name: 'notifications' }, { value: [...currentNotifications.value, ...[{ message: "ADMIN : " + req.body.globalMessage, type: "admin", seenBy: [] }]] });
         res.send({ state: 'success' });
     } else {
-        res.send({ state: 'error', message: 'Global message document not found!' })
+        res.send({ state: 'error', message: 'Notifications table not found!' })
     }
 }
 

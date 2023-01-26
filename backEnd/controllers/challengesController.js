@@ -164,9 +164,9 @@ exports.submitFlag = async function (req, res) {
         const endTime = await ctfConfig.findOne({ name: 'endTime' });
         const startTime = await ctfConfig.findOne({ name: 'startTime' });
 
-        if (parseInt(endTime.value) - (Math.floor((new Date()).getTime() / 1000)) <= 0) {
+        if (parseInt(endTime.value) - (Math.floor((new Date()).getTime())) <= 0) {
             throw new Error('CTF is Over!');
-        } else if (parseInt(startTime.value) - (Math.floor((new Date()).getTime() / 1000)) >= 0) {
+        } else if (parseInt(startTime.value) - (Math.floor((new Date()).getTime())) >= 0) {
             throw new Error('CTF has not started!');
         }
 
@@ -274,6 +274,11 @@ exports.submitFlag = async function (req, res) {
 
         if (challenge.firstBlood == 'none' || challenge.firstBlood == username) {
             await challenges.updateOne({ _id: req.body.challengeId }, { $inc: { solveCount: 1 }, firstBlood: updatedUser.username });
+
+            const currentNotifications = await ctfConfig.findOne({ name: 'notifications' });
+            if (currentNotifications) {
+                await ctfConfig.findOneAndUpdate({ name: 'notifications' }, { value: [...currentNotifications.value, ...[{ message: `${updatedUser.username} has first blood ${challenge.name}!`, type: "first_blood", seenBy: [] }]] });
+            }
         } else {
             await challenges.updateOne({ _id: req.body.challengeId }, { $inc: { solveCount: 1 } });
         }
