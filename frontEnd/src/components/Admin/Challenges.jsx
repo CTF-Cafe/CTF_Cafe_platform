@@ -10,6 +10,85 @@ function Challenges(props) {
   const [categories, setCategories] = useState(globalData.categories);
   const [assets, setAssets] = useState([]);
 
+  const importChallenges = () => {
+    const file = document.getElementById("jsonImport").files[0];
+
+    const reader = new FileReader();
+    reader.addEventListener("load", async (event) => {
+      const json = JSON.parse(window.atob(event.target.result.split(",")[1]));
+
+      let categoriesArray = [...categories];
+
+      json.results.forEach(async (challenge) => {
+        if (!categoriesArray.includes(challenge.category)) {
+          categoriesArray.push(challenge.category);
+        }
+
+        await axios
+          .post(
+            process.env.REACT_APP_SERVER_URI + "/api/admin/createChallenge",
+            {
+              name: challenge.name,
+              points: challenge.value,
+              minimumPoints: 50,
+              level: 0,
+              info: challenge.description,
+              hint: "",
+              file: "",
+              flag: "FLAG{H3LL0_W0RLD}",
+              category: challenge.category,
+              dockerCompose: false,
+            },
+            { withCredentials: true }
+          )
+          .then((response) => {
+            if (response.data.state == "sessionError") {
+              globalData.alert.error("Session expired!");
+              globalData.setUserData({});
+              globalData.setLoggedIn(false);
+              globalData.navigate("/", { replace: true });
+            } else {
+              if (response.data.state == "success") {
+                globalData.alert.success("Challenge created!");
+              } else {
+                globalData.alert.error(response.data.message);
+              }
+            }
+          })
+          .catch((error) => console.log(error.message));
+      });
+
+      await axios
+        .post(
+          process.env.REACT_APP_SERVER_URI + "/api/admin/saveConfigs",
+          {
+            newConfigs: [{ name: "categories", value: JSON.stringify(categoriesArray) }],
+          },
+          { withCredentials: true }
+        )
+        .then((response) => {
+          if (response.data.state == "sessionError") {
+            globalData.alert.error("Session expired!");
+            globalData.setUserData({});
+            globalData.setLoggedIn(false);
+            globalData.navigate("/", { replace: true });
+          } else {
+            if (response.data.state == "success") {
+              globalData.alert.success("Updated config!");
+            } else {
+              globalData.alert.error(response.data.message);
+            }
+          }
+        })
+        .catch((err) => {
+          console.log(err.message);
+        });
+
+      getChallenges();
+    });
+    reader.readAsDataURL(file);
+  };
+
   const getChallenges = () => {
     axios
       .get(process.env.REACT_APP_SERVER_URI + "/api/admin/getAssets", {
@@ -109,16 +188,22 @@ function Challenges(props) {
     const file = document.getElementById("file" + oldChallenge._id).value;
     formData.append("file", file);
 
-    const codeSnippet = document.getElementById("code_snippet" + oldChallenge._id).textContent;
+    const codeSnippet = document.getElementById(
+      "code_snippet" + oldChallenge._id
+    ).textContent;
     formData.append("codeSnippet", codeSnippet);
 
-    const codeLanguage = document.getElementById("code_language" + oldChallenge._id).value;
+    const codeLanguage = document.getElementById(
+      "code_language" + oldChallenge._id
+    ).value;
     formData.append("codeLanguage", codeLanguage);
 
     const flag = document.getElementById("flag" + oldChallenge._id).textContent;
     formData.append("flag", flag);
 
-    const dockerCompose = document.getElementById("dockerCompose" + oldChallenge._id);
+    const dockerCompose = document.getElementById(
+      "dockerCompose" + oldChallenge._id
+    );
     if (dockerCompose != null) {
       formData.append("dockerZip", dockerCompose.files[0]);
       formData.append("dockerCompose", dockerCompose.files[0] ? true : false);
@@ -126,14 +211,16 @@ function Challenges(props) {
       formData.append("dockerCompose", oldChallenge.dockerCompose);
     }
 
-    const randomFlag = document.getElementById("randomFlag" + oldChallenge._id).value;
+    const randomFlag = document.getElementById(
+      "randomFlag" + oldChallenge._id
+    ).value;
     formData.append("randomFlag", randomFlag);
 
     axios
       .post(
         process.env.REACT_APP_SERVER_URI + "/api/admin/saveChallenge",
         formData,
-        { headers: { 'Content-Type': 'multipart/form-data' } },
+        { headers: { "Content-Type": "multipart/form-data" } },
         { withCredentials: true }
       )
       .then((response) => {
@@ -155,7 +242,6 @@ function Challenges(props) {
   };
 
   const removeDockerCompose = (e, challenge) => {
-
     axios
       .post(
         process.env.REACT_APP_SERVER_URI + "/api/admin/removeDockerCompose",
@@ -181,7 +267,6 @@ function Challenges(props) {
       })
       .catch((error) => console.log(error.message));
   };
-
 
   const deleteChallenge = (e, oldChallenge) => {
     axios
@@ -252,7 +337,7 @@ function Challenges(props) {
       axios
         .post(
           process.env.REACT_APP_SERVER_URI +
-          "/api/admin/updateChallengeCategory",
+            "/api/admin/updateChallengeCategory",
           {
             id: challenge.id.replace("challenge-top", ""),
             category: newCategory.children[0].id,
@@ -295,7 +380,7 @@ function Challenges(props) {
           file: "",
           flag: "FLAG{H3LL0_W0RLD}",
           category: category,
-          dockerCompose: false
+          dockerCompose: false,
         },
         { withCredentials: true }
       )
@@ -343,7 +428,6 @@ function Challenges(props) {
               style={{ marginBottom: "10px" }}
             >
               <h4 style={{ display: "inline-block" }}>
-
                 {capitalize(category)}
               </h4>
               <a
@@ -377,6 +461,13 @@ function Challenges(props) {
         );
       })}
       <div className="row hackerFont justify-content-center mt-5">
+        <div className="col-md-12">
+          <button onClick={importChallenges} className="btn btn-outline-danger">
+            Import JSON
+          </button>
+          <br />
+          <input type="file" id="jsonImport" />
+        </div>
         <div className="col-md-12">
           <br />
           Challenge Types:

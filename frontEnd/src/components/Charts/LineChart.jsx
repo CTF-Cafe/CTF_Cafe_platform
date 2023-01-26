@@ -1,167 +1,119 @@
-import { Outlet, Routes, Route, Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Line } from "@ant-design/plots";
 
-function Stats(props) {
-  const data = [
-    {
-      year: "1951 年",
-      value: 38,
-    },
-    {
-      year: "1952 年",
-      value: 52,
-    },
-    {
-      year: "1956 年",
-      value: 61,
-    },
-    {
-      year: "1957 年",
-      value: 145,
-    },
-    {
-      year: "1958 年",
-      value: 48,
-    },
-  ];
+const LineChart = (props) => {
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    let rawData = [...props.data.slice(0, 10)];
+
+    let structuredData = [];
+
+    if (props.selection == "Users") {
+      rawData.forEach((user) => {
+        let currentPoints = 0;
+        let d = new Date(props.startTime);
+        let dformat =
+          [d.getMonth() + 1, d.getDate(), d.getFullYear()].join("/") +
+          " " +
+          [d.getHours(), d.getMinutes(), d.getSeconds()].join(":");
+        structuredData.push({
+          date: dformat,
+          points: 0,
+          name: user.username,
+        });
+
+        d = new Date(props.endTime);
+        dformat =
+          [d.getMonth() + 1, d.getDate(), d.getFullYear()].join("/") +
+          " " +
+          [d.getHours(), d.getMinutes(), d.getSeconds()].join(":");
+        structuredData.push({
+          date: dformat,
+          points: user.score,
+          name: user.username,
+        });
+        user.solved.forEach((solve) => {
+          currentPoints += solve.points;
+          d = new Date(solve.timestamp);
+          dformat =
+            [d.getMonth() + 1, d.getDate(), d.getFullYear()].join("/") +
+            " " +
+            [d.getHours(), d.getMinutes(), d.getSeconds()].join(":");
+          structuredData.push({
+            date: dformat,
+            points: currentPoints,
+            name: user.username,
+          });
+        });
+      });
+
+      structuredData.sort(
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+      );
+    } else {
+      rawData.forEach((team) => {
+        let currentPoints = 0;
+        let d = new Date(props.startTime);
+        let dformat =
+          [d.getMonth() + 1, d.getDate(), d.getFullYear()].join("/") +
+          " " +
+          [d.getHours(), d.getMinutes(), d.getSeconds()].join(":");
+        structuredData.push({
+          date: dformat,
+          points: 0,
+          name: team.name,
+        });
+
+        d = new Date(props.endTime);
+        dformat =
+          [d.getMonth() + 1, d.getDate(), d.getFullYear()].join("/") +
+          " " +
+          [d.getHours(), d.getMinutes(), d.getSeconds()].join(":");
+        structuredData.push({
+          date: dformat,
+          points: team.totalScore,
+          name: team.name,
+        });
+        team.solved.forEach((solve) => {
+          currentPoints += solve.points;
+          d = new Date(solve.timestamp);
+          dformat =
+            [d.getMonth() + 1, d.getDate(), d.getFullYear()].join("/") +
+            " " +
+            [d.getHours(), d.getMinutes(), d.getSeconds()].join(":");
+          structuredData.push({
+            date: dformat,
+            points: currentPoints,
+            name: team.name,
+          });
+        });
+      });
+
+      structuredData.sort(
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+      );
+    }
+
+    setData(structuredData);
+  }, [props]);
+
+  // { time: "1850", points: 54, name: "Test" }
+
   const config = {
     data,
-    xField: "value",
-    yField: "year",
-    seriesField: "year",
-    legend: {
-      position: "top-left",
-    },
+    xField: "date",
+    yField: "points",
+    seriesField: "name",
+    // point: {
+    //   shape: "circle",
+    // },
+    smooth: true,
+    theme: "dark",
+    padding: 50,
   };
 
-  const pieData = [
-    {
-      type: '分类一',
-      value: 27,
-    },
-    {
-      type: '分类二',
-      value: 25,
-    },
-    {
-      type: '分类三',
-      value: 18,
-    },
-    {
-      type: '分类四',
-      value: 15,
-    },
-    {
-      type: '分类五',
-      value: 10,
-    },
-    {
-      type: '其他',
-      value: 5,
-    },
-  ];
-  const pieConfig = {
-    appendPadding: 10,
-    data,
-    angleField: 'value',
-    colorField: 'type',
-    radius: 0.9,
-    label: {
-      type: 'inner',
-      offset: '-30%',
-      content: ({ percent }) => `${(percent * 100).toFixed(0)}%`,
-      style: {
-        fontSize: 14,
-        textAlign: 'center',
-      },
-    },
-    interactions: [
-      {
-        type: 'element-active',
-      },
-    ],
-  };
+  return <Line {...config} />;
+};
 
-  const lineData = [
-    {
-      year: '1991',
-      value: 3,
-    },
-    {
-      year: '1992',
-      value: 4,
-    },
-    {
-      year: '1993',
-      value: 3.5,
-    },
-    {
-      year: '1994',
-      value: 5,
-    },
-    {
-      year: '1995',
-      value: 4.9,
-    },
-    {
-      year: '1996',
-      value: 6,
-    },
-    {
-      year: '1997',
-      value: 7,
-    },
-    {
-      year: '1998',
-      value: 9,
-    },
-    {
-      year: '1999',
-      value: 13,
-    },
-  ];
-  const lineConfig = {
-    data,
-    xField: 'year',
-    yField: 'value',
-    label: {},
-    point: {
-      size: 5,
-      shape: 'diamond',
-      style: {
-        fill: 'white',
-        stroke: '#5B8FF9',
-        lineWidth: 2,
-      },
-    },
-    tooltip: {
-      showMarkers: false,
-    },
-    state: {
-      active: {
-        style: {
-          shadowBlur: 4,
-          stroke: '#000',
-          fill: 'red',
-        },
-      },
-    },
-    interactions: [
-      {
-        type: 'marker-active',
-      },
-    ],
-  };
-
-  return (
-    <div>
-      <h1 className="display-1 bold color_white content__title">
-        STATS<span className="vim-caret">&nbsp;</span>
-      </h1>
-      <Bar {...config} />
-      <Line {...lineConfig} />
-      <Pie {...pieConfig} />
-    </div>
-  );
-}
-
-export default Stats;
+export default LineChart;

@@ -1,7 +1,8 @@
+/* eslint-disable array-callback-return */
 import "./css/bootstrap4-neon-glow.css";
 import "./css/main.css";
 import "./css/prism.css";
-import { Outlet, Routes, Route, Link } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Index from "./components/Index";
 import FourOFour from "./components/FourOFour";
 import Rules from "./components/Rules";
@@ -34,7 +35,10 @@ function App() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sponsors, setSponsors] = useState([]);
+  const [endTime, setEndTime] = useState(0);
+  const [startTime, setStartTime] = useState(0);
   const alert = useAlert();
+  const [notifications, setNotifications] = useState(JSON.parse(localStorage.getItem('notifications')) || []);
   const navigate = useNavigate();
 
   const globalData = {
@@ -42,9 +46,13 @@ function App() {
     userData: userData,
     theme: theme,
     rules: rules,
+    notifications: notifications,
     dynamicScoring: dynamicScoring,
     categories: categories,
     sponsors: sponsors,
+    startTime: startTime,
+    endTime: endTime,
+    setNotifications,
     setTheme,
     setLoggedIn,
     setUserData,
@@ -56,7 +64,7 @@ function App() {
     axios
       .get(process.env.REACT_APP_SERVER_URI + "/api/getConfigs")
       .then((response) => {
-        if (response.data.state == "sessionError") {
+        if (response.data.state === "sessionError") {
           globalData.alert.error("Session expired!");
           globalData.setUserData({});
           globalData.setLoggedIn(false);
@@ -74,8 +82,14 @@ function App() {
                 setDynamicScoring(config.value);
                 break;
               case "categories":
-                  setCategories(config.value);
-                  break;
+                setCategories(config.value);
+                break;
+              case "startTime":
+                setStartTime(parseInt(config.value));
+                break;
+              case "endTime":
+                setEndTime(parseInt(config.value));
+                break;
               default:
                 break;
             }
@@ -87,21 +101,19 @@ function App() {
       });
   };
 
-  const getGlobalMessage = () => {
+  const getNotifications = () => {
     axios
-      .get(process.env.REACT_APP_SERVER_URI + "/api/user/getGlobalMessage", {
+      .get(process.env.REACT_APP_SERVER_URI + "/api/user/getNotifications", {
         withCredentials: true,
       })
       .then((response) => {
-        if (response.data.message && response.data.state == "success") {
-          alert.info("Admin Message: " + response.data.message, {
-            timeout: 5000,
-            position: positions.TOP_CENTER,
-          });
+        if (response.data.state === "success") {
+          setNotifications([...notifications, ...response.data.notifications]);
+          localStorage.setItem('notifications', JSON.stringify([...notifications, ...response.data.notifications]))
         }
       })
       .catch((err) => {
-        console.log(err.message);
+        console.log(err);
       });
   };
 
@@ -133,7 +145,7 @@ function App() {
         console.error(err);
       });
     getConfigs();
-    getGlobalMessage();
+    getNotifications();
   }, []);
 
   useEffect(() => {

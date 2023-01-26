@@ -7,6 +7,7 @@ import bronzeMask from "./img/bronzeMask.png";
 import LoadingScreen from "react-loading-screen";
 import AppContext from "./Data/AppContext";
 import Navbar from "./Global/Navbar";
+import LineChart from "./Charts/LineChart";
 
 const now = new Date();
 now.setHours(0, 0, 0, 0);
@@ -31,7 +32,7 @@ function Hackerboard(props) {
     axios
       .get(process.env.REACT_APP_SERVER_URI + "/api/getEndTime")
       .then((response) => {
-        setEndTime(response.data + "000");
+        setEndTime(response.data);
       })
       .catch((err) => {
         console.log(err.message);
@@ -240,7 +241,7 @@ function Hackerboard(props) {
               <p className="text-grey lead text-spacey text-center hackerFont">
                 Where the world 's greatest get ranked!
               </p>
-              {new Date().getTime() > endTime ? (
+              {/* {new Date().getTime() > endTime ? (
                 globalData.userData.team ? (
                   <div style={{ textAlign: "center" }}>
                     <button
@@ -254,11 +255,14 @@ function Hackerboard(props) {
                     </button>
                   </div>
                 ) : null
-              ) : null}
+              ) : null} */}
             </div>
           </div>
           <div className="row mt-5  justify-content-center">
             <div className="col-xl-10">
+              <div style={{ marginBottom: "25px" }}>
+                <LineChart startTime={globalData.startTime} endTime={globalData.endTime} data={selectionMain == "Users" ? users : teams} selection={selectionMain} />
+              </div>
               <div
                 style={{
                   display: "flex",

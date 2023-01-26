@@ -29,8 +29,8 @@ function ColumnChart(props) {
       }
     },
     slider: {
-      start: 0.1,
-      end: 0.2,
+      start: 0,
+      end: 1,
     },
   };
 
