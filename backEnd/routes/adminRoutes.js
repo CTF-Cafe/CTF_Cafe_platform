@@ -54,10 +54,6 @@ router.post('/createChallenge', (req, res) => {
     adminController.createChallenge(req, res);
 });
 
-router.post('/removeDockerCompose', (req, res) => {
-    adminController.removeDockerCompose(req, res);
-});
-
 router.post('/updateChallengeCategory', (req, res) => {
     adminController.updateChallengeCategory(req, res);
 });
