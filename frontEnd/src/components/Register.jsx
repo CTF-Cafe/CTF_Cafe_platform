@@ -19,7 +19,7 @@ function Register(props) {
       }, { withCredentials: true })
       .then((response) => {
         if (response.data.state == "success") {
-          globalData.alert.success("Registered! Now check email");
+          globalData.alert.success(response.data.message);
         } else {
           globalData.alert.error(response.data.message);
         }

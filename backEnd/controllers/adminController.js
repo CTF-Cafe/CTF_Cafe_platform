@@ -3,9 +3,9 @@ const teams = require('../models/teamModel');
 const challenges = require('../models/challengeModel.js');
 const ctfConfig = require('../models/ctfConfigModel.js');
 const theme = require('../models/themeModel.js');
+const log = require('../models/logModel.js')
 const path = require('path');
 const fs = require('fs');
-const axios = require('axios');
 const { v4 } = require('uuid');
 const ObjectId = require('mongoose').Types.ObjectId;
 const unzipper = require("unzipper");
@@ -177,10 +177,10 @@ exports.createChallenge = async function(req, res) {
         points: parseInt(req.body.points),
         initialPoints: parseInt(req.body.points),
         minimumPoints: parseInt(req.body.minimumPoints),
-        level: req.body.level,
-        info: req.body.info,
-        hint: req.body.hint,
-        flag: req.body.flag.toUpperCase(),
+        level: req.body.level || 0,
+        info: req.body.info || "",
+        hint: req.body.hint || "",
+        flag: req.body.flag.toUpperCase() || "EMPTY",
         file: (req.body.file.length > 0 ? req.body.file : ''),
         category: req.body.category,
         codeSnippet: '',
@@ -388,6 +388,7 @@ exports.getUsers = async function(req, res) {
                             username: { $first: "$username" },
                             score: { $sum: "$solved.points" },
                             solved: { $push: "$solved" },
+                            verified: { $first: "$verified" },
                             isAdmin: { $first: "$isAdmin" }
                         }
                     }
@@ -491,12 +492,17 @@ exports.saveTheme = async function(req, res) {
 }
 
 exports.sendGlobalMessage = async function(req, res) {
-    const currentGlobalMessage = await ctfConfig.findOne({ name: 'globalMessage' });
+    const currentNotifications = await ctfConfig.findOne({ name: 'notifications' });
 
-    if (currentGlobalMessage) {
-        await ctfConfig.findOneAndUpdate({ name: 'globalMessage' }, { value: { message: req.body.globalMessage, seenBy: [] } });
+    if (currentNotifications) {
+        await ctfConfig.findOneAndUpdate({ name: 'notifications' }, { value: [...currentNotifications.value, ...[{ message: "ADMIN : " + req.body.globalMessage, type: "admin", seenBy: [] }]] });
         res.send({ state: 'success' });
     } else {
-        res.send({ state: 'error', message: 'Global message document not found!' })
+        res.send({ state: 'error', message: 'Notifications table not found!' })
     }
+}
+
+exports.getLogs = async function(req, res) {
+    const logs = await log.find({});
+    res.send(logs);
 }

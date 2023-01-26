@@ -2,6 +2,7 @@ const challenges = require('../models/challengeModel');
 const users = require('../models/userModel');
 const teams = require('../models/teamModel');
 const ctfConfig = require('../models/ctfConfigModel.js');
+const logController = require("./logController")
 const ObjectId = require('mongoose').Types.ObjectId;
 const compose = require('docker-compose');
 const path = require('path');
@@ -29,7 +30,7 @@ exports.getChallenges = async function (req, res) {
     const endTime = await ctfConfig.findOne({ name: 'endTime' });
     let categories = [];
 
-    if (parseInt(startTime.value) - (Math.floor((new Date()).getTime() / 1000)) >= 0) {
+    if (parseInt(startTime.value) - (Math.floor((new Date()).getTime())) >= 0) {
         res.send({ state: 'error', message: 'CTF has not started!', startTime: startTime.value });
     } else {
         users.findOne({ username: req.session.username }).then((user) => {
@@ -250,9 +251,9 @@ exports.submitFlag = async function (req, res) {
         const endTime = await ctfConfig.findOne({ name: 'endTime' });
         const startTime = await ctfConfig.findOne({ name: 'startTime' });
 
-        if (parseInt(endTime.value) - (Math.floor((new Date()).getTime() / 1000)) <= 0) {
+        if (parseInt(endTime.value) - (Math.floor((new Date()).getTime())) <= 0) {
             throw new Error('CTF is Over!');
-        } else if (parseInt(startTime.value) - (Math.floor((new Date()).getTime() / 1000)) >= 0) {
+        } else if (parseInt(startTime.value) - (Math.floor((new Date()).getTime())) >= 0) {
             throw new Error('CTF has not started!');
         }
 
@@ -274,11 +275,13 @@ exports.submitFlag = async function (req, res) {
 
         if(challenge.randomFlag) {
             if (challenge.dockerLaunchers.find(launcher => launcher.team == user.teamId).flag != flag) {
+                logController.createLog(req, user, { state: 'error', message: 'Wrong Flag :(' });
                 throw new Error('Wrong Flag :(');
             }
         } else {
             // check flag
             if (challenge.flag != flag) {
+                logController.createLog(req, user, { state: 'error', message: 'Wrong Flag :(' });
                 throw new Error('Wrong Flag :(');
             }
         }
@@ -304,6 +307,7 @@ exports.submitFlag = async function (req, res) {
 
         // Check if team is currently submitting
         if (currentlySubmittingTeams.includes(user.teamId)) {
+            logController.createLog(req, user, { state: 'error', message: 'Submiting too fast!' });
             throw new Error('Submiting too fast!')
         }
 
@@ -357,9 +361,18 @@ exports.submitFlag = async function (req, res) {
 
         if (challenge.firstBlood == 'none' || challenge.firstBlood == username) {
             await challenges.updateOne({ _id: req.body.challengeId }, { $inc: { solveCount: 1 }, firstBlood: updatedUser.username });
+
+            const currentNotifications = await ctfConfig.findOne({ name: 'notifications' });
+            if (currentNotifications) {
+                await ctfConfig.findOneAndUpdate({ name: 'notifications' }, { value: [...currentNotifications.value, ...[{ message: `${updatedUser.username} has first blood ${challenge.name}!`, type: "first_blood", seenBy: [] }]] });
+            }
         } else {
             await challenges.updateOne({ _id: req.body.challengeId }, { $inc: { solveCount: 1 } });
         }
+
+        logController.createLog(req, updatedUser, {
+            state: "success",
+        });
 
         updatedUser.password = undefined;
         res.send({ state: 'success', user: updatedUser });

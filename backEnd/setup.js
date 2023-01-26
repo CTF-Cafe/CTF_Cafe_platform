@@ -9,7 +9,7 @@ exports.setupDB = async function() {
     if (!endTimeConfig) {
         await ctfConfig.create({
             name: 'endTime',
-            value: 0
+            value: new Date().getTime()
         });
     }
 
@@ -18,7 +18,7 @@ exports.setupDB = async function() {
     if (!startTimeConfig) {
         await ctfConfig.create({
             name: 'startTime',
-            value: 0
+            value: new Date().getTime()
         });
     }
 
@@ -39,15 +39,12 @@ exports.setupDB = async function() {
         });
     }
 
-    const globalMessageConfig = await ctfConfig.findOne({ name: 'globalMessage' });
+    const notificationsConfig = await ctfConfig.findOne({ name: 'notifications' });
 
-    if (!globalMessageConfig) {
+    if (!notificationsConfig) {
         await ctfConfig.create({
-            name: 'globalMessage',
-            value: {
-                message: '',
-                seenBy: []
-            }
+            name: 'notifications',
+            value: [{ message: "Welcome to CTFCafe!", type: "admin", seenBy: [] }]
         });
     }
 
