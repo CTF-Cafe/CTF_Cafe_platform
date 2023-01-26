@@ -860,3 +860,7 @@ a.text-light:focus {
 .min-btn:hover {
   color: var(--color-1);
 }
+
+.notification-close:hover {
+  color: var(--color-1) !important;
+}
