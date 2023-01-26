@@ -104,6 +104,18 @@ function Challenges(props) {
 
             return 0;
           });
+
+          response.data.challenges.forEach(c => {
+            
+          })
+          for(let c of response.data.challenges){
+            if(c.progress && c.progress !== 'finish') {
+              setTimeout(() => {
+                getChallenges()
+              }, 500);
+              break
+            }
+          }
           setChallenges(response.data.challenges);
           setCategories(response.data.categories);
           setEndTime(response.data.endTime);
@@ -127,47 +139,12 @@ function Challenges(props) {
     getChallenges();
   }, []);
 
-  const launchDocker = (challenge) => {
-    challenge.dockerLoading = true;
-    setChallenges([...challenges]);
-
-    axios
-      .post(
-        process.env.REACT_APP_SERVER_URI + "/api/user/launchDocker",
-        {
-          challengeId: challenge._id,
-        },
-        {
-          withCredentials: true,
-        }
-      )
-      .then((response) => {
-        if (response.data.state == "sessionError") {
-          globalData.alert.error("Session expired!");
-          globalData.setUserData({});
-          globalData.setLoggedIn(false);
-          globalData.navigate("/", { replace: true });
-        } else if (response.data.state == "error") {
-          globalData.alert.error(response.data.message);
-          challenge.dockerLoading = false;
-          setChallenges([...challenges]);
-        } else {
-          globalData.alert.success("Docker launched!");
-          getChallenges();
-        }
-      })
-      .catch((err) => {
-        console.log(err.message);
-      });
-  };
-
-  const stopDocker = (challenge) => {
+  const shutdownDocker = (challenge) => {
     challenge.dockerStopping = true;
-    setChallenges([...challenges]);
 
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/user/stopDocker",
+        process.env.REACT_APP_SERVER_URI + "/api/user/shutdownDocker",
         {
           challengeId: challenge._id,
         },
@@ -184,10 +161,45 @@ function Challenges(props) {
         } else if (response.data.state == "error") {
           globalData.alert.error(response.data.message);
           challenge.dockerStopping = false;
-          setChallenges([...challenges]);
         } else {
-          globalData.alert.success("Docker stopped!");
-          getChallenges();
+          globalData.alert.success("Challenge is stopping..");
+          setTimeout(() => {
+            getChallenges();
+          }, 250);
+        }
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+  };
+
+  const createDocker = (challenge) => {
+    challenge.dockerLoading = true;
+
+    axios
+      .post(
+        process.env.REACT_APP_SERVER_URI + "/api/user/deployDocker",
+        {
+          challengeId: challenge._id,
+        },
+        {
+          withCredentials: true,
+        }
+      )
+      .then((response) => {
+        if (response.data.state == "sessionError") {
+          globalData.alert.error("Session expired!");
+          globalData.setUserData({});
+          globalData.setLoggedIn(false);
+          globalData.navigate("/", { replace: true });
+        } else if (response.data.state == "error") {
+          globalData.alert.error(response.data.message);
+          challenge.dockerLoading = false;
+        } else {
+          globalData.alert.success("Challenge is starting..");
+          setTimeout(() => {
+            getChallenges();
+          }, 250);
         }
       })
       .catch((err) => {
@@ -439,50 +451,37 @@ function Challenges(props) {
                                     );
                                   })
                                 }
-                              </p>
+                              </p>  
 
-                              { challenge.dockerLaunchers.find(item => item.team === globalData.userData.team._id) != undefined ?
-                                (
-                                  <>  
-                                    <p>Port: {challenge.dockerLaunchers.find(item => item.team === globalData.userData.team._id).port}</p>
-                                  </>
-                                ) : null
-                              }
-
-                              {challenge.dockerCompose == "true" ? (
+                              {challenge.isInstance ? (
                                 <a
-                                  href="#"
                                   className="btn btn-outline-danger btn-shadow"
                                   onClick={(e) => {
                                     e.preventDefault();
-                                    challenge.dockerLaunchers.find(item => item.team === globalData.userData.team._id) == undefined ? launchDocker(challenge) : stopDocker(challenge);
+                                    !challenge.progress ? createDocker(challenge) : shutdownDocker(challenge);
                                   }}
                                 >
-                                  {challenge.dockerLoading ?
-                                    (
-                                      <>
-                                        <span className="fa-solid fa-spinner fa-spin mr-2"></span>
-                                        Loading
-                                      </>
-                                    ) : challenge.dockerStopping ?
-                                      (
-                                        <>
-                                          <span className="fa-solid fa-spinner fa-spin mr-2"></span>
-                                          Stopping
-                                        </>
-                                      ) : challenge.dockerLaunchers.find(item => item.team === globalData.userData.team._id) == undefined ?
+                                  {!challenge.progress ?
                                         (
                                           <>
                                             <span className="fa-solid fa-circle-play mr-2"></span>
                                             Start
                                           </>
                                         ) :
-                                        (
+                                        (challenge.progress === 'finished' ? (
                                           <>
                                             <span className="fa-solid fa-power-off mr-2"></span>
                                             Stop
                                           </>
+                                        ) : 
+                                        (
+                                          <>
+                                            <span className="fa-solid fa-spinner fa-spin mr-2"></span>
+                                            Building..
+                                          </>
                                         )
+                                        )
+                                        
                                   }
                                 </a>
                               ) : null}
@@ -567,6 +566,16 @@ function Challenges(props) {
                                   </button>
                                 </div>
                               </div>
+
+                                {challenge.url ? (
+                                    <a
+                                      href={`http://${challenge.url}`}
+                                      target="_blank"
+                                      className="btn btn-outline-danger btn-shadow mt-3" rel="noreferrer"
+                                    >
+                                      {challenge.url}
+                                    </a>
+                                ) : null}
                             </blockquote>
                           </div>
                         </div>
