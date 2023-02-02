@@ -3,6 +3,7 @@ import { useState, useEffect, useContext } from "react";
 import { saveAs } from "file-saver";
 import LoadingScreen from "react-loading-screen";
 import AppContext from "./Data/AppContext";
+import ConfirmModal from "./Global/ConfirmModal";
 import Navbar from "./Global/Navbar";
 import copy from "copy-to-clipboard";
 import "../css/prism.css";
@@ -46,6 +47,7 @@ function Challenges(props) {
   const [endTime, setEndTime] = useState(0);
   const [loading, setLoading] = useState(true);
   const [counter, setCounter] = useState(0);
+  const [action, setAction] = useState({});
 
   useEffect(() => {
     let timer;
@@ -59,6 +61,37 @@ function Challenges(props) {
       }
     };
   }, [counter]);
+
+  const buyHint = (e, challengeId) => {
+
+    axios
+      .post(
+        process.env.REACT_APP_SERVER_URI + "/api/user/buyHint",
+        {
+          challengeId: challengeId,
+        },
+        {
+          withCredentials: true,
+        }
+      )
+      .then((response) => {
+        if (response.data.state == "sessionError") {
+          globalData.alert.error("Session expired!");
+          globalData.setUserData({});
+          globalData.setLoggedIn(false);
+          globalData.navigate("/", { replace: true });
+        } else if (response.data.state == "error") {
+          globalData.alert.error(response.data.message);
+        } else {
+          globalData.alert.success("Hint Bought!");
+          setCurrentHint(response.data.hint);
+          getChallenges();
+        }
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+  };
 
   const getChallenges = () => {
     axios
@@ -203,7 +236,7 @@ function Challenges(props) {
         process.env.REACT_APP_SERVER_URI + "/api/user/submitFlag",
         {
           flag: flag,
-          challengeId: challenge._id
+          challengeId: challenge._id,
         },
         { withCredentials: true }
       )
@@ -289,19 +322,19 @@ function Challenges(props) {
                       <div className="col-md-6 mb-3" key={index}>
                         <div
                           className={
-                            challenge.category == "crypto"
+                            challenge.category.toLowerCase() == "crypto"
                               ? "card category_crypt"
-                              : challenge.category == "web"
-                                ? "card category_web"
-                                : challenge.category == "osint"
-                                  ? "card category_osint"
-                                  : challenge.category == "reverse"
-                                    ? "card category_reverse"
-                                    : challenge.category == "pwn"
-                                      ? "card category_pwning"
-                                      : challenge.category == "forensics"
-                                        ? "card category_forensics"
-                                        : "card category_misc"
+                              : challenge.category.toLowerCase() == "web"
+                              ? "card category_web"
+                              : challenge.category.toLowerCase() == "osint"
+                              ? "card category_osint"
+                              : challenge.category.toLowerCase() == "reverse"
+                              ? "card category_reverse"
+                              : challenge.category.toLowerCase() == "pwn"
+                              ? "card category_pwning"
+                              : challenge.category.toLowerCase() == "forensics"
+                              ? "card category_forensics"
+                              : "card category_misc"
                           }
                         >
                           <div
@@ -311,7 +344,7 @@ function Challenges(props) {
                               }).length > 0
                                 ? "card-header solved"
                                 : globalData.userData.team
-                                  ? globalData.userData.team.users.filter(
+                                ? globalData.userData.team.users.filter(
                                     (user) => {
                                       return (
                                         user.solved.filter((obj) => {
@@ -320,9 +353,9 @@ function Challenges(props) {
                                       );
                                     }
                                   ).length > 0
-                                    ? "card-header solved"
-                                    : "card-header"
+                                  ? "card-header solved"
                                   : "card-header"
+                                : "card-header"
                             }
                             data-target={"#problem_id_" + index}
                             data-toggle="collapse"
@@ -335,7 +368,7 @@ function Challenges(props) {
                           >
                             <div>
                               {challenge.firstBlood ==
-                                globalData.userData.username ? (
+                              globalData.userData.username ? (
                                 <div
                                   style={{
                                     display: "inline-flex",
@@ -374,20 +407,20 @@ function Challenges(props) {
                                   challenge.level == 0
                                     ? "badge color_white color_easy align-self-end"
                                     : challenge.level == 1
-                                      ? "badge color_white color_medium align-self-end"
-                                      : challenge.level == 2
-                                        ? "badge color_white color_hard align-self-end"
-                                        : "badge color_white color_ninja align-self-end"
+                                    ? "badge color_white color_medium align-self-end"
+                                    : challenge.level == 2
+                                    ? "badge color_white color_hard align-self-end"
+                                    : "badge color_white color_ninja align-self-end"
                                 }
                                 style={{ marginRight: "5px" }}
                               >
                                 {challenge.level == 0
                                   ? "Easy"
                                   : challenge.level == 1
-                                    ? "Medium"
-                                    : challenge.level == 2
-                                      ? "Hard"
-                                      : "Ninja"}
+                                  ? "Medium"
+                                  : challenge.level == 2
+                                  ? "Hard"
+                                  : "Ninja"}
                               </span>
                               <span className="badge align-self-end">
                                 {challenge.points} points
@@ -411,19 +444,19 @@ function Challenges(props) {
                                       challenge.level == 0
                                         ? "color_white color_easy"
                                         : challenge.level == 1
-                                          ? "color_white color_medium"
-                                          : challenge.level == 2
-                                            ? "color_white color_hard"
-                                            : "color_white color_ninja"
+                                        ? "color_white color_medium"
+                                        : challenge.level == 2
+                                        ? "color_white color_hard"
+                                        : "color_white color_ninja"
                                     }
                                   >
                                     {challenge.level == 0
                                       ? "Easy"
                                       : challenge.level == 1
-                                        ? "Medium"
-                                        : challenge.level == 2
-                                          ? "Hard"
-                                          : "Ninja"}
+                                      ? "Medium"
+                                      : challenge.level == 2
+                                      ? "Hard"
+                                      : "Ninja"}
                                   </span>
                                 </h6>
                               </div>
@@ -437,17 +470,26 @@ function Challenges(props) {
                                         <br />
                                       </span>
                                     );
-                                  })
-                                }
+                                  })}
                               </p>
 
-                              { challenge.dockerLaunchers.find(item => item.team === globalData.userData.team._id) != undefined ?
-                                (
-                                  <>  
-                                    <p>Port: {challenge.dockerLaunchers.find(item => item.team === globalData.userData.team._id).port}</p>
-                                  </>
-                                ) : null
-                              }
+                              {challenge.dockerLaunchers.find(
+                                (item) =>
+                                  item.team === globalData.userData.team._id
+                              ) != undefined ? (
+                                <>
+                                  <p>
+                                    Port:{" "}
+                                    {
+                                      challenge.dockerLaunchers.find(
+                                        (item) =>
+                                          item.team ===
+                                          globalData.userData.team._id
+                                      ).port
+                                    }
+                                  </p>
+                                </>
+                              ) : null}
 
                               {challenge.dockerCompose == "true" ? (
                                 <a
@@ -455,35 +497,40 @@ function Challenges(props) {
                                   className="btn btn-outline-danger btn-shadow"
                                   onClick={(e) => {
                                     e.preventDefault();
-                                    challenge.dockerLaunchers.find(item => item.team === globalData.userData.team._id) == undefined ? launchDocker(challenge) : stopDocker(challenge);
+                                    challenge.dockerLaunchers.find(
+                                      (item) =>
+                                        item.team ===
+                                        globalData.userData.team._id
+                                    ) == undefined
+                                      ? launchDocker(challenge)
+                                      : stopDocker(challenge);
                                   }}
                                 >
-                                  {challenge.dockerLoading ?
-                                    (
-                                      <>
-                                        <span className="fa-solid fa-spinner fa-spin mr-2"></span>
-                                        Loading
-                                      </>
-                                    ) : challenge.dockerStopping ?
-                                      (
-                                        <>
-                                          <span className="fa-solid fa-spinner fa-spin mr-2"></span>
-                                          Stopping
-                                        </>
-                                      ) : challenge.dockerLaunchers.find(item => item.team === globalData.userData.team._id) == undefined ?
-                                        (
-                                          <>
-                                            <span className="fa-solid fa-circle-play mr-2"></span>
-                                            Start
-                                          </>
-                                        ) :
-                                        (
-                                          <>
-                                            <span className="fa-solid fa-power-off mr-2"></span>
-                                            Stop
-                                          </>
-                                        )
-                                  }
+                                  {challenge.dockerLoading ? (
+                                    <>
+                                      <span className="fa-solid fa-spinner fa-spin mr-2"></span>
+                                      Loading
+                                    </>
+                                  ) : challenge.dockerStopping ? (
+                                    <>
+                                      <span className="fa-solid fa-spinner fa-spin mr-2"></span>
+                                      Stopping
+                                    </>
+                                  ) : challenge.dockerLaunchers.find(
+                                      (item) =>
+                                        item.team ===
+                                        globalData.userData.team._id
+                                    ) == undefined ? (
+                                    <>
+                                      <span className="fa-solid fa-circle-play mr-2"></span>
+                                      Start
+                                    </>
+                                  ) : (
+                                    <>
+                                      <span className="fa-solid fa-power-off mr-2"></span>
+                                      Stop
+                                    </>
+                                  )}
                                 </a>
                               ) : null}
 
@@ -526,7 +573,7 @@ function Challenges(props) {
                                 ) : null
                               ) : null}
 
-                              {challenge.hint ? (
+                              {challenge.hint && challenge.hintCost === 0 ? (
                                 challenge.hint.trim().length > 0 ? (
                                   <a
                                     onClick={() => {
@@ -541,7 +588,24 @@ function Challenges(props) {
                                     Hint
                                   </a>
                                 ) : null
-                              ) : null}
+                              ) : (
+                                <a
+                                  onClick={(e) => {
+                                    setAction({
+                                      function: buyHint,
+                                      e: e,
+                                      data: challenge._id,
+                                    });
+                                  }}
+                                  href="#confirmModal"
+                                  data-toggle="modal"
+                                  data-target="#confirmModal"
+                                  className="btn btn-outline-danger btn-shadow"
+                                >
+                                  <span className="fa-solid fa-lightbulb mr-2"></span>
+                                  Buy Hint
+                                </a>
+                              )}
                               <div className="input-group mt-3">
                                 <input
                                   type="text"
@@ -578,6 +642,7 @@ function Challenges(props) {
             );
           })}
         </div>
+        <ConfirmModal action={action} />
         <div
           className="modal fade"
           id="modal"

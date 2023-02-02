@@ -18,6 +18,10 @@ var challengeSchema = new Schema({
     hint: {
         type: String,
     },
+    hintCost: {
+        type: Number,
+        default: 0
+    },
     points: {
         type: Number,
         default: 100
