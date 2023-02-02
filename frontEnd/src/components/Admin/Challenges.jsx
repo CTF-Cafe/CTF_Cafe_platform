@@ -170,6 +170,11 @@ function Challenges(props) {
     ).textContent;
     formData.append("points", points);
 
+    const firstBloodPoints = document.getElementById(
+      "firstBloodPoints" + oldChallenge._id
+    ).textContent;
+    formData.append("firstBloodPoints", firstBloodPoints);
+
     const minimumPoints = document.getElementById(
       "minimumPoints" + oldChallenge._id
     ).textContent;

@@ -68,6 +68,16 @@ exports.saveChallenge = async function(req, res) {
         res.send({ state: 'error', message: 'Points and level must be positive numbers' });
         return;
     }
+    
+    if(isNaN(req.body.firstBloodPoints)) {
+        res.send({ state: 'error', message: 'firstBloodPoints must be a number!' });
+        return;
+    }
+
+    if(parseInt(req.body.firstBloodPoints) < 0) {
+        res.send({ state: 'error', message: 'firstBloodPoints must be positive number' });
+        return;
+    }
 
     if(isNaN(req.body.hintCost)) {
         res.send({ state: 'error', message: 'hintCost must be a number!' });
@@ -119,6 +129,7 @@ exports.saveChallenge = async function(req, res) {
         await challenges.findByIdAndUpdate((req.body.id), {
             name: req.body.name.trim(),
             points: parseInt(req.body.points),
+            firstBloodPoints: parseInt(req.body.firstBloodPoints),
             initialPoints: parseInt(req.body.points),
             minimumPoints: parseInt(req.body.minimumPoints),
             level: parseInt(req.body.level),
@@ -206,6 +217,7 @@ exports.createChallenge = async function(req, res) {
     await challenges.create({
         name: req.body.name + Math.random().toString().substr(2, 4),
         points: parseInt(req.body.points),
+        firstBloodPoints: 0,
         initialPoints: parseInt(req.body.points),
         minimumPoints: parseInt(req.body.minimumPoints),
         level: req.body.level || 0,

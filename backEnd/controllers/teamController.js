@@ -31,6 +31,7 @@ exports.register = async function (req, res) {
             teamCaptain: userToCheck.username,
             users: [
               {
+                _id: userToCheck._id,
                 username: userToCheck.username,
                 score: userToCheck.score,
                 solved: userToCheck.solved,
@@ -109,6 +110,7 @@ exports.joinTeam = async function (req, res) {
             {
               $push: {
                 users: {
+                  _id: userToCheck._id,
                   username: userToCheck.username,
                   score: userToCheck.score,
                   solved: userToCheck.solved,
@@ -188,6 +190,22 @@ exports.getTeams = async function (req, res) {
               },
             },
             {
+              $group: {
+                _id: "$_id",
+                users: { $first: "$oldUsers" },
+                oldUsers: { $first: "$oldUsers" },
+                solved: { $push: "$users.solved" },
+                name: { $first: "$name" },
+                teamCaptain: { $first: "$teamCaptain" },
+              },
+            },
+            {
+              $unwind: {
+                path: "$users",
+                preserveNullAndEmptyArrays: true,
+              },
+            },
+            {
               $unwind: {
                 path: "$users.hintsBought",
                 preserveNullAndEmptyArrays: true,
@@ -197,8 +215,27 @@ exports.getTeams = async function (req, res) {
               $group: {
                 _id: "$_id",
                 users: { $first: "$oldUsers" },
-                solved: { $push: "$users.solved" },
+                oldUsers: { $first: "$oldUsers" },
+                solved: { $first: "$solved" },
                 hintsCost: { $sum: "$users.hintsBought.cost" },
+                name: { $first: "$name" },
+                teamCaptain: { $first: "$teamCaptain" },
+              },
+            },
+            {
+              $unwind: {
+                path: "$users",
+                preserveNullAndEmptyArrays: true,
+              },
+            },
+            {
+              $group: {
+                _id: "$_id",
+                userIds: { $push: { $toString: "$users._id" } },
+                users: { $first: "$oldUsers" },
+                oldUsers: { $first: "$oldUsers" },
+                solved: { $first: "$solved" },
+                hintsCost: { $first: "$hintsCost" },
                 name: { $first: "$name" },
                 teamCaptain: { $first: "$teamCaptain" },
               },
@@ -212,7 +249,11 @@ exports.getTeams = async function (req, res) {
             {
               $lookup: {
                 from: "challenges",
-                let: { chalId: "$solved._id", timestamp: "$solved.timestamp" },
+                let: {
+                  chalId: "$solved._id",
+                  timestamp: "$solved.timestamp",
+                  userIds: "$userIds",
+                },
                 pipeline: [
                   {
                     $match: {
@@ -224,7 +265,13 @@ exports.getTeams = async function (req, res) {
                       _id: 0,
                       solve: {
                         _id: "$_id",
-                        points: "$points",
+                        points: {
+                          $cond: {
+                            if: { $in: ["$firstBlood", "$$userIds"] },
+                            then: { $add: ["$points", "$firstBloodPoints"] },
+                            else: "$points",
+                          },
+                        },
                         timestamp: "$$timestamp",
                       },
                     },
@@ -245,6 +292,7 @@ exports.getTeams = async function (req, res) {
             {
               $group: {
                 _id: "$_id",
+                users: { $first: "$oldUsers" },
                 totalScore: { $sum: "$newSolved.points" },
                 totalSolved: {
                   $sum: {
@@ -301,6 +349,7 @@ exports.getUserTeam = async function (req, res) {
             let: {
               chalId: "$users.solved._id",
               timestamp: "$users.solved.timestamp",
+              userId: { $toString: "$users._id" }
             },
             pipeline: [
               {
@@ -313,7 +362,13 @@ exports.getUserTeam = async function (req, res) {
                   _id: 0,
                   solve: {
                     _id: "$_id",
-                    points: "$points",
+                    points: {
+                        $cond: {
+                          if: { $eq: ["$firstBlood", "$$userId"] },
+                          then: { $add: ["$points", "$firstBloodPoints"] },
+                          else: "$points",
+                        },
+                    },
                   },
                 },
               },
@@ -360,7 +415,7 @@ exports.leaveTeam = async function (req, res) {
 
   if (userTeamExists) {
     let newTeamUsers = userTeamExists.users.filter(
-      (user) => user.username != req.session.username
+      (user) => user._id != userToCheck._id
     );
     await teams
       .findOneAndUpdate(
@@ -418,6 +473,7 @@ exports.getTeam = async function (req, res) {
         let: {
           chalId: "$users.solved._id",
           timestamp: "$users.solved.timestamp",
+          userId: { $toString: "$users._id" }
         },
         pipeline: [
           {
@@ -430,7 +486,13 @@ exports.getTeam = async function (req, res) {
               _id: 0,
               solve: {
                 _id: "$_id",
-                points: "$points",
+                points: {
+                    $cond: {
+                      if: { $eq: ["$firstBlood", "$$userId"] },
+                      then: { $add: ["$points", "$firstBloodPoints"] },
+                      else: "$points",
+                    },
+                },
               },
             },
           },

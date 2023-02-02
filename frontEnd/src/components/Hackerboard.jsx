@@ -17,7 +17,7 @@ function Hackerboard(props) {
   const [users, setUsers] = useState([]);
   const [teams, setTeams] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectionMain, setSelectionMain] = useState("Team");
+  const [selectionMain, setSelectionMain] = useState("Teams");
   const [selectionScore, setSelectionScore] = useState("up");
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
@@ -25,7 +25,7 @@ function Hackerboard(props) {
   const [teamCount, setTeamCount] = useState(0);
 
   useEffect(() => {
-    selectionMain == "Team" ? getTeams(page) : getUsers(page);
+    selectionMain == "Teams" ? getTeams(page) : getUsers(page);
   }, [searchQuery]);
 
   const getData = (index) => {

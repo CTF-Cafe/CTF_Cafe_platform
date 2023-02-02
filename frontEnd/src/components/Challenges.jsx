@@ -368,7 +368,7 @@ function Challenges(props) {
                           >
                             <div>
                               {challenge.firstBlood ==
-                              globalData.userData.username ? (
+                              globalData.userData._id ? (
                                 <div
                                   style={{
                                     display: "inline-flex",
