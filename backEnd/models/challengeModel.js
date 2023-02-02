@@ -26,6 +26,10 @@ var challengeSchema = new Schema({
         type: Number,
         default: 100
     },
+    firstBloodPoints: {
+        type: Number,
+        default: 0
+    },
     initialPoints: {
         type: Number,
         default: 100

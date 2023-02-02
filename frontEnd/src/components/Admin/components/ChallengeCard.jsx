@@ -138,8 +138,22 @@ function ChallengeCard(props) {
                   contentEditable="true"
                   id={"hintCost" + props.challenge._id}
                 >
-                  {console.log(props.challenge)}
                   {props.challenge.hintCost}
+                </p>
+              </div>
+
+              <div style={{ display: "flex" }}>
+                <label>First Blood Bonus:</label>
+                <p
+                  style={{
+                    backgroundColor: "rgb(30, 32, 55)",
+                    outline: "none",
+                    minWidth: "5%",
+                  }}
+                  contentEditable="true"
+                  id={"firstBloodPoints" + props.challenge._id}
+                >
+                  {props.challenge.firstBloodPoints}
                 </p>
               </div>
 

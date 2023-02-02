@@ -360,7 +360,7 @@ exports.submitFlag = async function (req, res) {
         let timestamp = new Date().getTime();
 
         if (challenge.firstBlood == 'none') {
-            challenge.firstBlood = username;
+            challenge.firstBlood = user._id;
         }
 
         const dynamicScoring = await ctfConfig.findOne({ name: 'dynamicScoring' });
@@ -369,11 +369,6 @@ exports.submitFlag = async function (req, res) {
             const decay = (await teams.countDocuments()) * 0.18;
             let dynamicPoints = Math.ceil((((challenge.minimumPoints - challenge.initialPoints)/((decay**2)+1)) * ((challenge.solveCount+1)**2)) + challenge.initialPoints)
             if(dynamicPoints < challenge.minimumPoints) { dynamicPoints = challenge.minimumPoints }
-
-            // ALTERNATE WAY:
-            // const decay = (await users.countDocuments()) * 0.18;
-            // let dynamicPoints = ((challenge.minimumPoints - challenge.initialPoints) / ((decay**2)+1) * ((challenge.solveCount+1)**2))
-            // if(dynamicPoints < challenge.minimumPoints) { dynamicPoints = challenge.minimumPoints } else { dynamicPoints += challenge.minimumPoints }
 
             await challenges.updateOne({ _id: ObjectId(req.body.challengeId) }, { $set: { points: dynamicPoints } });
             challenge = await challenges.findOne({ _id: ObjectId(req.body.challengeId) });
@@ -388,13 +383,12 @@ exports.submitFlag = async function (req, res) {
             users: { $elemMatch: { username: updatedUser.username } }
         }, {
             $set: {
-                "users.$.score": updatedUser.score,
                 "users.$.solved": updatedUser.solved,
             }
         });
 
-        if (challenge.firstBlood == 'none' || challenge.firstBlood == username) {
-            await challenges.updateOne({ _id: req.body.challengeId }, { $inc: { solveCount: 1 }, firstBlood: updatedUser.username });
+        if (challenge.firstBlood == 'none' || challenge.firstBlood == user._id) {
+            await challenges.updateOne({ _id: req.body.challengeId }, { $inc: { solveCount: 1 }, firstBlood: updatedUser._id });
 
             const currentNotifications = await ctfConfig.findOne({ name: 'notifications' });
             if (currentNotifications) {
