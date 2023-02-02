@@ -46,6 +46,10 @@ function UserTeam(props) {
             user.solved.forEach((solved) => {
               user.score += solved.points;
             });
+
+            user.hintsBought.forEach((hint) => {
+              user.score -= hint.cost;
+            });
           });
 
           globalData.userData.team = response.data;

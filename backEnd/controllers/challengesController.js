@@ -33,17 +33,51 @@ exports.getChallenges = async function (req, res) {
     if (parseInt(startTime.value) - (Math.floor((new Date()).getTime())) >= 0) {
         res.send({ state: 'error', message: 'CTF has not started!', startTime: startTime.value });
     } else {
-        users.findOne({ username: req.session.username }).then((user) => {
-            allChallenges.forEach(challenge => {
+        users.findOne({ username: req.session.username }).then(async (user) => {
+            for (let i = 0; i < allChallenges.length; i++) {
+                let challenge = allChallenges[i];
+
+                // Hide flag
                 challenge.flag = 'Nice try XD';
+
+                let team = false;
+                let teamHasBought = false;
+
+                // Check teamId is valid
+                if (ObjectId.isValid(user.teamId)) {
+                    team = await teams.findById(user.teamId);
+                }
+
+                // Check Team Exists
+                if (team) {
+                    // Check if hint bought by team
+                    if (team.users.filter(user => {
+                        return (user.hintsBought.filter(obj => {
+                            return obj.challId.equals(challenge._id)
+                        }).length > 0)
+                    }).length > 0) {
+                        teamHasBought = true;
+                    }
+                }
+
+                // Show hint if bought
+                if(!user.hintsBought.find(x => x.challId.equals(challenge._id)) && challenge.hintCost > 0 && teamHasBought == false) {
+                    challenge.hint = "";
+                } else {
+                    challenge.hintCost = 0;
+                }
+
+                // Check if challenge is a docker instance and hide flag
                 challenge.dockerLaunchers = challenge.dockerLaunchers.filter(launcher => launcher.team == user.teamId);
                 if(challenge.dockerLaunchers.length > 0) {
                     challenge.dockerLaunchers[0].flag = 'Nice try XD';
                 }
                 challenge.dockerCompose = challenge.dockerCompose.length > 0 ? true : false;
+
+                // List all categories
                 if (categories.indexOf(challenge.category) == -1)
                     categories.push(challenge.category);
-            });
+            }
 
             res.send({ categories: categories, challenges: allChallenges, endTime: endTime.value });
         }).catch((err) => {
@@ -386,6 +420,104 @@ exports.submitFlag = async function (req, res) {
 
         if (teamId) {
             currentlySubmittingTeams = currentlySubmittingTeams.filter(item => item !== teamId)
+        }
+    }
+}
+
+exports.buyHint = async function (req, res) {
+    try {
+        const endTime = await ctfConfig.findOne({ name: 'endTime' });
+        const startTime = await ctfConfig.findOne({ name: 'startTime' });
+
+        if (parseInt(endTime.value) - (Math.floor((new Date()).getTime())) <= 0) {
+            throw new Error('CTF is Over!');
+        } else if (parseInt(startTime.value) - (Math.floor((new Date()).getTime())) >= 0) {
+            throw new Error('CTF has not started!');
+        }
+
+        const username = (req.session.username);
+        const user = await users.findOne({ username: username, verified: true });
+
+        // Check if user exists
+        if (!user) {
+            throw new Error('Not logged in!');
+        }
+
+        // Check challengeId is valid
+        if (!ObjectId.isValid(req.body.challengeId)) {
+            throw new Error('Invalid challengeId!')
+        }
+
+        let challenge = await challenges.findOne({ _id: ObjectId(req.body.challengeId) });
+
+        // Check challenge has hint to be bought
+        if (challenge.hintCost <= 0) {
+            throw new Error('Challenge hint is free!')
+        }
+
+        // Check user already bought hint
+        if (user.hintsBought.includes(challenge._id)) {
+            throw new Error('Challenge hint already bought!')
+        }
+
+        // Check teamId is valid
+        if (!ObjectId.isValid(user.teamId)) {
+            throw new Error('Not in a team!')
+        }
+
+        const team = await teams.findById(user.teamId);
+
+        // Check Team Exists
+        if (!team) {
+            throw new Error('Not in a team!')
+        }
+
+        teamId = user.teamId;
+
+        if (team.users.filter(user => {
+            return (user.hintsBought.filter(obj => {
+                return obj.challId.equals(challenge._id)
+            }).length > 0)
+        }).length > 0) {
+            throw new Error('Hint already bought!')
+        }
+
+        for (let i = 0; i < user.solved.length; i++) {
+            let challenge = await challenges.findById(user.solved[i]._id);
+            if (challenge) {
+              user.solved[i].challenge = challenge;
+              user.score += challenge.points;
+            }
+        }
+
+        // Check User has enough points
+        if (user.score < challenge.hintCost) {
+            throw new Error('Not enough points!')
+        }
+
+        let timestamp = new Date().getTime();
+        await users.updateOne({ username: username, verified: true }, { $push: { hintsBought: { challId: challenge._id, cost: challenge.hintCost, timestamp: timestamp } } });
+
+        const updatedUser = await users.findOne({ username: username, verified: true });
+
+        await teams.updateOne({
+            _id: team._id,
+            users: { $elemMatch: { username: updatedUser.username } }
+        }, {
+            $set: {
+                "users.$.hintsBought": updatedUser.hintsBought,
+            }
+        });
+
+        logController.createLog(req, updatedUser, {
+            state: "success", hint: challenge.hint
+        });
+
+        res.send({ state: 'success', hint: challenge.hint });
+
+    } catch (err) {
+        if (err) {
+            res.send({ state: 'error', message: err.message });
         }
     }
 }

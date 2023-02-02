@@ -50,6 +50,10 @@ router.post("/submitFlag", (req, res) => {
   challengesController.submitFlag(req, res);
 });
 
+router.post("/buyHint", (req, res) => {
+  challengesController.buyHint(req, res);
+});
+
 router.get("/getChallenges", (req, res) => {
   challengesController.getChallenges(req, res);
 });

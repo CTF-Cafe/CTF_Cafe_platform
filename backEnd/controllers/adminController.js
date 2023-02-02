@@ -59,8 +59,23 @@ accentsTidy = function(s) {
 exports.saveChallenge = async function(req, res) {
     const challengeExists = await challenges.findById((req.body.id));
 
+    if(isNaN(req.body.points)) {
+        res.send({ state: 'error', message: 'points must be a number!' });
+        return;
+    }
+
     if(parseInt(req.body.points) < 0 || parseInt(req.body.level) < 0) {
         res.send({ state: 'error', message: 'Points and level must be positive numbers' });
+        return;
+    }
+
+    if(isNaN(req.body.hintCost)) {
+        res.send({ state: 'error', message: 'hintCost must be a number!' });
+        return;
+    }
+
+    if(parseInt(req.body.hintCost) < 0) {
+        res.send({ state: 'error', message: 'hintCost must be a positive number' });
         return;
     }
 
@@ -109,6 +124,7 @@ exports.saveChallenge = async function(req, res) {
             level: parseInt(req.body.level),
             info: req.body.info,
             hint: req.body.hint,
+            hintCost: parseInt(req.body.hintCost),
             flag: accentsTidy(req.body.flag.trim()).toUpperCase(),
             file: (req.body.file.length > 0 ? req.body.file : ''),
             codeSnippet: (req.body.codeSnippet.length > 0 ? req.body.codeSnippet : ''),
@@ -126,8 +142,23 @@ exports.saveChallenge = async function(req, res) {
 
 exports.createChallenge = async function(req, res) {
 
+    if(parseInt(req.body.points) == NaN) {
+        res.send({ state: 'error', message: 'points must be a number!' });
+        return;
+    }
+
     if(parseInt(req.body.points) < 0 || parseInt(req.body.level) < 0) {
         res.send({ state: 'error', message: 'Points and level must be positive numbers' });
+        return;
+    }
+
+    if(parseInt(req.body.hintCost) == NaN) {
+        res.send({ state: 'error', message: 'hintCost must be a number!' });
+        return;
+    }
+
+    if(parseInt(req.body.hintCost) < 0) {
+        res.send({ state: 'error', message: 'hintCost must be a positive number' });
         return;
     }
 
@@ -180,6 +211,7 @@ exports.createChallenge = async function(req, res) {
         level: req.body.level || 0,
         info: req.body.info || "",
         hint: req.body.hint || "",
+        hintCost: parseInt(req.body.hintCost) || 0,
         flag: req.body.flag.toUpperCase() || "EMPTY",
         file: (req.body.file.length > 0 ? req.body.file : ''),
         category: req.body.category,

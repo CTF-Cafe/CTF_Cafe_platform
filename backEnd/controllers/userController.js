@@ -358,10 +358,31 @@ exports.getUsers = async function (req, res) {
               $group: {
                 _id: "$_id",
                 username: { $first: "$username" },
+                hintsBought: { $first: "$hintsBought" },
                 score: { $sum: "$solved.points" },
                 solved: { $push: "$solved" },
               },
             },
+            {
+              $unwind: {
+                path: "$hintsBought",
+                preserveNullAndEmptyArrays: true,
+              },
+            },
+            {
+              $group: {
+                _id: "$_id",
+                username: { $first: "$username" },
+                hintsCost: { $sum: "$hintsBought.cost" },
+                score: { $first: "$score" },
+                solved: { $first: "$solved" },
+              },
+            },
+            {
+               $addFields: {
+                  score: { $subtract: ["$score", "$hintsCost"] }
+               }
+            }
           ])
           .sort({ score: -1, _id: 1 })
           .skip((page - 1) * 100)
@@ -396,6 +417,10 @@ exports.getUser = async function (req, res) {
         user.solved[i].challenge = challenge;
         user.score += challenge.points;
       }
+    }
+
+    for (let i = 0; i < user.hintsBought.length; i++) {
+      user.score -= user.hintsBought[i].cost;
     }
 
     res.send(user);
@@ -442,11 +467,19 @@ exports.getScoreboard = async function (req, res) {
         },
       },
       {
+        $unwind: {
+          path: "$users.hintsBought",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
         $group: {
           _id: "$_id",
-          users: { $push: "$users" },
+          users: { $first: "$oldUsers" },
           solved: { $push: "$users.solved" },
+          hintsCost: { $sum: "$users.hintsBought.cost" },
           name: { $first: "$name" },
+          teamCaptain: { $first: "$teamCaptain" },
         },
       },
       {
@@ -496,6 +529,12 @@ exports.getScoreboard = async function (req, res) {
           totalSolved: { $sum: 1 },
           maxTimestamp: { $max: "$newSolved.timestamp" },
           name: { $first: "$name" },
+          hintsCost: { $first: "$hintsCost" },
+        },
+      },
+      {
+        $addFields: {
+          totalScore: { $subtract: ["$totalScore", "$hintsCost"] },
         },
       },
     ])

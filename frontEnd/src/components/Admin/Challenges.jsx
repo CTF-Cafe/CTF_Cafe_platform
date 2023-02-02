@@ -1,4 +1,3 @@
-import { Outlet, Routes, Route, Link } from "react-router-dom";
 import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import AppContext from "../Data/AppContext";
@@ -95,7 +94,7 @@ function Challenges(props) {
         withCredentials: true,
       })
       .then((response) => {
-        if (response.data.state == "sessionError") {
+        if (response.data.state === "sessionError") {
           globalData.alert.error("Session expired!");
           globalData.setUserData({});
           globalData.setLoggedIn(false);
@@ -117,7 +116,7 @@ function Challenges(props) {
         { withCredentials: true }
       )
       .then((response) => {
-        if (response.data.state == "sessionError") {
+        if (response.data.state === "sessionError") {
           globalData.alert.error("Session expired!");
           globalData.setUserData({});
           globalData.setLoggedIn(false);
@@ -184,6 +183,9 @@ function Challenges(props) {
 
     const hint = document.getElementById("hint" + oldChallenge._id).textContent;
     formData.append("hint", hint);
+
+    const hintCost = document.getElementById("hintCost" + oldChallenge._id).textContent;
+    formData.append("hintCost", hintCost);
 
     const file = document.getElementById("file" + oldChallenge._id).value;
     formData.append("file", file);
@@ -377,6 +379,7 @@ function Challenges(props) {
           level: 0,
           info: "I am a challenge!",
           hint: "Easy Peasy Lemon Squeezy!",
+          hintCost: 0,
           file: "",
           flag: "FLAG{H3LL0_W0RLD}",
           category: category,
