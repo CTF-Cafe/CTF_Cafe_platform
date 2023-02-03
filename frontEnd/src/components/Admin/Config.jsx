@@ -144,7 +144,7 @@ function Config(props) {
         className="display-1 bold color_white"
         style={{ textAlign: "center", marginBottom: "50px" }}
       >
-        ASSETS
+        CONFIG
       </h1>
       <table className="table table-hover table-striped">
         <thead className="thead-dark hackerFont">
