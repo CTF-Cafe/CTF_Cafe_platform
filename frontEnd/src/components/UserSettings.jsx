@@ -12,7 +12,7 @@ function User(props) {
 
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/user/updateUsername",
+        process.env.REACT_APP_BACKEND_URI + "/api/user/updateUsername",
         {
           newUsername: newUsername,
         },

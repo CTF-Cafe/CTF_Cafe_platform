@@ -9,7 +9,7 @@ function Assets(props) {
 
   const getAssets = () => {
     axios
-      .get(process.env.REACT_APP_SERVER_URI + "/api/admin/getAssets", { withCredentials: true })
+      .get(process.env.REACT_APP_BACKEND_URI + "/api/admin/getAssets", { withCredentials: true })
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -32,7 +32,7 @@ function Assets(props) {
   const deleteAsset = (e, asset) => {
     e.preventDefault();
     axios
-      .post(process.env.REACT_APP_SERVER_URI + "/api/admin/deleteAsset", {
+      .post(process.env.REACT_APP_BACKEND_URI + "/api/admin/deleteAsset", {
         asset: asset.name,
       }, { withCredentials: true })
       .then((response) => {
@@ -61,7 +61,7 @@ function Assets(props) {
     var file = e.target;
     formData.append("file", file.files[0]);
 
-    axios.post(process.env.REACT_APP_SERVER_URI + "/api/admin/uploadAsset", formData, {
+    axios.post(process.env.REACT_APP_BACKEND_URI + "/api/admin/uploadAsset", formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

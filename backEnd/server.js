@@ -6,7 +6,6 @@ const db = mongoose.connection;
 const dotenv = require("dotenv");
 dotenv.config();
 const bodyparser = require("body-parser");
-const path = require("path");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const fileUpload = require("express-fileupload");

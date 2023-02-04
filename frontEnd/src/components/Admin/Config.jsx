@@ -70,7 +70,7 @@ function Config(props) {
 
   const getConfigs = () => {
     axios
-      .get(process.env.REACT_APP_SERVER_URI + "/api/getConfigs")
+      .get(process.env.REACT_APP_BACKEND_URI + "/api/getConfigs")
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -111,7 +111,7 @@ function Config(props) {
 
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/admin/saveConfigs",
+        process.env.REACT_APP_BACKEND_URI + "/api/admin/saveConfigs",
         {
           newConfigs: configsArray,
         },

@@ -104,27 +104,6 @@ exports.saveChallenge = async function(req, res) {
         return;
     }
 
-    let dockerComposeId = '';
-    if(req.files) {
-
-        if(req.files.dockerZip.mimetype != 'application/zip' && req.body.dockerCompose == 'true') {
-            res.send({ state: 'error', message: 'Docker compose file must be in a zip file' });
-            return;
-        } else if (req.body.dockerCompose == 'true'){
-            dockerComposeId = v4();
-            dockerComposePath = path.join(__dirname, '../dockers/' + dockerComposeId + '/docker.zip');
-
-            if (!fs.existsSync(path.join(__dirname, '../dockers/' + dockerComposeId))){
-                fs.mkdirSync(path.join(__dirname, '../dockers/' + dockerComposeId));
-            }
-
-            fs.writeFileSync(dockerComposePath, req.files.dockerZip.data);
-
-            fs.createReadStream(dockerComposePath).pipe(unzipper.Extract({ path: path.join(__dirname, '../dockers/' + dockerComposeId) }));
-
-        }
-    }
-
     if (challengeExists) {
         await challenges.findByIdAndUpdate((req.body.id), {
             name: req.body.name.trim(),
@@ -142,7 +121,6 @@ exports.saveChallenge = async function(req, res) {
             githubUrl: req.body.githubUrl.trim(),
             isInstance: req.body.isInstance == 'true',
             codeLanguage: req.body.codeLanguage,
-            dockerCompose: req.files ? dockerComposeId : req.body.dockerCompose == 'false' ? '' : req.body.dockerCompose,
             randomFlag: (req.body.randomFlag == 'true' ? true : false),
         });
 
@@ -194,27 +172,6 @@ exports.createChallenge = async function(req, res) {
         res.send({ state: 'error', message: 'Category cannot be empty' });
         return;
     }
-    
-
-    let dockerComposeId = '';
-    if(req.files) {
-        if(req.files.dockerZip.mimetype != 'application/zip' && req.body.dockerCompose == 'true') {
-            res.send({ state: 'error', message: 'Docker compose file must be in a zip file' });
-            return;
-        } else if (req.body.dockerCompose == 'true'){
-            dockerComposeId = v4();
-            dockerComposePath = path.join(__dirname, '../dockers/' + dockerComposeId + '/docker.zip');
-
-            if (!fs.existsSync(path.join(__dirname, '../dockers/' + dockerComposeId))){
-                fs.mkdirSync(path.join(__dirname, '../dockers/' + dockerComposeId));
-            }
-
-            fs.writeFileSync(dockerComposePath, req.files.dockerZip.data);
-
-            fs.createReadStream(dockerComposePath).pipe(unzipper.Extract({ path: path.join(__dirname, '../dockers/' + dockerComposeId) }));
-
-        }
-    }
 
     await challenges.create({
         name: req.body.name + Math.random().toString().substr(2, 4),
@@ -231,7 +188,6 @@ exports.createChallenge = async function(req, res) {
         category: req.body.category,
         codeSnippet: '',
         codeLanguage: 'none',
-        dockerCompose: dockerComposeId,
     });
     res.send({ state: 'success', message: 'Challenge created!' });
 

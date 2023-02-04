@@ -12,7 +12,7 @@ function Login(props) {
 
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/login",
+        process.env.REACT_APP_BACKEND_URI + "/api/login",
         {
           username: username,
           password: password,
@@ -23,7 +23,7 @@ function Login(props) {
         if (response.data.state == "success") {
           // Logged in, now get all needed data from session
           axios
-            .get(process.env.REACT_APP_SERVER_URI + "/api/checkSession", {
+            .get(process.env.REACT_APP_BACKEND_URI + "/api/checkSession", {
               withCredentials: true,
             })
             .then((res) => {

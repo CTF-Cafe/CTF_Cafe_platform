@@ -16,7 +16,7 @@ function Teams(props) {
   const getTeams = (index) => {
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/getTeams",
+        process.env.REACT_APP_BACKEND_URI + "/api/getTeams",
         {
           page: index,
           search: searchQuery
@@ -48,7 +48,7 @@ function Teams(props) {
   const deleteTeam = (e, team) => {
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/admin/deleteTeam",
+        process.env.REACT_APP_BACKEND_URI + "/api/admin/deleteTeam",
         {
           team: team,
         },

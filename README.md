@@ -32,30 +32,11 @@
 - MongoDB
 
 ## Setup
-- Make a `.env` file in /backEnd/ in this format:
-```
-SESSION_SECRET=<secure randomly generated session key for validating session cookies>
-MONGODB_CONNSTRING=<mongodb connect URI, e.g. "mongodb://localhost:27017" - you may need to surround it in quotes if you experience glitches or formatting issues>
-NODE_ENV=<development/production>
-FRONTEND_URI=<frontend url if local usually http://localhost:3000>
+- copy `.env.example` to `.env` file in /backEnd/ and fill the info needed
 
-MAIL_VERIFICATION=<true/false>
-BACKEND_URI=<backend url same as frontend unless testing locally, will then be port 3001>
-HOST=<mail server>
-MAIL_PORT=<mail server port>
-MAIL=<mail address to send emails>
-PASS=<mail password to send emails>
+- copy `.env.example` to `.env` file in /dockerAPI/ and fill the info needed
 
-DEPLOYER_API=<URL of the challenge deployer>
-DEPLOYER_SECRET=<deployer secret token>
-```
-
-- Make a `.env` file in /frontEnd/ in this format:
-```
-REACT_APP_SERVER_URI=<your backend url that has the /api pages and functions, e.g. http://localhost:3001>
-REACT_APP_CTF_NAME=<ctf_name_formatted_like_this>
-GENERATE_SOURCEMAP=<true for dev | false for production>
-```
+- copy `.env.example` to `.env` file in /frontEnd/ and fill the info needed
 
 ## Startup
 
@@ -67,6 +48,9 @@ GENERATE_SOURCEMAP=<true for dev | false for production>
 - Run `npm install` to install the requirements from `package.json`, then run `npm start` or `npm run start-react` for easier dev to start the frontend
 
 `/backEnd`
+- Run `npm install` to install the requirements from `package.json`, then run `npm start` to start & setup the backend
+
+`/dockerAPI`
 - Run `npm install` to install the requirements from `package.json`, then run `npm start` to start & setup the backend
 
 `/discordBot`

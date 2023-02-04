@@ -8,7 +8,7 @@ function Config(props) {
 
   const getTheme = () => {
     axios
-      .get(process.env.REACT_APP_SERVER_URI + "/api/getTheme", {
+      .get(process.env.REACT_APP_BACKEND_URI + "/api/getTheme", {
         withCredentials: true,
       })
       .then((response) => {
@@ -59,7 +59,7 @@ function Config(props) {
 
   const saveTheme = () => {
     axios
-      .post(process.env.REACT_APP_SERVER_URI + "/api/admin/saveTheme", {
+      .post(process.env.REACT_APP_BACKEND_URI + "/api/admin/saveTheme", {
         color_1: document.getElementById("theme_color_1").value,
         color_2: document.getElementById("theme_color_2").value,
         bg_img: document.getElementById("theme_img").innerHTML,
