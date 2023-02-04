@@ -4,6 +4,7 @@ const path = require("path");
 const cron = require("node-cron");
 const fs = require("fs");
 const simpleGit = require("simple-git");
+const crypto = require("crypto");
 const { fromUrl } = require("hosted-git-info");
 
 const progress = new Map();
@@ -101,11 +102,21 @@ exports.deployDocker = async function (req, res) {
             throw new Error("docker-compose.yml not found in project");
         }
 
-        // launch docker
-        await compose.upAll({
-            cwd: dockerPath,
-            composeOptions: [["--verbose"], ["-p", challengeId + "_" + ownerId]],
-        });
+        const randomFlag = crypto.randomBytes(20).toString('hex').toUpperCase();
+
+        if(req.body.randomFlag) {
+            // Create env
+            fs.writeFileSync(path.join(dockerPath, "/" + ownerId + ".env"), "RANDOM_FLAG=" + randomFlag);
+
+            // launch docker
+            await compose.upAll({ cwd: dockerPath, composeOptions: [["--verbose"], ["-p", challengeId + "_" + ownerId], ["--env-file", ownerId + ".env"]] });
+
+            // Delete env
+            // fs.rmSync(path.join(dockerPath, "/" + team.id + ".env"));
+        } else {
+            // launch docker
+            await compose.upAll({ cwd: dockerPath, composeOptions: [["--verbose"], ["-p", challengeId + "_" + ownerId]] });
+        }
 
         var containers = await compose.ps({
             cwd: dockerPath,
@@ -151,7 +162,9 @@ exports.deployDocker = async function (req, res) {
         }
 
         progress.delete(challengeId + "_" + ownerId);
-        res.send({ state: "success" });
+
+        if(req.body.randomFlag) res.send({ state: "success", flag: randomFlag });
+        else res.send({ state: "success" });
     } catch (err) {
         if (err) {
             res.send({ state: "error", message: err.message });

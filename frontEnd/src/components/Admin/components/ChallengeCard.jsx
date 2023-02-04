@@ -236,6 +236,18 @@ function ChallengeCard(props) {
                 <option value="false">False</option>
               </select>
               <br />
+              <label for={"#randomFlag" + props.challenge._id}>
+                Random Flag:{" "}
+              </label>
+              <select
+                id={"randomFlag" + props.challenge._id}
+                defaultValue={props.challenge.randomFlag}
+              >
+                <option value="true">True</option>
+                <option value="false">False</option>
+              </select>
+
+              <br />
               {props.dynamicScoring.toString() == "true" ? (
                 <>
                   <label>Minimum Points:</label>{" "}

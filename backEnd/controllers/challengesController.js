@@ -121,6 +121,7 @@ exports.deployDocker = async function (req, res) {
         githubUrl: challenge.githubUrl,
         ownerId: user.teamId,
         challengeId: challenge.id,
+        randomFlag: challenge.randomFlag,
       },
       {
         headers: {
@@ -130,6 +131,17 @@ exports.deployDocker = async function (req, res) {
     );
 
     if (resAxios.data.state == "error") throw new Error(resAxios.data.message);
+
+    if (challenge.randomFlag) {
+      await challenges.updateOne(
+        { id: challenge._id },
+        {
+          $push: {
+            randomFlags: { id: user.teamId, flag: resAxios.data.flag },
+          },
+        }
+      );
+    }
 
     res.send({ state: "success", message: resAxios.data });
   } catch (error) {
@@ -171,6 +183,17 @@ exports.shutdownDocker = async function (req, res) {
     );
 
     if (resAxios.data.state == "error") throw new Error(resAxios.data.message);
+
+    if (challenge.randomFlag) {
+      await challenges.updateOne(
+        { id: challenge._id },
+        {
+          $pull: {
+            randomFlags: { id: user.teamId },
+          },
+        }
+      );
+    }
 
     res.send({ state: "success", message: resAxios.data });
   } catch (error) {
@@ -259,13 +282,11 @@ exports.submitFlag = async function (req, res) {
     // Check random flag
     if (challenge.randomFlag) {
       if (
-        challenge.dockerLaunchers.find(
-          (launcher) => launcher.team == user.teamId
-        ).flag != flag
+        challenge.randomFlags.find((obj) => obj.id == user.teamId).flag != flag
       ) {
         logController.createLog(req, user, {
           state: "error",
-          message: "Wrong Flag :(",
+          message: "Wrong Flag :( " + flag,
         });
         throw new Error("Wrong Flag :(");
       }
@@ -274,7 +295,7 @@ exports.submitFlag = async function (req, res) {
       if (challenge.flag != flag) {
         logController.createLog(req, user, {
           state: "error",
-          message: "Wrong Flag :(",
+          message: "Wrong Flag :( " + flag,
         });
         throw new Error("Wrong Flag :(");
       }

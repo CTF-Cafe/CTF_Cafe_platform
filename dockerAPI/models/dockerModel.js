@@ -30,6 +30,10 @@ var dockerSchema = new Schema({
     path: {
         type: String,
         required: true
+    },
+    randomFlag: {
+        type: String,
+        required: false
     }
 });
 
