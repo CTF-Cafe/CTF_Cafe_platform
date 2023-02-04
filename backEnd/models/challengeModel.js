@@ -78,6 +78,10 @@ var challengeSchema = new Schema({
         type: Boolean,
         default: false
     },
+    randomFlags: {
+        type: Array,
+        default: []
+    },
 });
 
 module.exports = mongoose.model('Challenges', challengeSchema);

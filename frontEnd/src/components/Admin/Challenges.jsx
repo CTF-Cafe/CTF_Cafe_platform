@@ -214,6 +214,11 @@ function Challenges(props) {
     const isInstance = document.getElementById("isInstance" + oldChallenge._id).value;
     formData.append("isInstance", isInstance);
 
+    const randomFlag = document.getElementById(
+      "randomFlag" + oldChallenge._id
+    ).value;
+    formData.append("randomFlag", randomFlag);
+
     axios
       .post(
         process.env.REACT_APP_BACKEND_URI + "/api/admin/saveChallenge",
