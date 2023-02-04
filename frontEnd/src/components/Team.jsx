@@ -37,6 +37,9 @@ function Team(props) {
             user.solved.forEach((solved) => {
               user.score += solved.points;
             });
+            user.hintsBought.forEach((hint) => {
+              user.score -= hint.cost;
+            });
           });
           setTeam(response.data);
         }

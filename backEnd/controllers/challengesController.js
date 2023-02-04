@@ -23,6 +23,34 @@ exports.getChallenges = async function (req, res) {
             const deployed = await getDocker(user.teamId)
             let returnedChallenges = allChallenges.map(challenge => {
                 let copy = {...challenge._doc, id: challenge.id}
+                
+                let team = false;
+                let teamHasBought = false;
+
+                // Check teamId is valid
+                if (ObjectId.isValid(user.teamId)) {
+                    team = await teams.findById(user.teamId);
+                }
+
+                // Check Team Exists
+                if (team) {
+                    // Check if hint bought by team
+                    if (team.users.filter(user => {
+                        return (user.hintsBought.filter(obj => {
+                            return obj.challId.equals(challenge._id)
+                        }).length > 0)
+                    }).length > 0) {
+                        teamHasBought = true;
+                    }
+                }
+
+                // Show hint if bought
+                if(!user.hintsBought.find(x => x.challId.equals(challenge._id)) && challenge.hintCost > 0 && teamHasBought == false) {
+                    copy.hint = "";
+                } else {
+                    copy.hintCost = 0;
+                }
+                
                 let challengeDeployed = deployed.find(d => d.challengeId == copy.id)
                 if(challengeDeployed){
                     if(!challengeDeployed.progress){
@@ -239,7 +267,7 @@ exports.submitFlag = async function (req, res) {
         let timestamp = new Date().getTime();
 
         if (challenge.firstBlood == 'none') {
-            challenge.firstBlood = username;
+            challenge.firstBlood = user._id;
         }
 
         const dynamicScoring = await ctfConfig.findOne({ name: 'dynamicScoring' });
@@ -248,11 +276,6 @@ exports.submitFlag = async function (req, res) {
             const decay = (await teams.countDocuments()) * 0.18;
             let dynamicPoints = Math.ceil((((challenge.minimumPoints - challenge.initialPoints)/((decay**2)+1)) * ((challenge.solveCount+1)**2)) + challenge.initialPoints)
             if(dynamicPoints < challenge.minimumPoints) { dynamicPoints = challenge.minimumPoints }
-
-            // ALTERNATE WAY:
-            // const decay = (await users.countDocuments()) * 0.18;
-            // let dynamicPoints = ((challenge.minimumPoints - challenge.initialPoints) / ((decay**2)+1) * ((challenge.solveCount+1)**2))
-            // if(dynamicPoints < challenge.minimumPoints) { dynamicPoints = challenge.minimumPoints } else { dynamicPoints += challenge.minimumPoints }
 
             await challenges.updateOne({ _id: ObjectId(req.body.challengeId) }, { $set: { points: dynamicPoints } });
             challenge = await challenges.findOne({ _id: ObjectId(req.body.challengeId) });
@@ -267,13 +290,12 @@ exports.submitFlag = async function (req, res) {
             users: { $elemMatch: { username: updatedUser.username } }
         }, {
             $set: {
-                "users.$.score": updatedUser.score,
                 "users.$.solved": updatedUser.solved,
             }
         });
 
-        if (challenge.firstBlood == 'none' || challenge.firstBlood == username) {
-            await challenges.updateOne({ _id: req.body.challengeId }, { $inc: { solveCount: 1 }, firstBlood: updatedUser.username });
+        if (challenge.firstBlood == 'none' || challenge.firstBlood == user._id) {
+            await challenges.updateOne({ _id: req.body.challengeId }, { $inc: { solveCount: 1 }, firstBlood: updatedUser._id });
 
             const currentNotifications = await ctfConfig.findOne({ name: 'notifications' });
             if (currentNotifications) {
@@ -299,6 +321,104 @@ exports.submitFlag = async function (req, res) {
 
         if (teamId) {
             currentlySubmittingTeams = currentlySubmittingTeams.filter(item => item !== teamId)
+        }
+    }
+}
+
+exports.buyHint = async function (req, res) {
+    try {
+        const endTime = await ctfConfig.findOne({ name: 'endTime' });
+        const startTime = await ctfConfig.findOne({ name: 'startTime' });
+
+        if (parseInt(endTime.value) - (Math.floor((new Date()).getTime())) <= 0) {
+            throw new Error('CTF is Over!');
+        } else if (parseInt(startTime.value) - (Math.floor((new Date()).getTime())) >= 0) {
+            throw new Error('CTF has not started!');
+        }
+
+        const username = (req.session.username);
+        const user = await users.findOne({ username: username, verified: true });
+
+        // Check if user exists
+        if (!user) {
+            throw new Error('Not logged in!');
+        }
+
+        // Check challengeId is valid
+        if (!ObjectId.isValid(req.body.challengeId)) {
+            throw new Error('Invalid challengeId!')
+        }
+
+        let challenge = await challenges.findOne({ _id: ObjectId(req.body.challengeId) });
+
+        // Check challenge has hint to be bought
+        if (challenge.hintCost <= 0) {
+            throw new Error('Challenge hint is free!')
+        }
+
+        // Check user already bought hint
+        if (user.hintsBought.includes(challenge._id)) {
+            throw new Error('Challenge hint already bought!')
+        }
+
+        // Check teamId is valid
+        if (!ObjectId.isValid(user.teamId)) {
+            throw new Error('Not in a team!')
+        }
+
+        const team = await teams.findById(user.teamId);
+
+        // Check Team Exists
+        if (!team) {
+            throw new Error('Not in a team!')
+        }
+
+        teamId = user.teamId;
+
+        if (team.users.filter(user => {
+            return (user.hintsBought.filter(obj => {
+                return obj.challId.equals(challenge._id)
+            }).length > 0)
+        }).length > 0) {
+            throw new Error('Hint already bought!')
+        }
+
+        for (let i = 0; i < user.solved.length; i++) {
+            let challenge = await challenges.findById(user.solved[i]._id);
+            if (challenge) {
+              user.solved[i].challenge = challenge;
+              user.score += challenge.points;
+            }
+        }
+
+        // Check User has enough points
+        if (user.score < challenge.hintCost) {
+            throw new Error('Not enough points!')
+        }
+
+        let timestamp = new Date().getTime();
+        await users.updateOne({ username: username, verified: true }, { $push: { hintsBought: { challId: challenge._id, cost: challenge.hintCost, timestamp: timestamp } } });
+
+        const updatedUser = await users.findOne({ username: username, verified: true });
+
+        await teams.updateOne({
+            _id: team._id,
+            users: { $elemMatch: { username: updatedUser.username } }
+        }, {
+            $set: {
+                "users.$.hintsBought": updatedUser.hintsBought,
+            }
+        });
+
+        logController.createLog(req, updatedUser, {
+            state: "success", hint: challenge.hint
+        });
+
+        res.send({ state: 'success', hint: challenge.hint });
+
+    } catch (err) {
+        if (err) {
+            res.send({ state: 'error', message: err.message });
         }
     }
 }

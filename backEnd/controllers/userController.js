@@ -227,7 +227,7 @@ exports.updateUsername = async function (req, res) {
             let newUsers = userTeamExists.users;
             let captain = userTeamExists.teamCaptain;
             newUsers.forEach((userInTeam) => {
-              if (userInTeam.username == req.session.username) {
+              if (userInTeam._id == user._id) {
                 userInTeam.username = username;
               }
             });
@@ -319,11 +319,15 @@ exports.getUsers = async function (req, res) {
             {
               $lookup: {
                 from: "challenges",
-                let: { chalId: "$solved._id", timestamp: "$solved.timestamp" },
+                let: {
+                  challId: "$solved._id",
+                  timestamp: "$solved.timestamp",
+                  userId: { $toString: "$_id" },
+                },
                 pipeline: [
                   {
                     $match: {
-                      $expr: { $eq: ["$$chalId", "$_id"] },
+                      $expr: { $eq: ["$$challId", "$_id"] },
                     },
                   },
                   {
@@ -331,13 +335,14 @@ exports.getUsers = async function (req, res) {
                       _id: 0,
                       solve: {
                         _id: "$_id",
-                        challenge: {
-                          points: "$points",
-                          name: "$name",
-                          _id: "$_id",
-                        },
                         timestamp: "$$timestamp",
-                        points: "$points",
+                        points: {
+                          $cond: {
+                            if: { $eq: ["$firstBlood", "$$userId"] },
+                            then: { $add: ["$points", "$firstBloodPoints"] },
+                            else: "$points",
+                          },
+                        },
                       },
                     },
                   },
@@ -358,8 +363,29 @@ exports.getUsers = async function (req, res) {
               $group: {
                 _id: "$_id",
                 username: { $first: "$username" },
+                hintsBought: { $first: "$hintsBought" },
                 score: { $sum: "$solved.points" },
                 solved: { $push: "$solved" },
+              },
+            },
+            {
+              $unwind: {
+                path: "$hintsBought",
+                preserveNullAndEmptyArrays: true,
+              },
+            },
+            {
+              $group: {
+                _id: "$_id",
+                username: { $first: "$username" },
+                hintsCost: { $sum: "$hintsBought.cost" },
+                score: { $first: "$score" },
+                solved: { $first: "$solved" },
+              },
+            },
+            {
+              $addFields: {
+                score: { $subtract: ["$score", "$hintsCost"] },
               },
             },
           ])
@@ -398,6 +424,10 @@ exports.getUser = async function (req, res) {
       }
     }
 
+    for (let i = 0; i < user.hintsBought.length; i++) {
+      user.score -= user.hintsBought[i].cost;
+    }
+
     res.send(user);
   } else {
     res.send({ state: "error", message: "User not found" });
@@ -430,6 +460,11 @@ exports.getScoreboard = async function (req, res) {
   let allTeams = await teams
     .aggregate([
       {
+        $addFields: {
+          oldUsers: "$users",
+        },
+      },
+      {
         $unwind: {
           path: "$users",
           preserveNullAndEmptyArrays: true,
@@ -444,9 +479,52 @@ exports.getScoreboard = async function (req, res) {
       {
         $group: {
           _id: "$_id",
-          users: { $push: "$users" },
+          users: { $first: "$oldUsers" },
+          oldUsers: { $first: "$oldUsers" },
           solved: { $push: "$users.solved" },
           name: { $first: "$name" },
+          teamCaptain: { $first: "$teamCaptain" },
+        },
+      },
+      {
+        $unwind: {
+          path: "$users",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $unwind: {
+          path: "$users.hintsBought",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $group: {
+          _id: "$_id",
+          users: { $first: "$oldUsers" },
+          oldUsers: { $first: "$oldUsers" },
+          solved: { $first: "$solved" },
+          hintsCost: { $sum: "$users.hintsBought.cost" },
+          name: { $first: "$name" },
+          teamCaptain: { $first: "$teamCaptain" },
+        },
+      },
+      {
+        $unwind: {
+          path: "$users",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $group: {
+          _id: "$_id",
+          userIds: { $push: { $toString: "$users._id" } },
+          users: { $first: "$oldUsers" },
+          oldUsers: { $first: "$oldUsers" },
+          solved: { $first: "$solved" },
+          hintsCost: { $first: "$hintsCost" },
+          name: { $first: "$name" },
+          teamCaptain: { $first: "$teamCaptain" },
         },
       },
       {
@@ -458,7 +536,11 @@ exports.getScoreboard = async function (req, res) {
       {
         $lookup: {
           from: "challenges",
-          let: { chalId: "$solved._id", timestamp: "$solved.timestamp" },
+          let: {
+            chalId: "$solved._id",
+            timestamp: "$solved.timestamp",
+            userIds: "$userIds",
+          },
           pipeline: [
             {
               $match: {
@@ -470,7 +552,13 @@ exports.getScoreboard = async function (req, res) {
                 _id: 0,
                 solve: {
                   _id: "$_id",
-                  points: "$points",
+                  points: {
+                    $cond: {
+                      if: { $in: ["$firstBlood", "$$userIds"] },
+                      then: { $add: ["$points", "$firstBloodPoints"] },
+                      else: "$points",
+                    },
+                  },
                   timestamp: "$$timestamp",
                 },
               },
@@ -491,11 +579,23 @@ exports.getScoreboard = async function (req, res) {
       {
         $group: {
           _id: "$_id",
-          users: { $first: "$users" },
+          users: { $first: "$oldUsers" },
           totalScore: { $sum: "$newSolved.points" },
-          totalSolved: { $sum: 1 },
+          totalSolved: {
+            $sum: {
+              $cond: { if: "$newSolved.points", then: 1, else: 0 },
+            },
+          },
+          solved: { $push: "$newSolved" },
           maxTimestamp: { $max: "$newSolved.timestamp" },
           name: { $first: "$name" },
+          teamCaptain: { $first: "$teamCaptain" },
+          hintsCost: { $first: "$hintsCost" },
+        },
+      },
+      {
+        $addFields: {
+          totalScore: { $subtract: ["$totalScore", "$hintsCost"] },
         },
       },
     ])
