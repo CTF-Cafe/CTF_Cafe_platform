@@ -30,7 +30,7 @@ function Hackerboard(props) {
 
   const getData = (index) => {
     axios
-      .get(process.env.REACT_APP_SERVER_URI + "/api/getEndTime")
+      .get(process.env.REACT_APP_BACKEND_URI + "/api/getEndTime")
       .then((response) => {
         setEndTime(response.data);
       })
@@ -39,7 +39,7 @@ function Hackerboard(props) {
       });
 
     axios
-      .get(process.env.REACT_APP_SERVER_URI + "/api/user/getTeamCount")
+      .get(process.env.REACT_APP_BACKEND_URI + "/api/user/getTeamCount")
       .then((response) => {
         setTeamCount(response.data);
       })
@@ -53,7 +53,7 @@ function Hackerboard(props) {
 
   const getUsers = (index) => {
     axios
-      .post(process.env.REACT_APP_SERVER_URI + "/api/getUsers", {
+      .post(process.env.REACT_APP_BACKEND_URI + "/api/getUsers", {
         page: index,
         search: searchQuery,
       })
@@ -77,7 +77,7 @@ function Hackerboard(props) {
 
   const getTeams = (index) => {
     axios
-      .post(process.env.REACT_APP_SERVER_URI + "/api/getTeams", {
+      .post(process.env.REACT_APP_BACKEND_URI + "/api/getTeams", {
         page: index,
         search: searchQuery,
       })
@@ -225,7 +225,7 @@ function Hackerboard(props) {
       {/* Hidden Stuff */}
       <img
         style={{ display: "none" }}
-        src={process.env.REACT_APP_SERVER_URI + "/api/assets/template.jpg"}
+        src={process.env.REACT_APP_BACKEND_URI + "/api/assets/template.jpg"}
         crossorigin="anonymous"
         id="certImg"
       />

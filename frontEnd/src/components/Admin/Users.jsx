@@ -16,7 +16,7 @@ function Users(props) {
   const getUsers = (index) => {
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/admin/getUsers",
+        process.env.REACT_APP_BACKEND_URI + "/api/admin/getUsers",
         {
           page: index,
           search: searchQuery,
@@ -60,7 +60,7 @@ function Users(props) {
   const deleteUser = (e, user) => {
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/admin/deleteUser",
+        process.env.REACT_APP_BACKEND_URI + "/api/admin/deleteUser",
         {
           user: user,
         },
@@ -90,7 +90,7 @@ function Users(props) {
   const addAdmin = (e, user) => {
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/admin/addAdmin",
+        process.env.REACT_APP_BACKEND_URI + "/api/admin/addAdmin",
         {
           user: user,
         },
@@ -120,7 +120,7 @@ function Users(props) {
   const removeAdmin = (e, user) => {
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/admin/removeAdmin",
+        process.env.REACT_APP_BACKEND_URI + "/api/admin/removeAdmin",
         {
           user: user,
         },

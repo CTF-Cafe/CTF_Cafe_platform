@@ -63,10 +63,9 @@ function Challenges(props) {
   }, [counter]);
 
   const buyHint = (e, challengeId) => {
-
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/user/buyHint",
+        process.env.REACT_APP_BACKEND_URI + "/api/user/buyHint",
         {
           challengeId: challengeId,
         },
@@ -95,7 +94,7 @@ function Challenges(props) {
 
   const getChallenges = () => {
     axios
-      .get(process.env.REACT_APP_SERVER_URI + "/api/user/getChallenges", {
+      .get(process.env.REACT_APP_BACKEND_URI + "/api/user/getChallenges", {
         withCredentials: true,
       })
       .then((response) => {
@@ -138,15 +137,13 @@ function Challenges(props) {
             return 0;
           });
 
-          response.data.challenges.forEach(c => {
-            
-          })
-          for(let c of response.data.challenges){
-            if(c.progress && c.progress !== 'finish') {
+          response.data.challenges.forEach((c) => {});
+          for (let c of response.data.challenges) {
+            if (c.progress && c.progress !== "finished") {
               setTimeout(() => {
-                getChallenges()
+                getChallenges();
               }, 500);
-              break
+              break;
             }
           }
           setChallenges(response.data.challenges);
@@ -161,7 +158,7 @@ function Challenges(props) {
   };
 
   const downloadFile = (file, name) => {
-    saveAs(process.env.REACT_APP_SERVER_URI + "/api/assets/" + file, name); // Put your image url here.
+    saveAs(process.env.REACT_APP_BACKEND_URI + "/api/assets/" + file, name); // Put your image url here.
   };
 
   useEffect(() => {
@@ -173,11 +170,12 @@ function Challenges(props) {
   }, []);
 
   const shutdownDocker = (challenge) => {
-    challenge.dockerStopping = true;
+    challenge.progress = "stopping";
+    setChallenges([...challenges]);
 
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/user/shutdownDocker",
+        process.env.REACT_APP_BACKEND_URI + "/api/user/shutdownDocker",
         {
           challengeId: challenge._id,
         },
@@ -193,12 +191,11 @@ function Challenges(props) {
           globalData.navigate("/", { replace: true });
         } else if (response.data.state == "error") {
           globalData.alert.error(response.data.message);
-          challenge.dockerStopping = false;
+          delete challenge.progress;
+          setChallenges([...challenges]);
         } else {
-          globalData.alert.success("Challenge is stopping..");
-          setTimeout(() => {
-            getChallenges();
-          }, 250);
+          globalData.alert.success("Challenge docker stopped!");
+          getChallenges();
         }
       })
       .catch((err) => {
@@ -207,11 +204,12 @@ function Challenges(props) {
   };
 
   const createDocker = (challenge) => {
-    challenge.dockerLoading = true;
+    challenge.progress = "deploying";
+    setChallenges([...challenges]);
 
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/user/deployDocker",
+        process.env.REACT_APP_BACKEND_URI + "/api/user/deployDocker",
         {
           challengeId: challenge._id,
         },
@@ -227,12 +225,11 @@ function Challenges(props) {
           globalData.navigate("/", { replace: true });
         } else if (response.data.state == "error") {
           globalData.alert.error(response.data.message);
-          challenge.dockerLoading = false;
+          delete challenge.progress;
+          setChallenges([...challenges]);
         } else {
-          globalData.alert.success("Challenge is starting..");
-          setTimeout(() => {
-            getChallenges();
-          }, 250);
+          globalData.alert.success("Challenge docker started!");
+          getChallenges();
         }
       })
       .catch((err) => {
@@ -245,7 +242,7 @@ function Challenges(props) {
 
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/user/submitFlag",
+        process.env.REACT_APP_BACKEND_URI + "/api/user/submitFlag",
         {
           flag: flag,
           challengeId: challenge._id,
@@ -482,42 +479,42 @@ function Challenges(props) {
                                         <br />
                                       </span>
                                     );
-                                  })
-                                }
-                              </p>  
+                                  })}
+                              </p>
 
                               {challenge.isInstance ? (
-
                                 <a
                                   className="btn btn-outline-danger btn-shadow"
                                   onClick={(e) => {
                                     e.preventDefault();
 
-                                    !challenge.progress ? createDocker(challenge) : shutdownDocker(challenge);
+                                    if (!challenge.progress)
+                                      createDocker(challenge);
+                                    if (challenge.progress === "finished")
+                                      shutdownDocker(challenge);
                                   }}
                                 >
-                                  {!challenge.progress ?
-                                        (
-                                          <>
-                                            <span className="fa-solid fa-circle-play mr-2"></span>
-                                            Start
-                                          </>
-                                        ) :
-                                        (challenge.progress === 'finished' ? (
-                                          <>
-                                            <span className="fa-solid fa-power-off mr-2"></span>
-                                            Stop
-                                          </>
-                                        ) : 
-                                        (
-                                          <>
-                                            <span className="fa-solid fa-spinner fa-spin mr-2"></span>
-                                            Building..
-                                          </>
-                                        )
-                                        )
-                                        
-                                  }
+                                  {!challenge.progress ? (
+                                    <>
+                                      <span className="fa-solid fa-circle-play mr-2"></span>
+                                      Start
+                                    </>
+                                  ) : challenge.progress === "finished" ? (
+                                    <>
+                                      <span className="fa-solid fa-power-off mr-2"></span>
+                                      Stop
+                                    </>
+                                  ) : challenge.progress === "stopping" ? (
+                                    <>
+                                      <span className="fa-solid fa-spinner fa-spin mr-2"></span>
+                                      Stopping ...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <span className="fa-solid fa-spinner fa-spin mr-2"></span>
+                                      Building ...
+                                    </>
+                                  )}
                                 </a>
                               ) : null}
 
@@ -619,15 +616,16 @@ function Challenges(props) {
                                 </div>
                               </div>
 
-                                {challenge.url ? (
-                                    <a
-                                      href={`http://${challenge.url}`}
-                                      target="_blank"
-                                      className="btn btn-outline-danger btn-shadow mt-3" rel="noreferrer"
-                                    >
-                                      {challenge.url}
-                                    </a>
-                                ) : null}
+                              {challenge.url ? (
+                                <a
+                                  href={`${challenge.url}`}
+                                  target="_blank"
+                                  className="btn btn-outline-danger btn-shadow mt-3"
+                                  rel="noreferrer"
+                                >
+                                  {challenge.url}
+                                </a>
+                              ) : null}
                             </blockquote>
                           </div>
                         </div>

@@ -12,7 +12,7 @@ function Register(props) {
     const email = document.getElementById("email").value;
 
     axios
-      .post(process.env.REACT_APP_SERVER_URI + "/api/register", {
+      .post(process.env.REACT_APP_BACKEND_URI + "/api/register", {
         username: username,
         password: password,
         email: email

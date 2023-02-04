@@ -8,7 +8,7 @@ function Stats(props) {
 
   const getLogs = () => {
     axios
-      .post(process.env.REACT_APP_SERVER_URI + "/api/admin/getLogs", {
+      .post(process.env.REACT_APP_BACKEND_URI + "/api/admin/getLogs", {
         withCredentials: true,
       })
       .then((response) => {

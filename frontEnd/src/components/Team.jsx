@@ -13,7 +13,7 @@ function Team(props) {
 
   const getTeam = (teamName) => {
     axios
-      .post(process.env.REACT_APP_SERVER_URI + "/api/getTeam", {
+      .post(process.env.REACT_APP_BACKEND_URI + "/api/getTeam", {
         teamName: teamName,
       })
       .then((response) => {

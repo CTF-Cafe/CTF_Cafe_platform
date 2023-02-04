@@ -14,7 +14,7 @@ function UserTeam(props) {
   const getTeam = () => {
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/user/getUserTeam",
+        process.env.REACT_APP_BACKEND_URI + "/api/user/getUserTeam",
         {
           teamId: globalData.userData.teamId,
         },
@@ -71,7 +71,7 @@ function UserTeam(props) {
 
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/user/registerTeam",
+        process.env.REACT_APP_BACKEND_URI + "/api/user/registerTeam",
         {
           teamName: teamName,
         },
@@ -110,7 +110,7 @@ function UserTeam(props) {
 
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/user/joinTeam",
+        process.env.REACT_APP_BACKEND_URI + "/api/user/joinTeam",
         {
           teamCode: teamCode,
         },
@@ -140,7 +140,7 @@ function UserTeam(props) {
   const copyCode = (e) => {
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/user/getTeamCode",
+        process.env.REACT_APP_BACKEND_URI + "/api/user/getTeamCode",
         {
           teamName: globalData.userData.team.name,
         },
@@ -166,7 +166,7 @@ function UserTeam(props) {
 
   const leaveTeam = (e) => {
     axios
-      .get(process.env.REACT_APP_SERVER_URI + "/api/user/leaveTeam", {
+      .get(process.env.REACT_APP_BACKEND_URI + "/api/user/leaveTeam", {
         withCredentials: true,
       })
       .then((response) => {
@@ -193,7 +193,7 @@ function UserTeam(props) {
   const kickUser = (e, userToKick) => {
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/user/kickUser",
+        process.env.REACT_APP_BACKEND_URI + "/api/user/kickUser",
         {
           userToKick: userToKick,
         },

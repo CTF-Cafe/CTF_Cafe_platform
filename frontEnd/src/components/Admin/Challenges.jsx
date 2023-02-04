@@ -25,7 +25,7 @@ function Challenges(props) {
 
         await axios
           .post(
-            process.env.REACT_APP_SERVER_URI + "/api/admin/createChallenge",
+            process.env.REACT_APP_BACKEND_URI + "/api/admin/createChallenge",
             {
               name: challenge.name,
               points: challenge.value,
@@ -59,7 +59,7 @@ function Challenges(props) {
 
       await axios
         .post(
-          process.env.REACT_APP_SERVER_URI + "/api/admin/saveConfigs",
+          process.env.REACT_APP_BACKEND_URI + "/api/admin/saveConfigs",
           {
             newConfigs: [{ name: "categories", value: JSON.stringify(categoriesArray) }],
           },
@@ -90,7 +90,7 @@ function Challenges(props) {
 
   const getChallenges = () => {
     axios
-      .get(process.env.REACT_APP_SERVER_URI + "/api/admin/getAssets", {
+      .get(process.env.REACT_APP_BACKEND_URI + "/api/admin/getAssets", {
         withCredentials: true,
       })
       .then((response) => {
@@ -109,7 +109,7 @@ function Challenges(props) {
 
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/admin/getStats",
+        process.env.REACT_APP_BACKEND_URI + "/api/admin/getStats",
         {
           name: "challenges&categories",
         },
@@ -216,7 +216,7 @@ function Challenges(props) {
 
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/admin/saveChallenge",
+        process.env.REACT_APP_BACKEND_URI + "/api/admin/saveChallenge",
         formData,
         { headers: { "Content-Type": "multipart/form-data" } },
         { withCredentials: true }
@@ -242,7 +242,7 @@ function Challenges(props) {
   const deleteChallenge = (e, oldChallenge) => {
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/admin/deleteChallenge",
+        process.env.REACT_APP_BACKEND_URI + "/api/admin/deleteChallenge",
         {
           id: oldChallenge._id,
         },
@@ -307,7 +307,7 @@ function Challenges(props) {
     if (newCategory.children[0].id != oldCategory.children[0].id) {
       axios
         .post(
-          process.env.REACT_APP_SERVER_URI +
+          process.env.REACT_APP_BACKEND_URI +
             "/api/admin/updateChallengeCategory",
           {
             id: challenge.id.replace("challenge-top", ""),
@@ -340,7 +340,7 @@ function Challenges(props) {
     e.preventDefault();
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/admin/createChallenge",
+        process.env.REACT_APP_BACKEND_URI + "/api/admin/createChallenge",
         {
           name: "Challenge",
           points: 100,

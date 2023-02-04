@@ -13,7 +13,7 @@ function User(props) {
 
   const getUser = (username) => {
     axios
-      .post(process.env.REACT_APP_SERVER_URI + "/api/getUser", {
+      .post(process.env.REACT_APP_BACKEND_URI + "/api/getUser", {
         username: username,
       })
       .then((response) => {
