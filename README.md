@@ -46,7 +46,7 @@ MAIL_PORT=<mail server port>
 MAIL=<mail address to send emails>
 PASS=<mail password to send emails>
 
-DPELOYER_API=<URL of the challenge deployer>
+DEPLOYER_API=<URL of the challenge deployer>
 DEPLOYER_SECRET=<deployer secret token>
 ```
 
