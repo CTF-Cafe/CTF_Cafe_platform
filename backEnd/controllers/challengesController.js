@@ -4,25 +4,11 @@ const teams = require('../models/teamModel');
 const ctfConfig = require('../models/ctfConfigModel.js');
 const logController = require("./logController")
 const ObjectId = require('mongoose').Types.ObjectId;
-const compose = require('docker-compose');
 const path = require('path');
 const cron = require('node-cron');
 const crypto = require("crypto");
 const fs = require('fs');
-
-// Cron Job to check if docker containers should be stopped
-cron.schedule('*/5 * * * *', () => {
-    challenges.find({}).then((allChallenges) => {
-        allChallenges.forEach(challenge => {
-            challenge.dockerLaunchers.forEach(async launcher => {
-                if (Date.now() - launcher.startTime >= (1000 * 60 * 60) * 2) {
-                    compose.down({ cwd: path.join(__dirname, "../dockers/", challenge.dockerCompose, "/"), composeOptions: [["--verbose"], ["-p", challenge.dockerCompose + "_" + launcher.team]] });
-                    await challenges.updateOne({ _id: ObjectId(challenge._id) }, { $pull: { dockerLaunchers: { user: launcher.user, team: launcher.team } } });
-                }
-            });
-        });
-    });
-});
+const axios = require('axios');
 
 exports.getChallenges = async function (req, res) {
     let allChallenges = await challenges.find({}).sort({ points: 1 });
@@ -34,12 +20,10 @@ exports.getChallenges = async function (req, res) {
         res.send({ state: 'error', message: 'CTF has not started!', startTime: startTime.value });
     } else {
         users.findOne({ username: req.session.username }).then(async (user) => {
-            for (let i = 0; i < allChallenges.length; i++) {
-                let challenge = allChallenges[i];
-
-                // Hide flag
-                challenge.flag = 'Nice try XD';
-
+            const deployed = await getDocker(user.teamId)
+            let returnedChallenges = allChallenges.map(challenge => {
+                let copy = {...challenge._doc, id: challenge.id}
+                
                 let team = false;
                 let teamHasBought = false;
 
@@ -62,191 +46,114 @@ exports.getChallenges = async function (req, res) {
 
                 // Show hint if bought
                 if(!user.hintsBought.find(x => x.challId.equals(challenge._id)) && challenge.hintCost > 0 && teamHasBought == false) {
-                    challenge.hint = "";
+                    copy.hint = "";
                 } else {
-                    challenge.hintCost = 0;
+                    copy.hintCost = 0;
                 }
-
-                // Check if challenge is a docker instance and hide flag
-                challenge.dockerLaunchers = challenge.dockerLaunchers.filter(launcher => launcher.team == user.teamId);
-                if(challenge.dockerLaunchers.length > 0) {
-                    challenge.dockerLaunchers[0].flag = 'Nice try XD';
+                
+                let challengeDeployed = deployed.find(d => d.challengeId == copy.id)
+                if(challengeDeployed){
+                    if(!challengeDeployed.progress){
+                        copy.url = challengeDeployed.url
+                        copy.progress = 'finished'
+                    } else {
+                        copy.progress = challengeDeployed.progress
+                    }
                 }
-                challenge.dockerCompose = challenge.dockerCompose.length > 0 ? true : false;
-
-                // List all categories
-                if (categories.indexOf(challenge.category) == -1)
-                    categories.push(challenge.category);
-            }
-
-            res.send({ categories: categories, challenges: allChallenges, endTime: endTime.value });
+                
+                delete copy.flag
+                delete copy.githubUrl
+                if (categories.indexOf(copy.category) == -1)
+                    categories.push(copy.category);
+                return copy
+            });
+            res.send({ categories: categories, challenges: returnedChallenges, endTime: endTime.value });
         }).catch((err) => {
+            console.log(err);
             res.send({ state: 'error', message: err });
         });
     }
 
 }
 
-currentlyLaunching = [];
-
-exports.launchDocker = async function (req, res) {
-    let user;
+exports.deployDocker = async function (req, res) {
     try {
-        user = await users.findOne({ username: req.session.username });
-
-        // Check teamId is valid
-        if (!ObjectId.isValid(user.teamId)) {
-            throw new Error('Not in a team!')
-        }
+        const user = await users.findOne({ username: req.session.username });
+        if(!user) throw new Error("User not found");
+        if (!ObjectId.isValid(user.teamId)) throw new Error('Not in a team!')
 
         const team = await teams.findById(user.teamId);
-
-        // Check Team Exists
-        if (!team) {
-            throw new Error('Not in a team!')
-        }
-
-        // Check challengeId is valid
-        if (!ObjectId.isValid(req.body.challengeId)) {
-            throw new Error('Invalid challengeId!')
-        }
-
+        if (!team)  throw new Error('Not in a team!')
+            
         const challenge = await challenges.findOne({ _id: ObjectId(req.body.challengeId) });
 
-        if (!challenge) {
-            throw new Error('Challenge does not exist!');
-        }
+        if (!challenge) throw new Error('Challenge does not exist!');
+        if (!challenge.isInstance) throw new Error('Challenge is not an instance!');
+        if (!challenge.githubUrl) throw new Error('Challenge doesn\'t have a github url!');
 
-        // Check if challenge is dockerized
-        if (challenge.dockerCompose.length == 0) {
-            throw new Error('Challenge is not dockerized!');
-        }
-        
-        // check is challenge is already in the process of being launched
-        if (currentlyLaunching.find(item => item.user === user.id && item.challenge === challenge._id || item.team === team.id && item.challenge === challenge._id) != undefined) {
-            throw new Error('Please wait before launching another instance!');
-        }
-
-        currentlyLaunching.push({ user: user.id, team: team.id, challenge: challenge._id });
-
-        // check if user has already launched this challenge
-        if (challenge.dockerLaunchers.find(item => item.team === team.id) == undefined && challenge.dockerLaunchers.find(item => item.user === user.id) == undefined) {
-            try {
-
-                const random_flag = crypto.randomBytes(20).toString('hex').toUpperCase();
-
-                if(challenge.randomFlag) {
-                    // Create env
-                    fs.writeFileSync(path.join(__dirname, "../dockers/", challenge.dockerCompose, "/" + team.id + ".env"), "RANDOM_FLAG=" + random_flag);
-
-                    // launch docker
-                    await compose.upAll({ cwd: path.join(__dirname, "../dockers/", challenge.dockerCompose, "/"), composeOptions: [["--verbose"], ["-p", challenge.dockerCompose + "_" + team.id], ["--env-file", team.id + ".env"]] });
-
-                    // Delete env
-                    fs.rmSync(path.join(__dirname, "../dockers/", challenge.dockerCompose, "/" + team.id + ".env"));
-                } else {
-                    // launch docker
-                    await compose.upAll({ cwd: path.join(__dirname, "../dockers/", challenge.dockerCompose, "/"), composeOptions: [["--verbose"], ["-p", challenge.dockerCompose + "_" + team.id]] });
-                }
-
-                var containers = await compose.ps({ cwd: path.join(__dirname, "../dockers/", challenge.dockerCompose, "/"), composeOptions: [["--verbose"], ["-p", challenge.dockerCompose + "_" + team.id]] });
-
-                let i=0;
-                try {
-                    while(!containers.data.services[i].ports[0].hasOwnProperty('mapped')) {
-                        i+=1;
-                    }
-                    
-                    var port = containers.data.services[i].ports[0].mapped.port;
-                    await challenges.updateOne({ _id: ObjectId(req.body.challengeId) }, { $push: { dockerLaunchers: { user: user.id, team: team.id, port: port, startTime: Date.now(), flag: random_flag } } });
-
-                } catch (err) {
-                    await compose.stop({ cwd: path.join(__dirname, "../dockers/", challenge.dockerCompose, "/"), composeOptions: [["--verbose"], ["-p", challenge.dockerCompose + "_" + team.id]] });
-                    throw new Error('Error launching docker!');
-                }
-
-            } catch (err) {
-                console.log(err);
-                throw new Error('Error launching docker!');
+        const resAxios = await axios.post(`${process.env.DEPLOYER_API}/instances`, {
+            "githubUrl": challenge.githubUrl,
+            "owner": user.teamId,
+            "team": user.teamId,
+            "challengeId": challenge.id
+          }, {
+            headers: {
+                'X-API-KEY': process.env.DEPLOYER_SECRET
             }
+          })
+          res.send({state: 'success', message: resAxios.data})
+    } catch (error) {
+        if(error.response?.data?.message) return res.send({ state: 'error', message: error.response.data.message });
+        res.send({ state: 'error', message: error.message });
+    }
 
-            res.send({ state: 'success' });
-        } else {
-            throw new Error('You have already launched this challenge!');
-        }
+}
 
-    } catch (err) {
-        if (err) {
-            res.send({ state: 'error', message: err.message });
-        }
-    } finally {
-        if (user) {
-            currentlyLaunching = currentlyLaunching.filter(item => item.user !== user.id);
-        }
+exports.shutdownDocker = async function (req, res) {
+    try {
+        const user = await users.findOne({ username: req.session.username });
+        if(!user) throw new Error("User not found");
+        if (!ObjectId.isValid(user.teamId)) throw new Error('Not in a team!')
+
+        const team = await teams.findById(user.teamId);
+        if (!team)  throw new Error('Not in a team!')
+            
+        const challenge = await challenges.findOne({ _id: ObjectId(req.body.challengeId) });
+
+        if (!challenge) throw new Error('Challenge does not exist!');
+        if (!challenge.isInstance) throw new Error('Challenge is not an instance!');
+        if (!challenge.githubUrl) throw new Error('Challenge doesn\'t have a github url!');
+
+        const resAxios = await axios.delete(`${process.env.DEPLOYER_API}/instances/${user.teamId}`,
+            {
+                headers: {
+                    'X-API-KEY': process.env.DEPLOYER_SECRET
+                }
+            })
+          res.send({state: 'success', message: resAxios.data})
+    } catch (error) {
+        if(error.response?.data?.message) return res.send({ state: 'error', message: error.response.data.message });
+        res.send({ state: 'error', message: error.message });
     }
 }
 
-exports.stopDocker = async function (req, res) {
+async function getDocker(teamId) {
     try {
-        const user = await users.findOne({ username: req.session.username, verified: true });
-
-        // Check teamId is valid
-        if (!ObjectId.isValid(user.teamId)) {
-            throw new Error('Not in a team!')
-        }
-
-        const team = await teams.findById(user.teamId);
-        
-        // Check Team Exists
-        if (!team) {
-            throw new Error('Not in a team!')
-        }
-
-        // Check challengeId is valid
-        if (!ObjectId.isValid(req.body.challengeId)) {
-            throw new Error('Invalid challengeId!')
-        }
-
-        const challenge = await challenges.findOne({ _id: ObjectId(req.body.challengeId) });
-
-        if (!challenge) {
-            throw new Error('Challenge does not exist!');
-        }
-
-        // Check if challenge is dockerized
-        if (challenge.dockerCompose.length == 0) {
-            throw new Error('Challenge is not dockerized!');
-        }
-
-        // check if user has already launched this challenge
-        if (challenge.dockerLaunchers.find(item => item.team === team.id) != undefined || challenge.dockerLaunchers.find(item => item.user === user.id) != undefined) {
-           
-            try {
-                // stop docker
-                await compose.stop({ cwd: path.join(__dirname, "../dockers/", challenge.dockerCompose, "/"), composeOptions: [["--verbose"], ["-p", challenge.dockerCompose + "_" + team.id]] });
-                
-                if (challenge.dockerLaunchers.find(item => item.team === team.id) != undefined) {
-                    await challenges.updateOne({ _id: ObjectId(req.body.challengeId) }, { $pull: { dockerLaunchers: { team: team.id } } });
-                } else {
-                    await challenges.updateOne({ _id: ObjectId(req.body.challengeId) }, { $pull: { dockerLaunchers: { user: user.id } } });
-                }
-
-            } catch (err) {
-                console.log(err);
-                throw new Error('Error stopping docker!');
+        const deployed = await axios.get(`${process.env.DEPLOYER_API}/instances/team/${teamId}`, {
+            headers: {
+                'X-API-KEY': process.env.DEPLOYER_SECRET
             }
-
-            res.send({ state: 'success' });
-        } else {
-            throw new Error('You have not launched this challenge!');
-        }
-
-    } catch (err) {
-        if (err) {
-            res.send({ state: 'error', message: err.message });
-        }
+        })
+    
+        return deployed.data.map(c => {
+            delete c.composeProjectName
+            delete c.githubUrl
+            return c
+        })
+    } catch (error) {
+        return []
     }
-}            
+}       
 
 accentsTidy = function (s) {
     var r = s.toLowerCase();

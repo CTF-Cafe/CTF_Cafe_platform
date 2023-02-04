@@ -38,8 +38,16 @@ router.post("/getUserTeam", (req, res) => {
   teamController.getUserTeam(req, res);
 });
 
-router.post("/launchDocker", (req, res) => {
-  challengesController.launchDocker(req, res);
+router.post('/deployDocker', (req, res) => {
+    challengesController.deployDocker(req, res);
+});
+
+router.post('/shutdownDocker', (req, res) => {
+    challengesController.shutdownDocker(req, res);
+});
+
+router.post('/launchDocker', (req, res) => {
+    challengesController.launchDocker(req, res);
 });
 
 router.post("/stopDocker", (req, res) => {

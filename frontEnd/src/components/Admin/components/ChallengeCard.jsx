@@ -52,7 +52,7 @@ function ChallengeCard(props) {
             style={{ display: "flex", justifyContent: "space-between" }}
           >
             <div>
-              {props.challenge.dockerCompose.length > 0 ? (
+              {props.challenge.isInstance ? (
                 <span
                   className="fa-brands fa-docker"
                   style={{ fontSize: "18px" }}
@@ -215,52 +215,26 @@ function ChallengeCard(props) {
               </p>
 
               <br />
-              <label>Docker-Compose ZIP:</label>
-              {props.challenge.dockerCompose.length > 0 ? (
-                <>
-                  <button
-                    className="btn btn-outline-danger btn-shadow"
-                    data-toggle="modal"
-                    data-target="#confirmModal"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      props.setAction({
-                        function: props.removeDockerCompose,
-                        e: e,
-                        data: props.challenge,
-                      });
-                    }}
-                    style={{ marginRight: "10px" }}
-                  >
-                    <span className="fa-solid fa-minus"></span>
-                  </button>
-                  {props.challenge.dockerCompose.slice(0, 8)}...
-                  <br />
-                  <label for={"#randomFlag" + props.challenge._id}>
-                    Random Flag:{" "}
-                  </label>
-                  <select
-                    id={"randomFlag" + props.challenge._id}
-                    defaultValue={props.challenge.randomFlag}
-                  >
-                    <option value="true">True</option>
-                    <option value="false">False</option>
-                  </select>
-                </>
-              ) : (
-                <>
-                  <select
-                    id={"randomFlag" + props.challenge._id}
-                    value="false"
-                    style={{ display: "none" }}
-                  />
-                  <input
-                    id={"dockerCompose" + props.challenge._id}
-                    type="file"
-                  />
-                </>
-              )}
+              <label>Github URL:</label>
+              <p
+                contentEditable="true"
+                style={{
+                  backgroundColor: "rgb(30, 32, 55)",
+                  outline: "none",
+                }}
+                id={"githubUrl" + props.challenge._id}
+              >
+                {props.challenge.githubUrl}
+              </p>
               <br />
+              <label>isInstance:</label>
+              <select
+                id={"isInstance" + props.challenge._id}
+                defaultValue={props.challenge.isInstance}
+              >
+                <option value="true">True</option>
+                <option value="false">False</option>
+              </select>
               <br />
               {props.dynamicScoring.toString() == "true" ? (
                 <>

@@ -66,13 +66,13 @@ var challengeSchema = new Schema({
         type: String,
         default: 'none'
     },
-    dockerCompose: {
+    githubUrl: {
         type: String,
-        default: ''
+        default: null
     },
-    dockerLaunchers: {
-        type: Array,
-        default: []
+    isInstance: {
+        type: Boolean,
+        default: false
     },
     randomFlag: {
         type: Boolean,
