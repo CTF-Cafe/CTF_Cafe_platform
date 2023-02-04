@@ -24,19 +24,19 @@ function ChallengeCard(props) {
       >
         <div
           className={
-            props.challenge.category == "crypto"
+            props.challenge.category.toLowerCase() === "crypto"
               ? "card category_crypt"
-              : props.challenge.category == "web"
-                ? "card category_web"
-                : props.challenge.category == "osint"
-                  ? "card category_osint"
-                  : props.challenge.category == "reverse"
-                    ? "card category_reverse"
-                    : props.challenge.category == "pwn"
-                      ? "card category_pwning"
-                      : props.challenge.category == "forensics"
-                        ? "card category_forensics"
-                        : "card category_misc"
+              : props.challenge.category.toLowerCase() === "web"
+              ? "card category_web"
+              : props.challenge.category.toLowerCase() === "osint"
+              ? "card category_osint"
+              : props.challenge.category.toLowerCase() === "reverse"
+              ? "card category_reverse"
+              : props.challenge.category.toLowerCase() === "pwn"
+              ? "card category_pwning"
+              : props.challenge.category.toLowerCase() === "forensics"
+              ? "card category_forensics"
+              : "card category_misc"
           }
           id={"challenge" + props.challenge._id}
         >
@@ -127,6 +127,36 @@ function ChallengeCard(props) {
                 {props.challenge.hint}
               </p>
 
+              <div style={{ display: "flex" }}>
+                <label>Hint Cost:</label>
+                <p
+                  style={{
+                    backgroundColor: "rgb(30, 32, 55)",
+                    outline: "none",
+                    minWidth: "5%",
+                  }}
+                  contentEditable="true"
+                  id={"hintCost" + props.challenge._id}
+                >
+                  {props.challenge.hintCost}
+                </p>
+              </div>
+
+              <div style={{ display: "flex" }}>
+                <label>First Blood Bonus:</label>
+                <p
+                  style={{
+                    backgroundColor: "rgb(30, 32, 55)",
+                    outline: "none",
+                    minWidth: "5%",
+                  }}
+                  contentEditable="true"
+                  id={"firstBloodPoints" + props.challenge._id}
+                >
+                  {props.challenge.firstBloodPoints}
+                </p>
+              </div>
+
               <label>File:</label>
               <div style={{ marginBottom: "16px" }}>
                 <select
@@ -206,23 +236,30 @@ function ChallengeCard(props) {
                 <option value="false">False</option>
               </select>
               <br />
-              {props.dynamicScoring.toString() == "true" ? <><label>Minimum Points:</label> <p
-                contentEditable="true"
-                style={{
-                  backgroundColor: "rgb(30, 32, 55)",
-                  outline: "none",
-                }}
-                id={"minimumPoints" + props.challenge._id}
-              >
-                {props.challenge.minimumPoints}
-              </p></> : <p
-                style={{
-                  display: "none",
-                }}
-                id={"minimumPoints" + props.challenge._id}
-              >
-                {props.challenge.minimumPoints}
-              </p>}
+              {props.dynamicScoring.toString() == "true" ? (
+                <>
+                  <label>Minimum Points:</label>{" "}
+                  <p
+                    contentEditable="true"
+                    style={{
+                      backgroundColor: "rgb(30, 32, 55)",
+                      outline: "none",
+                    }}
+                    id={"minimumPoints" + props.challenge._id}
+                  >
+                    {props.challenge.minimumPoints}
+                  </p>
+                </>
+              ) : (
+                <p
+                  style={{
+                    display: "none",
+                  }}
+                  id={"minimumPoints" + props.challenge._id}
+                >
+                  {props.challenge.minimumPoints}
+                </p>
+              )}
 
               <label>Flag:</label>
               <p

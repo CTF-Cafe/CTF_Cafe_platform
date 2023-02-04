@@ -45,6 +45,10 @@ var userSchema = new Schema({
     },
     token: {
         type: String,
+    },
+    hintsBought: {
+        type: Array,
+        default: [],
     }
 });
 

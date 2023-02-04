@@ -24,7 +24,6 @@ var teamSchema = new Schema({
         type: String,
         required: false,
     }
-
 });
 
 module.exports = mongoose.model('Teams', teamSchema);
