@@ -1,7 +1,7 @@
 # Contributors
 
-@Zerotistic
-@Eteckq
+[@Zerotistic]( https://github.com/Zerotistic )
+[@Eteckq]( https://github.com/Eteckq )
 
 
 # Features
