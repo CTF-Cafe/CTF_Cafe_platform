@@ -62,12 +62,13 @@ function Challenges(props) {
     };
   }, [counter]);
 
-  const buyHint = (e, challengeId) => {
+  const buyHint = (e, data) => {
     axios
       .post(
         process.env.REACT_APP_BACKEND_URI + "/api/user/buyHint",
         {
-          challengeId: challengeId,
+          challengeId: data.challId,
+          hintId: data.hintId,
         },
         {
           withCredentials: true,
@@ -294,7 +295,10 @@ function Challenges(props) {
 
       <Navbar />
 
-      <div className="jumbotron bg-transparent mb-0 pt-0 radius-0" style={{ position: "relative" }}>
+      <div
+        className="jumbotron bg-transparent mb-0 pt-0 radius-0"
+        style={{ position: "relative" }}
+      >
         <div className="container">
           <div className="row">
             <div className="col-xl-12  text-center">
@@ -559,39 +563,45 @@ function Challenges(props) {
                                 ) : null
                               ) : null}
 
-                              {challenge.hint && challenge.hintCost === 0 ? (
-                                challenge.hint.trim().length > 0 ? (
+                              {challenge.hints.map((hint, i) =>
+                                hint.cost == 0 ? (
+                                  hint.content.trim().length > 0 && (
+                                    <a
+                                      onClick={() => {
+                                        setCurrentHint(hint.content);
+                                      }}
+                                      href="#modal"
+                                      data-toggle="modal"
+                                      data-target="#modal"
+                                      className="btn btn-outline-danger btn-shadow"
+                                    >
+                                      <span className="fa-solid fa-lightbulb mr-2"></span>
+                                      Hint#{i + 1}
+                                    </a>
+                                  )
+                                ) : (
                                   <a
-                                    onClick={() => {
-                                      setCurrentHint(challenge.hint);
+                                    onClick={(e) => {
+                                      setAction({
+                                        function: buyHint,
+                                        e: e,
+                                        data: {
+                                          challId: challenge._id,
+                                          hintId: hint.id,
+                                        },
+                                      });
                                     }}
-                                    href="#modal"
+                                    href="#confirmModal"
                                     data-toggle="modal"
-                                    data-target="#modal"
+                                    data-target="#confirmModal"
                                     className="btn btn-outline-danger btn-shadow"
                                   >
                                     <span className="fa-solid fa-lightbulb mr-2"></span>
-                                    Hint
+                                    Buy Hint#{i + 1} ({hint.cost.toString()})
                                   </a>
-                                ) : null
-                              ) : (
-                                <a
-                                  onClick={(e) => {
-                                    setAction({
-                                      function: buyHint,
-                                      e: e,
-                                      data: challenge._id,
-                                    });
-                                  }}
-                                  href="#confirmModal"
-                                  data-toggle="modal"
-                                  data-target="#confirmModal"
-                                  className="btn btn-outline-danger btn-shadow"
-                                >
-                                  <span className="fa-solid fa-lightbulb mr-2"></span>
-                                  Buy Hint
-                                </a>
+                                )
                               )}
+
                               <div className="input-group mt-3">
                                 <input
                                   type="text"

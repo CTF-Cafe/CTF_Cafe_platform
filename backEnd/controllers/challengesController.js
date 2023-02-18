@@ -7,7 +7,9 @@ const ObjectId = require("mongoose").Types.ObjectId;
 const axios = require("axios");
 
 exports.getChallenges = async function (req, res) {
-  let allChallenges = await challenges.find({ hidden: false }).sort({ points: 1 });
+  let allChallenges = await challenges
+    .find({ hidden: false })
+    .sort({ points: 1 });
   const startTime = await ctfConfig.findOne({ name: "startTime" });
   const endTime = await ctfConfig.findOne({ name: "endTime" });
   let categories = [];
@@ -37,32 +39,37 @@ exports.getChallenges = async function (req, res) {
             team = await teams.findById(user.teamId);
           }
 
-          // Check Team Exists
-          if (team) {
-            // Check if hint bought by team
-            if (
-              team.users.filter((user) => {
-                return (
-                  user.hintsBought.filter((obj) => {
-                    return obj.challId.equals(challenge._id);
-                  }).length > 0
-                );
-              }).length > 0
-            ) {
-              teamHasBought = true;
+          copy.hints = challenge.hints.map((hint) => {
+            hintCopy = { ...hint };
+            // Check Team Exists
+            if (team) {
+              // Check if hint bought by team
+              if (
+                team.users.filter((user) =>
+                  user.hintsBought.find(
+                    (x) => challenge._id.equals(x.challId) && parseInt(x.hintId) == parseInt(hint.id)
+                  )
+                ).length > 0
+              ) {
+                teamHasBought = true;
+              }
             }
-          }
 
-          // Show hint if bought
-          if (
-            !user.hintsBought.find((x) => x.challId.equals(challenge._id)) &&
-            challenge.hintCost > 0 &&
-            teamHasBought == false
-          ) {
-            copy.hint = "";
-          } else {
-            copy.hintCost = 0;
-          }
+            // Show hint if bought
+            if (
+              !user.hintsBought.find(
+                (x) => challenge._id.equals(x.challId) && parseInt(x.hintId) == parseInt(hint.id)
+              ) &&
+              hint.cost > 0 &&
+              teamHasBought == false
+            ) {
+              hintCopy.content = "";
+            } else {
+              hintCopy.cost = 0;
+            }
+
+            return hintCopy;
+          });
 
           let challengeDeployed = deployed.find(
             (d) => d.challengeId == copy.id
@@ -276,10 +283,11 @@ exports.submitFlag = async function (req, res) {
         throw new Error("Wrong Flag :(");
       }
     } else {
-      
       // Make sure Regex tests the whole string
-      challenge.flag = (challenge.flag[0] != "^" ? "^" + challenge.flag : challenge.flag)
-      challenge.flag = (challenge.flag[-1] != "$" ? challenge.flag + "$" : challenge.flag)
+      challenge.flag =
+        challenge.flag[0] != "^" ? "^" + challenge.flag : challenge.flag;
+      challenge.flag =
+        challenge.flag[-1] != "$" ? challenge.flag + "$" : challenge.flag;
 
       // check flag
       if (!new RegExp(challenge.flag).test(flag)) {
@@ -463,10 +471,15 @@ exports.buyHint = async function (req, res) {
     });
 
     // Check challenge has hint to be bought
-    if (challenge.hintCost <= 0) throw new Error("Challenge hint is free!");
+    const hint = challenge.hints.find((x) => x.id == req.body.hintId);
+    if (hint.cost <= 0) throw new Error("Challenge hint is free!");
 
     // Check user already bought hint
-    if (user.hintsBought.includes(challenge._id))
+    if (
+      user.hintsBought.find(
+        (x) => challenge._id.equals(x.challId) && parseInt(x.hintId) == parseInt(hint.id)
+      )
+    )
       throw new Error("Challenge hint already bought!");
 
     // Check teamId is valid
@@ -479,17 +492,15 @@ exports.buyHint = async function (req, res) {
 
     teamId = user.teamId;
 
+    // Check Team bought Hint
     if (
-      team.users.filter((user) => {
-        return (
-          user.hintsBought.filter((obj) => {
-            return obj.challId.equals(challenge._id);
-          }).length > 0
-        );
-      }).length > 0
-    ) {
+      team.users.filter((user) =>
+        user.hintsBought.find(
+          (x) => challenge._id.equals(x.challId) && parseInt(x.hintId) == parseInt(hint.id)
+        )
+      ).length > 0
+    )
       throw new Error("Hint already bought!");
-    }
 
     for (let i = 0; i < user.solved.length; i++) {
       let challenge = await challenges.findById(user.solved[i]._id);
@@ -500,7 +511,7 @@ exports.buyHint = async function (req, res) {
     }
 
     // Check User has enough points
-    if (user.score < challenge.hintCost) throw new Error("Not enough points!");
+    if (user.score < hint.cost) throw new Error("Not enough points!");
 
     let timestamp = new Date().getTime();
     await users.updateOne(
@@ -509,7 +520,8 @@ exports.buyHint = async function (req, res) {
         $push: {
           hintsBought: {
             challId: challenge._id,
-            cost: challenge.hintCost,
+            hintId: hint.id,
+            cost: hint.cost,
             timestamp: timestamp,
           },
         },
@@ -535,10 +547,10 @@ exports.buyHint = async function (req, res) {
 
     logController.createLog(req, updatedUser, {
       state: "success",
-      hint: challenge.hint,
+      hint: hint,
     });
 
-    res.send({ state: "success", hint: challenge.hint });
+    res.send({ state: "success", hint: hint });
   } catch (err) {
     if (err) {
       res.send({ state: "error", message: err.message });
