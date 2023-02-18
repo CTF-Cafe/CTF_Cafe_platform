@@ -9,16 +9,16 @@ function FourOFour(props) {
     <div>
       <style>{"body { background-color: #0b130d }"}</style>
       <div className="glitch">
-        <div className="glitch__img glitch__img_404"></div>
-        <div className="glitch__img glitch__img_404"></div>
-        <div className="glitch__img glitch__img_404"></div>
-        <div className="glitch__img glitch__img_404"></div>
-        <div className="glitch__img glitch__img_404"></div>
+        <div className="glitch_bg bg"></div>
+        <div className="glitch_bg bg"></div>
+        <div className="glitch_bg bg"></div>
+        <div className="glitch_bg bg"></div>
+        <div className="glitch_bg bg"></div>
       </div>
 
       <Navbar />
 
-      <div className="jumbotron bg-transparent mb-0 pt-5 radius-0">
+      <div className="jumbotron bg-transparent mb-0 pt-5 radius-0" style={{ position: "relative" }}>
         <div className="container">
           <div className="row">
             <div className="col-xl-12 text-center">

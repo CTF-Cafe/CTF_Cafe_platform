@@ -62,7 +62,7 @@ exports.setupDB = async function() {
         await theme.create({
             color_1: "#ff3d3d",
             color_2: "#ff7070",
-            bg_img: "none"
+            bg_img: ""
         });
     }
 

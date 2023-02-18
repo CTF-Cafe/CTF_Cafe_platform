@@ -222,9 +222,10 @@ function UserTeam(props) {
 
   return (
     <div>
+      <div className="bg" />
       <Navbar />
       <ConfirmModal action={action} />
-      <div className="jumbotron bg-transparent mb-0 pt-3 radius-0">
+      <div className="jumbotron bg-transparent mb-0 pt-3 radius-0" style={{ position: "relative" }}>
         <div className="container">
           {!userTeam.name ? (
             <div className="jumbotron bg-transparent mb-0 pt-3 radius-0">
