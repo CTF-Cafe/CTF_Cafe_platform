@@ -41,21 +41,6 @@ exports.getStats = async function(req, res) {
 
 }
 
-accentsTidy = function(s) {
-    var r = s.toLowerCase();
-    r = r.replace(new RegExp("[àáâãäå]", 'g'), "a");
-    r = r.replace(new RegExp("æ", 'g'), "ae");
-    r = r.replace(new RegExp("ç", 'g'), "c");
-    r = r.replace(new RegExp("[èéêë]", 'g'), "e");
-    r = r.replace(new RegExp("[ìíîï]", 'g'), "i");
-    r = r.replace(new RegExp("ñ", 'g'), "n");
-    r = r.replace(new RegExp("[òóôõö]", 'g'), "o");
-    r = r.replace(new RegExp("œ", 'g'), "oe");
-    r = r.replace(new RegExp("[ùúûü]", 'g'), "u");
-    r = r.replace(new RegExp("[ýÿ]", 'g'), "y");
-    return r;
-};
-
 exports.saveChallenge = async function(req, res) {
     const challengeExists = await challenges.findById((req.body.id));
 
@@ -115,7 +100,7 @@ exports.saveChallenge = async function(req, res) {
             info: req.body.info,
             hint: req.body.hint,
             hintCost: parseInt(req.body.hintCost),
-            flag: accentsTidy(req.body.flag.trim()).toUpperCase(),
+            flag: req.body.flag.trim(),
             file: (req.body.file.length > 0 ? req.body.file : ''),
             codeSnippet: (req.body.codeSnippet.length > 0 ? req.body.codeSnippet : ''),
             githubUrl: req.body.githubUrl.trim(),
@@ -183,7 +168,7 @@ exports.createChallenge = async function(req, res) {
         info: req.body.info || "",
         hint: req.body.hint || "",
         hintCost: parseInt(req.body.hintCost) || 0,
-        flag: req.body.flag.toUpperCase() || "EMPTY",
+        flag: req.body.flag.trim() || "EMPTY",
         file: (req.body.file.length > 0 ? req.body.file : ''),
         category: req.body.category,
         codeSnippet: '',
