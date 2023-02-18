@@ -170,7 +170,7 @@ function Tools(props) {
         <canvas id="canvas" hidden />
 
         <tbody>
-          <tr>
+          {/* <tr>
             <td>Generate Certificate</td>
             <td>
               <select id={"cert_team"}>
@@ -196,7 +196,7 @@ function Tools(props) {
                 Run
               </button>
             </td>
-          </tr>
+          </tr> */}
           <tr>
             <td>Send Global Message</td>
             <td>
