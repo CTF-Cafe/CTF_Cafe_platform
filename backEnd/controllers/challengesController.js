@@ -7,7 +7,7 @@ const ObjectId = require("mongoose").Types.ObjectId;
 const axios = require("axios");
 
 exports.getChallenges = async function (req, res) {
-  let allChallenges = await challenges.find({}).sort({ points: 1 });
+  let allChallenges = await challenges.find({ hidden: false }).sort({ points: 1 });
   const startTime = await ctfConfig.findOne({ name: "startTime" });
   const endTime = await ctfConfig.findOne({ name: "endTime" });
   let categories = [];

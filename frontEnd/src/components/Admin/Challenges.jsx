@@ -162,6 +162,9 @@ function Challenges(props) {
 
     formData.append("id", oldChallenge._id);
 
+    const hidden = document.getElementById("hidden" + oldChallenge._id).value;
+    formData.append("hidden", hidden);
+
     const name = document.getElementById("name" + oldChallenge._id).textContent;
     formData.append("name", name);
 
@@ -347,17 +350,7 @@ function Challenges(props) {
       .post(
         process.env.REACT_APP_BACKEND_URI + "/api/admin/createChallenge",
         {
-          name: "Challenge",
-          points: 100,
-          minimumPoints: 50,
-          level: 0,
-          info: "I am a challenge!",
-          hint: "Easy Peasy Lemon Squeezy!",
-          hintCost: 0,
-          file: "",
-          flag: "FLAG{H3LL0_W0RLD}",
           category: category,
-          dockerCompose: false,
         },
         { withCredentials: true }
       )
