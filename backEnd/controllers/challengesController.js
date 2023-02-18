@@ -226,21 +226,6 @@ async function getDocker(teamId) {
   }
 }
 
-accentsTidy = function (s) {
-  var r = s.toLowerCase();
-  r = r.replace(new RegExp("[àáâãäå]", "g"), "a");
-  r = r.replace(new RegExp("æ", "g"), "ae");
-  r = r.replace(new RegExp("ç", "g"), "c");
-  r = r.replace(new RegExp("[èéêë]", "g"), "e");
-  r = r.replace(new RegExp("[ìíîï]", "g"), "i");
-  r = r.replace(new RegExp("ñ", "g"), "n");
-  r = r.replace(new RegExp("[òóôõö]", "g"), "o");
-  r = r.replace(new RegExp("œ", "g"), "oe");
-  r = r.replace(new RegExp("[ùúûü]", "g"), "u");
-  r = r.replace(new RegExp("[ýÿ]", "g"), "y");
-  return r;
-};
-
 let currentlySubmittingUsers = [];
 let currentlySubmittingTeams = [];
 
@@ -265,7 +250,7 @@ exports.submitFlag = async function (req, res) {
       throw new Error("CTF has not started!");
 
     const username = req.session.username;
-    const flag = accentsTidy(req.body.flag.trim()).toUpperCase();
+    const flag = req.body.flag.trim();
     const user = await users.findOne({ username: username, verified: true });
 
     // Check if user exists
@@ -291,8 +276,13 @@ exports.submitFlag = async function (req, res) {
         throw new Error("Wrong Flag :(");
       }
     } else {
+      
+      // Make sure Regex tests the whole string
+      challenge.flag = (challenge.flag[0] != "^" ? "^" + challenge.flag : challenge.flag)
+      challenge.flag = (challenge.flag[-1] != "$" ? challenge.flag + "$" : challenge.flag)
+
       // check flag
-      if (challenge.flag != flag) {
+      if (!new RegExp(challenge.flag).test(flag)) {
         logController.createLog(req, user, {
           state: "error",
           message: "Wrong Flag :( " + flag,
