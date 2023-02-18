@@ -31,17 +31,11 @@ function Register(props) {
 
   return (
     <div>
-      <div className="glitch">
-        <div className="glitch__img"></div>
-        <div className="glitch__img"></div>
-        <div className="glitch__img"></div>
-        <div className="glitch__img"></div>
-        <div className="glitch__img"></div>
-      </div>
+      <div className="bg" />
       
       <Navbar />
 
-      <div className="jumbotron bg-transparent mb-0 pt-3 radius-0">
+      <div className="jumbotron bg-transparent mb-0 pt-3 radius-0" style={{ position: "relative" }}>
         <div className="container">
           <div className="row">
             <div className="col-xl-8">

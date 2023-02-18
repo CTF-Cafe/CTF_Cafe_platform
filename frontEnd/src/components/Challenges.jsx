@@ -290,9 +290,11 @@ function Challenges(props) {
         spinnerColor="#ef121b"
       />
 
+      <div className="bg" />
+
       <Navbar />
 
-      <div className="jumbotron bg-transparent mb-0 pt-0 radius-0">
+      <div className="jumbotron bg-transparent mb-0 pt-0 radius-0" style={{ position: "relative" }}>
         <div className="container">
           <div className="row">
             <div className="col-xl-12  text-center">

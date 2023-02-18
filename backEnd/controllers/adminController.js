@@ -471,7 +471,7 @@ exports.saveTheme = async function(req, res) {
     const currentTheme = await theme.findOne({});
 
     if (currentTheme) {
-        await theme.findOneAndUpdate({}, { color_1: req.body.color_1, color_2: req.body.color_2, bg_img: req.body.bg_img });
+        await theme.findOneAndUpdate({}, { color_1: req.body.color_1, color_2: req.body.color_2, bg_img: req.body.bg_img.trim() });
         res.send({ state: 'success' });
     } else {
         res.send({ state: 'error', message: 'No theme found!' })

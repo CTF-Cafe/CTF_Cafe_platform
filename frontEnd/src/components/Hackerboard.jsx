@@ -213,25 +213,21 @@ function Hackerboard(props) {
         bgColor="#0c0d16"
         spinnerColor="#ef121b"
       />
-      <div className="glitch">
-        <div className="glitch__img glitch__img_leaderboard"> </div>
-        <div className="glitch__img glitch__img_leaderboard"> </div>
-        <div className="glitch__img glitch__img_leaderboard"> </div>
-        <div className="glitch__img glitch__img_leaderboard"> </div>
-        <div className="glitch__img glitch__img_leaderboard"> </div>
-      </div>
+
+      <div className="bg" />
+      
       <Navbar />
 
       {/* Hidden Stuff */}
-      <img
+      {/* <img
         style={{ display: "none" }}
         src={process.env.REACT_APP_BACKEND_URI + "/api/assets/template.jpg"}
         crossorigin="anonymous"
         id="certImg"
       />
-      <canvas id="canvas" hidden />
+      <canvas id="canvas" hidden /> */}
 
-      <div className="jumbotron bg-transparent mb-0 pt-3 radius-0">
+      <div className="jumbotron bg-transparent mb-0 pt-3 radius-0" style={{ position: "relative" }}>
         <div className="container">
           <div className="row">
             <div className="col-xl-12">

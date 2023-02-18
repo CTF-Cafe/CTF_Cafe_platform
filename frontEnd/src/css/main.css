@@ -30,7 +30,7 @@
   --color-1: rgb(60, 255, 70);
   --color-1-50: rgba(60, 255, 89, 0.5);
   --color-2: rgb(129, 255, 112);
-  --bg-img: url("https://ez.ctf.cafe/assets/a");
+  --bg-img: none;
 }
 
 .color_easy {
@@ -463,8 +463,8 @@ input[type="radio"].toggle:checked + label {
   overflow: hidden;
 }
 
-.glitch__img {
-  position: absolute;
+.glitch_bg {
+  position: fixed;
   top: calc(-1 * var(--gap-vertical));
   left: calc(-1 * var(--gap-horizontal));
   width: calc(100% + var(--gap-horizontal) * 2);
@@ -477,56 +477,70 @@ input[type="radio"].toggle:checked + label {
   background-repeat: no-repeat;
 }
 
-.glitch__img_login {
+.bg {
+  position: fixed;
+  top: calc(-1 * var(--gap-vertical));
+  left: calc(-1 * var(--gap-horizontal));
+  width: calc(100% + var(--gap-horizontal) * 2);
+  height: calc(100% + var(--gap-vertical) * 2);
+  background: var(--bg-img);
+  transform: translate3d(0, 0, 0);
+  background-blend-mode: var(--blend-mode-1);
+  background-position: right;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.glitch_bg_login {
   background: url(../images/bg--world.png) !important;
 }
 
-.glitch__img_404 {
+.glitch_bg_404 {
   background: url(../images/404.gif) !important;
   background-repeat: no-repeat !important;
   background-size: contain !important;
   background-position: center !important;
 }
 
-.glitch__img_leaderboard {
+.glitch_bg_leaderboard {
   position: fixed !important;
   background: url(../images/bg--world.png) !important;
 }
 
-.glitch__img_register {
+.glitch_bg_register {
   position: fixed !important;
 }
 
-.glitch__img:nth-child(n + 2) {
+.glitch_bg:nth-child(n + 2) {
   opacity: 0;
 }
 
-.imgloaded .glitch__img:nth-child(n + 2) {
+.imgloaded .glitch_bg:nth-child(n + 2) {
   animation-duration: var(--time-anim);
   animation-delay: var(--delay-anim-1);
   animation-timing-function: linear;
   animation-iteration-count: infinite;
 }
 
-.imgloaded .glitch__img:nth-child(2) {
+.imgloaded .glitch_bg:nth-child(2) {
   background-color: var(--blend-color-2);
   background-blend-mode: var(--blend-mode-2);
   animation-name: glitch-anim-1;
 }
 
-.imgloaded .glitch__img:nth-child(3) {
+.imgloaded .glitch_bg:nth-child(3) {
   background-color: var(--blend-color-3);
   background-blend-mode: var(--blend-mode-3);
   animation-name: glitch-anim-2;
 }
 
-.imgloaded .glitch__img:nth-child(4) {
+.imgloaded .glitch_bg:nth-child(4) {
   background-color: var(--blend-color-4);
   background-blend-mode: var(--blend-mode-4);
   animation-name: glitch-anim-3;
 }
 
-.imgloaded .glitch__img:nth-child(5) {
+.imgloaded .glitch_bg:nth-child(5) {
   background-color: var(--blend-color-5);
   background-blend-mode: var(--blend-mode-5);
   animation-name: glitch-anim-flash;

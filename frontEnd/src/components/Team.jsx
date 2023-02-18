@@ -55,8 +55,9 @@ function Team(props) {
 
   return (
     <div>
+      <div className="bg" />
       <Navbar />
-      <div className="jumbotron bg-transparent mb-0 pt-3 radius-0">
+      <div className="jumbotron bg-transparent mb-0 pt-3 radius-0" style={{ position: "relative" }}>
         <div className="container">
           {!team.name ? (
             <div>

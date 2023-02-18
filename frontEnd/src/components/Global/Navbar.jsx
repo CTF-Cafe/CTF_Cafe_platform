@@ -29,12 +29,13 @@ function Navbar() {
               <Link to={`/`} style={{ display: "flex", paddingRight: "10px" }}>
                 <a className="pl-md-0 text-decoration-none text-light">
                   <h3 className="bold" style={{ margin: 0 }}>
-                    <span className="color_danger">
-                      {process.env.REACT_APP_CTF_NAME.split("_")[0]}
-                    </span>
-                    <span className="color_white">
-                      {process.env.REACT_APP_CTF_NAME.split("_")[1]}
-                    </span>
+                    {process.env.REACT_APP_CTF_NAME.split("_").map((text, i) =>
+                      i % 2 ? (
+                        <span className="color_white">{text}</span>
+                      ) : (
+                        <span className="color_danger">{text}</span>
+                      )
+                    )}
                   </h3>
                 </a>
               </Link>

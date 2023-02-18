@@ -136,7 +136,7 @@ function App() {
         );
         root.style.setProperty(
           "--bg-img",
-          res.data.theme.bg_img ? `url(${res.data.theme.bg_img})` : "none"
+          res.data.theme.bg_img.trim().length > 0 ? `url(${res.data.theme.bg_img})` : "none"
         );
 
         setTheme(res.data.theme);

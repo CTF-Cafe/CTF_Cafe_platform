@@ -9,30 +9,15 @@ function Index(props) {
   return (
     <div>
       <div className="glitch">
-        <div className="glitch__img"></div>
-        <div className="glitch__img"></div>
-        <div className="glitch__img"></div>
-        <div className="glitch__img"></div>
-        <div className="glitch__img"></div>
+        <div className="glitch_bg"></div>
+        <div className="glitch_bg"></div>
+        <div className="glitch_bg"></div>
+        <div className="glitch_bg"></div>
+        <div className="glitch_bg"></div>
       </div>
 
       <Navbar />
-
-      <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-header">
-          <img src="..." class="rounded me-2" alt="..." />
-          <strong class="me-auto">Bootstrap</strong>
-          <small>11 mins ago</small>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="toast"
-            aria-label="Close"
-          ></button>
-        </div>
-        <div class="toast-body">Hello, world! This is a toast message.</div>
-      </div>
-
+      
       <div className="jumbotron bg-transparent mb-0 pt-3 radius-0">
         <div className="container">
           <div className="row">
