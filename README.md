@@ -1,3 +1,9 @@
+# Contributors
+
+@Zerotistic
+@Eteckq
+
+
 # Features
 
 - Create your own challenges, files, hints, code snippets and flags from the admin dashboard
