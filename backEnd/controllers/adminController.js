@@ -91,6 +91,7 @@ exports.saveChallenge = async function(req, res) {
 
     if (challengeExists) {
         await challenges.findByIdAndUpdate((req.body.id), {
+            hidden: (req.body.hidden == 'true' ? true : false),
             name: req.body.name.trim(),
             points: parseInt(req.body.points),
             firstBloodPoints: parseInt(req.body.firstBloodPoints),
@@ -118,62 +119,16 @@ exports.saveChallenge = async function(req, res) {
 
 exports.createChallenge = async function(req, res) {
 
-    if(parseInt(req.body.points) == NaN) {
-        res.send({ state: 'error', message: 'points must be a number!' });
-        return;
-    }
-
-    if(parseInt(req.body.points) < 0 || parseInt(req.body.level) < 0) {
-        res.send({ state: 'error', message: 'Points and level must be positive numbers' });
-        return;
-    }
-
-    if(parseInt(req.body.hintCost) == NaN) {
-        res.send({ state: 'error', message: 'hintCost must be a number!' });
-        return;
-    }
-
-    if(parseInt(req.body.hintCost) < 0) {
-        res.send({ state: 'error', message: 'hintCost must be a positive number' });
-        return;
-    }
-
-    if (req.body.name.length < 1) {
-        res.send({ state: 'error', message: 'Name cannot be empty' });
-        return;
-    }
-
-    if (req.body.info.length < 1) {
-        res.send({ state: 'error', message: 'Info cannot be empty' });
-        return;
-    }
-
-    if (req.body.flag.length < 1) {
-        res.send({ state: 'error', message: 'Flag cannot be empty' });
-        return;
-    }
-
     if (req.body.category.length < 1) {
         res.send({ state: 'error', message: 'Category cannot be empty' });
         return;
     }
 
     await challenges.create({
-        name: req.body.name + Math.random().toString().substr(2, 4),
-        points: parseInt(req.body.points),
-        firstBloodPoints: 0,
-        initialPoints: parseInt(req.body.points),
-        minimumPoints: parseInt(req.body.minimumPoints),
-        level: req.body.level || 0,
-        info: req.body.info || "",
-        hint: req.body.hint || "",
-        hintCost: parseInt(req.body.hintCost) || 0,
-        flag: req.body.flag.trim() || "EMPTY",
-        file: (req.body.file.length > 0 ? req.body.file : ''),
+        name: "Challenge_" + Math.random().toString().substr(2, 4),
         category: req.body.category,
-        codeSnippet: '',
-        codeLanguage: 'none',
     });
+
     res.send({ state: 'success', message: 'Challenge created!' });
 
 }

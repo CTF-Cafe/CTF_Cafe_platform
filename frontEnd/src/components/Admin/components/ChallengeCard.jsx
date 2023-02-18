@@ -82,50 +82,67 @@ function ChallengeCard(props) {
             className="collapse card-body"
           >
             <blockquote className="card-blockquote">
-              <div style={{ display: "flex" }}>
-                <h6 className="solvers">
-                  Solves:{" "}
-                  <span className="solver_num">
-                    {props.challenge.solveCount}
-                  </span>{" "}
-                  &nbsp;
-                  <span className="color_white">Difficulty: </span>
-                  <span className="color_white">
-                    <select
-                      defaultValue={props.challenge.level.toString()}
-                      id={"level" + props.challenge._id}
-                    >
-                      <option value="0">Easy</option>
-                      <option value="1">Medium</option>
-                      <option value="2">Hard</option>
-                      <option value="3">Ninja</option>
-                    </select>
-                  </span>
-                </h6>
-              </div>
-              <label>Info:</label>
-              <p
-                contentEditable="true"
-                style={{
-                  backgroundColor: "rgb(30, 32, 55)",
-                  outline: "none",
-                }}
-                id={"info" + props.challenge._id}
-              >
-                {props.challenge.info}
-              </p>
+              <h6 className="solvers">
+                Solves:{" "}
+                <span className="solver_num">{props.challenge.solveCount}</span>{" "}
+                &nbsp;
+              </h6>
 
-              <label>Hint:</label>
-              <p
-                style={{
-                  backgroundColor: "rgb(30, 32, 55)",
-                  outline: "none",
-                }}
-                contentEditable="true"
-                id={"hint" + props.challenge._id}
-              >
-                {props.challenge.hint}
-              </p>
+              <div style={{ display: "block" }}>
+                <span className="color_white">Hidden: </span>
+                <span className="color_white">
+                  <select
+                    defaultValue={props.challenge.hidden.toString()}
+                    id={"hidden" + props.challenge._id}
+                  >
+                    <option value="true">True</option>
+                    <option value="false">False</option>
+                  </select>
+                </span>
+              </div>
+
+              <div style={{ display: "block" }}>
+                <span className="color_white">Difficulty: </span>
+                <span className="color_white">
+                  <select
+                    defaultValue={props.challenge.level.toString()}
+                    id={"level" + props.challenge._id}
+                  >
+                    <option value="0">Easy</option>
+                    <option value="1">Medium</option>
+                    <option value="2">Hard</option>
+                    <option value="3">Ninja</option>
+                  </select>
+                </span>
+              </div>
+
+              <div style={{ display: "block" }}>
+                <label>Info:</label>
+                <p
+                  contentEditable="true"
+                  style={{
+                    backgroundColor: "rgb(30, 32, 55)",
+                    outline: "none",
+                  }}
+                  id={"info" + props.challenge._id}
+                >
+                  {props.challenge.info}
+                </p>
+              </div>
+
+              <div style={{ display: "block" }}>
+                <label>Hint:</label>
+                <p
+                  style={{
+                    backgroundColor: "rgb(30, 32, 55)",
+                    outline: "none",
+                  }}
+                  contentEditable="true"
+                  id={"hint" + props.challenge._id}
+                >
+                  {props.challenge.hint}
+                </p>
+              </div>
 
               <div style={{ display: "flex" }}>
                 <label>Hint Cost:</label>
@@ -157,8 +174,8 @@ function ChallengeCard(props) {
                 </p>
               </div>
 
-              <label>File:</label>
-              <div style={{ marginBottom: "16px" }}>
+              <div style={{ display: "block" }}>
+                <label>File:</label>
                 <select
                   defaultValue={props.challenge.file}
                   id={"file" + props.challenge._id}
@@ -214,42 +231,60 @@ function ChallengeCard(props) {
                 {code}
               </p>
 
-              <br />
-              <label>Github URL:</label>
-              <p
-                contentEditable="true"
-                style={{
-                  backgroundColor: "rgb(30, 32, 55)",
-                  outline: "none",
-                }}
-                id={"githubUrl" + props.challenge._id}
-              >
-                {props.challenge.githubUrl}
-              </p>
-              <br />
-              <label>isInstance:</label>
-              <select
-                id={"isInstance" + props.challenge._id}
-                defaultValue={props.challenge.isInstance}
-              >
-                <option value="true">True</option>
-                <option value="false">False</option>
-              </select>
-              <br />
-              <label for={"#randomFlag" + props.challenge._id}>
-                Random Flag:{" "}
-              </label>
-              <select
-                id={"randomFlag" + props.challenge._id}
-                defaultValue={props.challenge.randomFlag}
-              >
-                <option value="true">True</option>
-                <option value="false">False</option>
-              </select>
+              <div style={{ display: "block" }}>
+                <label>Github URL:</label>
+                <p
+                  contentEditable="true"
+                  style={{
+                    backgroundColor: "rgb(30, 32, 55)",
+                    outline: "none",
+                  }}
+                  id={"githubUrl" + props.challenge._id}
+                >
+                  {props.challenge.githubUrl}
+                </p>
+              </div>
 
-              <br />
+              <div style={{ display: "block" }}>
+                <label>isInstance:</label>
+                <select
+                  id={"isInstance" + props.challenge._id}
+                  defaultValue={props.challenge.isInstance}
+                >
+                  <option value="true">True</option>
+                  <option value="false">False</option>
+                </select>
+              </div>
+
+              {/* Only Show RandomFlag if Instance is On */}
+              {props.challenge.isInstance.toString() == "true" ? (
+                <div style={{ display: "block" }}>
+                  <label for={"#randomFlag" + props.challenge._id}>
+                    Random Flag:{" "}
+                  </label>
+                  <select
+                    id={"randomFlag" + props.challenge._id}
+                    defaultValue={props.challenge.randomFlag}
+                  >
+                    <option value="true">True</option>
+                    <option value="false">False</option>
+                  </select>
+                </div>
+              ) : (
+                <select
+                  id={"randomFlag" + props.challenge._id}
+                  defaultValue={props.challenge.randomFlag}
+                  style={{
+                    display: "none",
+                  }}
+                >
+                  <option value="true">True</option>
+                  <option value="false">False</option>
+                </select>
+              )}
+
               {props.dynamicScoring.toString() == "true" ? (
-                <>
+                <div style={{ display: "block" }}>
                   <label>Minimum Points:</label>{" "}
                   <p
                     contentEditable="true"
@@ -261,7 +296,7 @@ function ChallengeCard(props) {
                   >
                     {props.challenge.minimumPoints}
                   </p>
-                </>
+                </div>
               ) : (
                 <p
                   style={{
@@ -273,17 +308,31 @@ function ChallengeCard(props) {
                 </p>
               )}
 
-              <label>Flag:</label>
-              <p
-                contentEditable="true"
-                style={{
-                  backgroundColor: "rgb(30, 32, 55)",
-                  outline: "none",
-                }}
-                id={"flag" + props.challenge._id}
-              >
-                {props.challenge.flag}
-              </p>
+              {/* Only Show Flag if RandomFlag is Off */}
+              {props.challenge.randomFlag.toString() == "false" ? (
+                <div style={{ display: "block" }}>
+                  <label>Flag:</label>
+                  <p
+                    contentEditable="true"
+                    style={{
+                      backgroundColor: "rgb(30, 32, 55)",
+                      outline: "none",
+                    }}
+                    id={"flag" + props.challenge._id}
+                  >
+                    {props.challenge.flag}
+                  </p>
+                </div>
+              ) : (
+                <p
+                  style={{
+                    display: "none",
+                  }}
+                  id={"flag" + props.challenge._id}
+                >
+                  {props.challenge.flag}
+                </p>
+              )}
 
               <div
                 style={{

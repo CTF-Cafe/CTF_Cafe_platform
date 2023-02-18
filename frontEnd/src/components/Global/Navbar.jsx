@@ -27,7 +27,7 @@ function Navbar() {
           <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div className="navbar-nav">
               <Link to={`/`} style={{ display: "flex", paddingRight: "10px" }}>
-                <a className="pl-md-0 text-decoration-none text-light">
+                <a className="pl-md-0 p-3 text-decoration-none text-light">
                   <h3 className="bold" style={{ margin: 0 }}>
                     {process.env.REACT_APP_CTF_NAME.split("_").map((text, i) =>
                       i % 2 ? (

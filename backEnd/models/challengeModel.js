@@ -3,6 +3,10 @@ const mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var challengeSchema = new Schema({
+    hidden: {
+        type: Boolean,
+        default: true
+    },
     name: {
         type: String,
         required: true
@@ -13,10 +17,11 @@ var challengeSchema = new Schema({
     },
     flag: {
         type: String,
-        required: true
+        default: "FLAG{HELLO}"
     },
     hint: {
         type: String,
+        default: ""
     },
     hintCost: {
         type: Number,
@@ -40,7 +45,7 @@ var challengeSchema = new Schema({
     },
     info: {
         type: String,
-        required: true
+        default: "Beep. Boop."
     },
     level: {
         type: Number,
