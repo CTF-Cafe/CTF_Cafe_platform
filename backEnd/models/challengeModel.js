@@ -19,13 +19,9 @@ var challengeSchema = new Schema({
         type: String,
         default: "FLAG{HELLO}"
     },
-    hint: {
-        type: String,
-        default: ""
-    },
-    hintCost: {
-        type: Number,
-        default: 0
+    hints: {
+        type: Array,
+        default: [{ content: "Easy Peasy", cost: 0, id: Math.random().toString().substr(2, 4) }]
     },
     points: {
         type: Number,
@@ -65,7 +61,7 @@ var challengeSchema = new Schema({
     },
     codeLanguage: {
         type: String,
-        default: 'python'
+        default: 'none'
     },
     firstBlood: {
         type: String,

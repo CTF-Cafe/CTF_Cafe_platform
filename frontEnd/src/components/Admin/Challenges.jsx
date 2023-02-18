@@ -27,16 +27,7 @@ function Challenges(props) {
           .post(
             process.env.REACT_APP_BACKEND_URI + "/api/admin/createChallenge",
             {
-              name: challenge.name,
-              points: challenge.value,
-              minimumPoints: 50,
-              level: 0,
-              info: challenge.description,
-              hint: "",
-              file: "",
-              flag: "FLAG{H3LL0_W0RLD}",
               category: challenge.category,
-              dockerCompose: false,
             },
             { withCredentials: true }
           )
@@ -61,7 +52,9 @@ function Challenges(props) {
         .post(
           process.env.REACT_APP_BACKEND_URI + "/api/admin/saveConfigs",
           {
-            newConfigs: [{ name: "categories", value: JSON.stringify(categoriesArray) }],
+            newConfigs: [
+              { name: "categories", value: JSON.stringify(categoriesArray) },
+            ],
           },
           { withCredentials: true }
         )
@@ -189,11 +182,22 @@ function Challenges(props) {
     const info = document.getElementById("info" + oldChallenge._id).textContent;
     formData.append("info", info);
 
-    const hint = document.getElementById("hint" + oldChallenge._id).textContent;
-    formData.append("hint", hint);
+    let hints = [];
+    let i = 0;
+    while (document.getElementById(i + "hintId" + oldChallenge._id)) {
+      const id = document.getElementById(i + "hintId" + oldChallenge._id).textContent;
+      const content = document.getElementById(
+        i + "hintContent" + oldChallenge._id
+      ).textContent;
+      const cost = document.getElementById(
+        i + "hintCost" + oldChallenge._id
+      ).textContent;
 
-    const hintCost = document.getElementById("hintCost" + oldChallenge._id).textContent;
-    formData.append("hintCost", hintCost);
+      hints.push({ id: id, content: content, cost: cost });
+      i += 1;
+    }
+
+    formData.append("hints", JSON.stringify(hints));
 
     const file = document.getElementById("file" + oldChallenge._id).value;
     formData.append("file", file);
@@ -211,10 +215,14 @@ function Challenges(props) {
     const flag = document.getElementById("flag" + oldChallenge._id).textContent;
     formData.append("flag", flag);
 
-    const githubUrl = document.getElementById("githubUrl" + oldChallenge._id).textContent;
+    const githubUrl = document.getElementById(
+      "githubUrl" + oldChallenge._id
+    ).textContent;
     formData.append("githubUrl", githubUrl);
 
-    const isInstance = document.getElementById("isInstance" + oldChallenge._id).value;
+    const isInstance = document.getElementById(
+      "isInstance" + oldChallenge._id
+    ).value;
     formData.append("isInstance", isInstance);
 
     const randomFlag = document.getElementById(
