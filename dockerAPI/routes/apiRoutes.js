@@ -14,4 +14,8 @@ router.post('/getDockers', (req, res) => {
     dockerController.getDockers(req, res);
 });
 
+router.post('/getAllDockers', (req, res) => {
+    dockerController.getAllDockers(req, res);
+});
+
 module.exports = router;

@@ -78,4 +78,8 @@ router.post('/sendGlobalMessage', (req, res) => {
     adminController.sendGlobalMessage(req, res);
 });
 
+router.post('/getDockers', (req, res) => {
+    adminController.getDockers(req, res);
+});
+
 module.exports = router;

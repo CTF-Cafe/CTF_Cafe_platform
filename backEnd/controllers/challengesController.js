@@ -140,6 +140,17 @@ exports.deployDocker = async function (req, res) {
     if (resAxios.data.state == "error") throw new Error(resAxios.data.message);
 
     if (challenge.randomFlag) {
+      if(challenge.randomFlags.find(x => x.id == user.teamId)) {
+        await challenges.updateOne(
+          { id: challenge._id },
+          {
+            $pull: {
+              randomFlags: { id: user.teamId },
+            },
+          }
+        );
+      }
+
       await challenges.updateOne(
         { id: challenge._id },
         {
