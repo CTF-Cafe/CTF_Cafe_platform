@@ -8,6 +8,7 @@ function Users(props) {
   const [users, setUsers] = useState([]);
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
+  const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
     getUsers(page);
@@ -147,6 +148,66 @@ function Users(props) {
       });
   };
 
+  const shadowBan = (e, user) => {
+    axios
+      .post(
+        process.env.REACT_APP_BACKEND_URI + "/api/admin/shadowBan",
+        {
+          user: user,
+        },
+        { withCredentials: true }
+      )
+      .then((response) => {
+        if (response.data.state == "sessionError") {
+          globalData.alert.error("Session expired!");
+          globalData.setUserData({});
+          globalData.setLoggedIn(false);
+          globalData.navigate("/", { replace: true });
+        } else {
+          if (response.data.state == "success") {
+            globalData.alert.success("User shadow banned!");
+            getUsers(page);
+          } else {
+            globalData.alert.error(response.data.message);
+            getUsers(page);
+          }
+        }
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+  };
+
+  const unShadowBan = (e, user) => {
+    axios
+      .post(
+        process.env.REACT_APP_BACKEND_URI + "/api/admin/unShadowBan",
+        {
+          user: user,
+        },
+        { withCredentials: true }
+      )
+      .then((response) => {
+        if (response.data.state == "sessionError") {
+          globalData.alert.error("Session expired!");
+          globalData.setUserData({});
+          globalData.setLoggedIn(false);
+          globalData.navigate("/", { replace: true });
+        } else {
+          if (response.data.state == "success") {
+            globalData.alert.success("User unShadow banned!");
+            getUsers(page);
+          } else {
+            globalData.alert.error(response.data.message);
+            getUsers(page);
+          }
+        }
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+  };
+
   const previousPage = () => {
     getUsers(page - 1);
   };
@@ -183,6 +244,12 @@ function Users(props) {
           >
             <span className="fa-solid fa-arrow-right"></span>
           </button>
+          <button
+            className="btn btn-outline-danger btn-shadow"
+            onClick={() => setEditMode(!editMode)}
+          >
+            <span className="fa-solid fa-pencil"></span>
+          </button>
         </div>
         <div>
           <input
@@ -208,6 +275,7 @@ function Users(props) {
             <th scope="col">User Solves</th>
             <th scope="col">Verified</th>
             <th scope="col">Admin</th>
+            <th scope="col">SBanned</th>
           </tr>
         </thead>
         <tbody>
@@ -218,21 +286,23 @@ function Users(props) {
                   {index + (page - 1) * 100}
                 </th>
                 <td>
-                  <button
-                    className="btn btn-outline-danger btn-shadow"
-                    data-toggle="modal"
-                    data-target="#confirmModal"
-                    onClick={(e) => {
-                      props.setAction({
-                        function: deleteUser,
-                        e: e,
-                        data: user,
-                      });
-                    }}
-                    style={{ marginRight: "30px" }}
-                  >
-                    <span className="fa-solid fa-minus"></span>
-                  </button>
+                  {editMode && (
+                    <button
+                      className="btn btn-outline-danger btn-shadow"
+                      data-toggle="modal"
+                      data-target="#confirmModal"
+                      onClick={(e) => {
+                        props.setAction({
+                          function: deleteUser,
+                          e: e,
+                          data: user,
+                        });
+                      }}
+                      style={{ marginRight: "30px" }}
+                    >
+                      <span className="fa-solid fa-minus"></span>
+                    </button>
+                  )}
                   {user.username}
                 </td>
                 <td>{user.score}</td>
@@ -240,36 +310,73 @@ function Users(props) {
                 <td>{user.verified.toString()}</td>
                 <td>
                   {user.isAdmin.toString()}{" "}
-                  <button
-                    className="btn btn-outline-danger btn-shadow"
-                    data-toggle="modal"
-                    data-target="#confirmModal"
-                    onClick={(e) => {
-                      props.setAction({
-                        function: addAdmin,
-                        e: e,
-                        data: user,
-                      });
-                    }}
-                    style={{ marginLeft: "15px" }}
-                  >
-                    <span className="fa-solid fa-arrow-up"></span>
-                  </button>
-                  <button
-                    className="btn btn-outline-danger btn-shadow"
-                    data-toggle="modal"
-                    data-target="#confirmModal"
-                    onClick={(e) => {
-                      props.setAction({
-                        function: removeAdmin,
-                        e: e,
-                        data: user,
-                      });
-                    }}
-                    style={{ marginLeft: "5px" }}
-                  >
-                    <span className="fa-solid fa-arrow-down"></span>
-                  </button>
+                  {editMode &&
+                    (user.isAdmin.toString() == "false" ? (
+                      <button
+                        className="btn btn-outline-danger btn-shadow"
+                        data-toggle="modal"
+                        data-target="#confirmModal"
+                        onClick={(e) => {
+                          props.setAction({
+                            function: addAdmin,
+                            e: e,
+                            data: user,
+                          });
+                        }}
+                      >
+                        <span className="fa-solid fa-arrow-up"></span>
+                      </button>
+                    ) : (
+                      <button
+                        className="btn btn-outline-danger btn-shadow"
+                        data-toggle="modal"
+                        data-target="#confirmModal"
+                        onClick={(e) => {
+                          props.setAction({
+                            function: removeAdmin,
+                            e: e,
+                            data: user,
+                          });
+                        }}
+                      >
+                        <span className="fa-solid fa-arrow-down"></span>
+                      </button>
+                    ))}
+                </td>
+                <td>
+                  {user.shadowBanned.toString()}
+                  {editMode &&
+                    (user.shadowBanned.toString() == "false" ? (
+                      <button
+                        className="btn btn-outline-danger btn-shadow"
+                        data-toggle="modal"
+                        data-target="#confirmModal"
+                        onClick={(e) => {
+                          props.setAction({
+                            function: shadowBan,
+                            e: e,
+                            data: user,
+                          });
+                        }}
+                      >
+                        <span className="fa-solid fa-thumbs-down"></span>
+                      </button>
+                    ) : (
+                      <button
+                        className="btn btn-outline-danger btn-shadow"
+                        data-toggle="modal"
+                        data-target="#confirmModal"
+                        onClick={(e) => {
+                          props.setAction({
+                            function: unShadowBan,
+                            e: e,
+                            data: user,
+                          });
+                        }}
+                      >
+                        <span className="fa-solid fa-thumbs-up"></span>
+                      </button>
+                    ))}
                 </td>
               </tr>
             );

@@ -56,7 +56,7 @@ function Hackerboard(props) {
       .post(process.env.REACT_APP_BACKEND_URI + "/api/getUsers", {
         page: index,
         search: searchQuery,
-      })
+      }, { withCredentials: true })
       .then((response) => {
         if (response.data.state == "error") {
           globalData.alert.error(response.data.message);
@@ -80,7 +80,7 @@ function Hackerboard(props) {
       .post(process.env.REACT_APP_BACKEND_URI + "/api/getTeams", {
         page: index,
         search: searchQuery,
-      })
+      }, { withCredentials: true })
       .then((response) => {
         if (response.data.state == "error") {
           globalData.alert.error(response.data.message);
