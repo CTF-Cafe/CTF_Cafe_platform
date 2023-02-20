@@ -115,8 +115,6 @@ function checkAuth(req, res, next) {
 }
 
 function checkAdminAuth(req, res, next) {
-  // next();
-  // REMOVE FOR LOCAL TESTS
   users.findOne({ username: req.session.username }).then(function (user) {
     if (!user) {
       res.send({ state: "sessionError" });

@@ -430,20 +430,19 @@ exports.shadowBan = async function (req, res) {
   if (user) {
     if (!user.shadowBanned) {
       await users.findByIdAndUpdate(req.body.user._id, { shadowBanned: true });
-      
+
       if (ObjectId.isValid(user.teamId)) {
-        await teams
-          .findOneAndUpdate(
-            {
-              _id: user.teamId,
-              users: { $elemMatch: { username: user.username } },
+        await teams.findOneAndUpdate(
+          {
+            _id: user.teamId,
+            users: { $elemMatch: { username: user.username } },
+          },
+          {
+            $set: {
+              "users.$.shadowBanned": true,
             },
-            {
-              $set: {
-                "users.$.shadowBanned": true,
-              },
-            }
-          );
+          }
+        );
       }
 
       res.send({ state: "success" });
@@ -463,18 +462,17 @@ exports.unShadowBan = async function (req, res) {
       await users.findByIdAndUpdate(req.body.user._id, { shadowBanned: false });
 
       if (ObjectId.isValid(user.teamId)) {
-        await teams
-          .findOneAndUpdate(
-            {
-              _id: user.teamId,
-              users: { $elemMatch: { username: user.username } },
+        await teams.findOneAndUpdate(
+          {
+            _id: user.teamId,
+            users: { $elemMatch: { username: user.username } },
+          },
+          {
+            $set: {
+              "users.$.shadowBanned": false,
             },
-            {
-              $set: {
-                "users.$.shadowBanned": false,
-              },
-            }
-          );
+          }
+        );
       }
 
       res.send({ state: "success" });
@@ -543,6 +541,29 @@ exports.sendGlobalMessage = async function (req, res) {
 };
 
 exports.getLogs = async function (req, res) {
-  const logs = await log.find({});
-  res.send(logs);
+  let search = req.body.search;
+  let page = req.body.page;
+
+  try {
+    if (page <= 0) throw Error("Page cannot be less than 1!");
+    let logCount = await log.count();
+    if ((page - 1) * 100 > logCount) throw Error("No more pages!");
+    if (isNaN(page)) page = 1;
+
+    const logs = await log
+      .find({
+        $or: [
+          { authorIp: new RegExp(search, "i") },
+          { authorId: new RegExp(search, "i") },
+          { authorName: new RegExp(search, "i") },
+          { function: new RegExp(search, "i") },
+          { result: new RegExp(search, "i") },
+        ],
+      })
+      .skip((page - 1) * 100)
+      .limit(100);
+    res.send(logs);
+  } catch (e) {
+    res.send({ state: "error", message: e.message });
+  }
 };
