@@ -140,7 +140,7 @@ function User(props) {
                                 {index}
                               </th>
                               <td>
-                                {solve.challenge.firstBlood == user.username ? (
+                                {solve.challenge.firstBlood == user._id ? (
                                   <span
                                     class="fa-solid fa-droplet"
                                     style={{
