@@ -234,8 +234,7 @@ function Challenges(props) {
       .post(
         process.env.REACT_APP_BACKEND_URI + "/api/admin/saveChallenge",
         formData,
-        { headers: { "Content-Type": "multipart/form-data" } },
-        { withCredentials: true }
+        { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true },
       )
       .then((response) => {
         if (response.data.state == "sessionError") {
