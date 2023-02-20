@@ -8,6 +8,7 @@ import Teams from "./Teams";
 import Theme from "./Theme";
 import Tools from "./Tools";
 import Logs from "./Logs";
+import Dockers from "./Dockers";
 import ConfirmModal from "../Global/ConfirmModal";
 import { useState } from "react";
 
@@ -98,6 +99,11 @@ function Admin(props) {
                     Logs
                   </a>
                 </Link>
+                <Link to={`/admin/dockers`}>
+                  <a className="p-3 text-decoration-none text-light bold">
+                    Dockers
+                  </a>
+                </Link>
               </div>
             </div>
           </nav>
@@ -123,6 +129,8 @@ function Admin(props) {
             <Tools />
           ) : pathName == "/logs/" || pathName == "/logs" ? (
             <Logs />
+          ) : pathName == "/dockers/" || pathName == "/dockers" ? (
+            <Dockers />
           ) : (
             <h1 className="display-1 bold color_white content__title">
               404<span className="vim-caret">&nbsp;</span>

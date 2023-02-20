@@ -7,6 +7,7 @@ const log = require("../models/logModel.js");
 const path = require("path");
 const fs = require("fs");
 const ObjectId = require("mongoose").Types.ObjectId;
+const axios = require("axios");
 
 exports.getStats = async function (req, res) {
   let allChallenges = await challenges.find({}).sort({ points: 1 });
@@ -563,6 +564,35 @@ exports.getLogs = async function (req, res) {
       .skip((page - 1) * 100)
       .limit(100);
     res.send(logs);
+  } catch (e) {
+    res.send({ state: "error", message: e.message });
+  }
+};
+
+exports.getDockers = async function (req, res) {
+  let search = req.body.search;
+  let page = req.body.page;
+
+  try {
+    if (page <= 0) throw Error("Page cannot be less than 1!");
+    let logCount = await log.count();
+    if ((page - 1) * 100 > logCount) throw Error("No more pages!");
+    if (isNaN(page)) page = 1;
+
+    const dockers = (await axios.post(
+      `${process.env.DEPLOYER_API}/api/getAllDockers`,
+      {
+        page: page
+      },
+      {
+        headers: {
+          "X-API-KEY": process.env.DEPLOYER_SECRET,
+        },
+      }
+    )).data.dockers;
+
+
+    res.send(dockers);
   } catch (e) {
     res.send({ state: "error", message: e.message });
   }
