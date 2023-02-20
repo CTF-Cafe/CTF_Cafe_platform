@@ -26,6 +26,14 @@ router.post('/removeAdmin', (req, res) => {
     adminController.removeAdmin(req, res);
 });
 
+router.post('/shadowBan', (req, res) => {
+    adminController.shadowBan(req, res);
+});
+
+router.post('/unShadowBan', (req, res) => {
+    adminController.unShadowBan(req, res);
+});
+
 router.post('/getStats', (req, res) => {
     adminController.getStats(req, res);
 });

@@ -25,7 +25,6 @@ function User(props) {
             let finalDataDifficulty = [];
 
             response.data.solved.forEach((solve) => {
-              console.log(solve);
               var category = finalDataCategory.find((obj) => {
                 return obj.name == solve.challenge.category;
               });

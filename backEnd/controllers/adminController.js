@@ -341,16 +341,13 @@ exports.getUsers = async function (req, res) {
                 solved: { $push: "$solved" },
                 verified: { $first: "$verified" },
                 isAdmin: { $first: "$isAdmin" },
+                shadowBanned: { $first: "$shadowBanned" },
               },
             },
           ])
           .sort({ score: -1, _id: 1 })
           .skip((page - 1) * 100)
           .limit(100);
-
-        await allUsers.forEach((user) => {
-          user.key = "Nice try XD";
-        });
 
         res.send(allUsers);
       } catch (err) {
@@ -421,6 +418,68 @@ exports.removeAdmin = async function (req, res) {
       res.send({ state: "success" });
     } else {
       res.send({ state: "error", message: "User is not an Admin!" });
+    }
+  } else {
+    res.send({ state: "error", message: "User not found!" });
+  }
+};
+
+exports.shadowBan = async function (req, res) {
+  const user = await users.findById(req.body.user._id);
+
+  if (user) {
+    if (!user.shadowBanned) {
+      await users.findByIdAndUpdate(req.body.user._id, { shadowBanned: true });
+      
+      if (ObjectId.isValid(user.teamId)) {
+        await teams
+          .findOneAndUpdate(
+            {
+              _id: user.teamId,
+              users: { $elemMatch: { username: user.username } },
+            },
+            {
+              $set: {
+                "users.$.shadowBanned": true,
+              },
+            }
+          );
+      }
+
+      res.send({ state: "success" });
+    } else {
+      res.send({ state: "error", message: "User is already shadowBanned!" });
+    }
+  } else {
+    res.send({ state: "error", message: "User not found!" });
+  }
+};
+
+exports.unShadowBan = async function (req, res) {
+  const user = await users.findById(req.body.user._id);
+
+  if (user) {
+    if (user.shadowBanned) {
+      await users.findByIdAndUpdate(req.body.user._id, { shadowBanned: false });
+
+      if (ObjectId.isValid(user.teamId)) {
+        await teams
+          .findOneAndUpdate(
+            {
+              _id: user.teamId,
+              users: { $elemMatch: { username: user.username } },
+            },
+            {
+              $set: {
+                "users.$.shadowBanned": false,
+              },
+            }
+          );
+      }
+
+      res.send({ state: "success" });
+    } else {
+      res.send({ state: "error", message: "User is not shadowBanned!" });
     }
   } else {
     res.send({ state: "error", message: "User not found!" });

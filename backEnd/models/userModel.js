@@ -49,6 +49,10 @@ var userSchema = new Schema({
     hintsBought: {
         type: Array,
         default: [],
+    },
+    shadowBanned: {
+        type: Boolean,
+        default: false
     }
 });
 
