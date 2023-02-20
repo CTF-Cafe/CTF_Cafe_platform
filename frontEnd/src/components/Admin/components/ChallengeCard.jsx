@@ -63,6 +63,7 @@ function ChallengeCard(props) {
                 contentEditable="true"
                 style={{ outline: "none" }}
                 id={"name" + challenge._id}
+                onClick={(e) => e.stopPropagation()}
               >
                 {challenge.name}{" "}
               </span>
@@ -71,6 +72,7 @@ function ChallengeCard(props) {
               <span
                 contentEditable="true"
                 style={{ outline: "none" }}
+                onClick={(e) => e.stopPropagation()}
                 id={"points" + challenge._id}
               >
                 {challenge.points}
