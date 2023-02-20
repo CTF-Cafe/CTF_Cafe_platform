@@ -150,6 +150,17 @@ function ChallengeCard(props) {
                     </p>
                     <div style={{ display: "block" }}>
                       <label>Hint#{i + 1}:</label>
+                      <button
+                        className="btn btn-outline-danger"
+                        type="button"
+                        style={{ fontSize: "10px" }}
+                        onClick={() => {
+                          let updateChallenge = { ...challenge, hints: challenge.hints.filter(x => x != hint)};
+                          setChallenge(updateChallenge);
+                        }}
+                      >
+                        -
+                      </button>
                       <p
                         style={{
                           backgroundColor: "rgb(30, 32, 55)",
@@ -180,13 +191,16 @@ function ChallengeCard(props) {
                 );
               })}
               <button
-                id="submit_p2"
                 className="btn btn-outline-danger"
                 type="button"
                 onClick={() => {
                   let updateChallenge = { ...challenge };
-                  updateChallenge.hints.push({ id: Math.random().toString().substr(2, 4), content: "Easy Peazy", cost: 0});
-                  setChallenge(updateChallenge)
+                  updateChallenge.hints.push({
+                    id: Math.random().toString().substr(2, 4),
+                    content: "Easy Peazy",
+                    cost: 0,
+                  });
+                  setChallenge(updateChallenge);
                 }}
               >
                 Add Hint
