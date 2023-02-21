@@ -273,7 +273,7 @@ function Hackerboard(props) {
                   }}
                   title={selectionMain == "Users" ? "View Teams" :  "View Users" }
                 >
-                  {selectionMain == "Users" ? <span className="fa-solid fa-user" /> :  <span className="fa-solid fa-users" /> }
+                  {selectionMain == "Users" ? <span className="fa-solid fa-users" /> :  <span className="fa-solid fa-user" /> }
                 </button>
                 <div>
                   <input
