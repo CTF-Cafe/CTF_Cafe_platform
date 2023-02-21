@@ -34,7 +34,7 @@ function Index(props) {
           <div className="row">
             <div className="col-xl-4">
               <p className="mt-5 text-grey text-spacey hackerFont lead">
-                The quieter you become the more you are able to hear.
+                It is always 13:37 somewhere in the world.
               </p>
               {globalData.loggedIn ? (
                 <Link to={`/challenges`} style={{ display: "block" }}>
