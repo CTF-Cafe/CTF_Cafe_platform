@@ -18,20 +18,26 @@ db.once("open", async function () {
 
   await users.updateMany(
     {
-      $size: { solved: { $gt: 0 } },
+      $or: [
+        { $size: { solved: { $gt: 0 } } },
+        {
+          $size: { hintsBought: { $gt: 0 } },
+        },
+      ],
     },
-    { score: 0, solved: [] }
+    { score: 0, solved: [], hintsBought: [] }
   );
 
   console.log("Users reset successfully");
 
   await teams.updateMany(
     {
-        users: { $elemMatch: { "solved.0": { $exists: true } } },
+      users: { $elemMatch: { "hintsBought.0": { $exists: true } } },
     },
     {
       $set: {
         "users.$.solved": [],
+        "users.$.hintsBought": [],
       },
     }
   );
