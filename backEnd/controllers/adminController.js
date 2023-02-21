@@ -506,6 +506,9 @@ exports.saveTheme = async function (req, res) {
         color_1: req.body.color_1,
         color_2: req.body.color_2,
         bg_img: req.body.bg_img.trim(),
+        top1_icon: req.body.top1_icon,
+        top2_icon: req.body.top2_icon,
+        top3_icon: req.body.top3_icon,
       }
     );
     res.send({ state: "success" });

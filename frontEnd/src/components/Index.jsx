@@ -17,7 +17,7 @@ function Index(props) {
       </div>
 
       <Navbar />
-      
+
       <div className="jumbotron bg-transparent mb-0 pt-3 radius-0">
         <div className="container">
           <div className="row">
@@ -26,16 +26,10 @@ function Index(props) {
                 {process.env.REACT_APP_CTF_NAME}
                 <span className="vim-caret">&nbsp;</span>
               </h1>
-              <h1 className="display-1 bold color_white content__title2">
-                INC {new Date().getFullYear()}
-              </h1>
             </div>
           </div>
           <div className="row">
             <div className="col-xl-4">
-              <p className="mt-5 text-grey text-spacey hackerFont lead">
-                It is always 13:37 somewhere in the world.
-              </p>
               {globalData.loggedIn ? (
                 <Link to={`/challenges`} style={{ display: "block" }}>
                   <button
@@ -81,39 +75,45 @@ function Index(props) {
                   </button>
                 </Link>
               )}
-              <a
-                href="https://discord.gg/HzcxNgRmjx"
-                className="btn btn-outline-danger btn-shadow mr-2 ml-0 ml-sm-1"
-                target="_blank"
-                style={{ paddingRight: "8px" }}
-              >
-                <span
-                  className="fa-brands fa-discord"
-                  style={{ fontSize: "32px" }}
-                ></span>
-              </a>
-              <a
-                href="https://twitter.com/CTFCafe"
-                className="btn btn-outline-danger btn-shadow mr-2 ml-0 ml-sm-1"
-                target="_blank"
-                style={{ paddingRight: "8px" }}
-              >
-                <span
-                  className="fa-brands fa-twitter"
-                  style={{ fontSize: "32px" }}
-                ></span>
-              </a>
-              <a
-                href="https://github.com/CTF-Cafe/CTF_Cafe"
-                className="btn btn-outline-danger btn-shadow mr-2 ml-0 ml-sm-1"
-                target="_blank"
-                style={{ paddingRight: "8px" }}
-              >
-                <span
-                  className="fa-brands fa-github"
-                  style={{ fontSize: "32px" }}
-                ></span>
-              </a>
+              {process.env.REACT_APP_DISCORD_URI && (
+                <a
+                  href={process.env.REACT_APP_DISCORD_URI}
+                  className="btn btn-outline-danger btn-shadow mr-2 ml-0"
+                  target="_blank"
+                  style={{ padding: "8px" }}
+                >
+                  <span
+                    className="fa-brands fa-discord"
+                    style={{ fontSize: "32px" }}
+                  ></span>
+                </a>
+              )}
+              {process.env.REACT_APP_TWITTER_URI && (
+                <a
+                  href={process.env.REACT_APP_TWITTER_URI}
+                  className="btn btn-outline-danger btn-shadow mr-2 ml-0"
+                  target="_blank"
+                  style={{ padding: "8px" }}
+                >
+                  <span
+                    className="fa-brands fa-twitter"
+                    style={{ fontSize: "32px" }}
+                  ></span>
+                </a>
+              )}
+              {process.env.REACT_APP_GITHUB_URI && (
+                <a
+                  href={process.env.REACT_APP_GITHUB_URI}
+                  className="btn btn-outline-danger btn-shadow mr-2 ml-0"
+                  target="_blank"
+                  style={{ padding: "8px" }}
+                >
+                  <span
+                    className="fa-brands fa-github"
+                    style={{ fontSize: "32px" }}
+                  ></span>
+                </a>
+              )}
             </div>
           </div>
 
