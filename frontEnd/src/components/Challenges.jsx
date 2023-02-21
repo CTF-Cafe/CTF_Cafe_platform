@@ -489,45 +489,39 @@ function Challenges(props) {
                               </p>
 
                               {challenge.isInstance ? (
-                                <a
+                                <button
                                   className="btn btn-outline-danger btn-shadow"
                                   onClick={(e) => {
-                                    e.preventDefault();
-
                                     if (!challenge.progress)
                                       createDocker(challenge);
                                     if (challenge.progress === "finished")
                                       shutdownDocker(challenge);
                                   }}
+                                  title={!challenge.progress ? "Start" : challenge.progress === "finished" ? "Stop" : challenge.progress === "stopping" ? "Stopping" : "Building"}
                                 >
                                   {!challenge.progress ? (
                                     <>
-                                      <span className="fa-solid fa-circle-play mr-2"></span>
-                                      Start
+                                      <span className="fa-solid fa-circle-play"></span>
                                     </>
                                   ) : challenge.progress === "finished" ? (
                                     <>
-                                      <span className="fa-solid fa-power-off mr-2"></span>
-                                      Stop
+                                      <span className="fa-solid fa-power-off"></span>
                                     </>
                                   ) : challenge.progress === "stopping" ? (
                                     <>
-                                      <span className="fa-solid fa-spinner fa-spin mr-2"></span>
-                                      Stopping ...
+                                      <span className="fa-solid fa-spinner fa-spin"></span>
                                     </>
                                   ) : (
                                     <>
-                                      <span className="fa-solid fa-spinner fa-spin mr-2"></span>
-                                      Building ...
+                                      <span className="fa-solid fa-spinner fa-spin"></span>
                                     </>
                                   )}
-                                </a>
+                                </button>
                               ) : null}
 
                               {challenge.file ? (
                                 challenge.file.length > 0 ? (
-                                  <a
-                                    href="#"
+                                  <button
                                     className="btn btn-outline-danger btn-shadow"
                                     onClick={() => {
                                       downloadFile(
@@ -535,10 +529,10 @@ function Challenges(props) {
                                         challenge.name
                                       );
                                     }}
+                                    title="Download File"
                                   >
-                                    <span className="fa-solid fa-download mr-2"></span>
-                                    Files
-                                  </a>
+                                    <span className="fa-solid fa-download"/>
+                                  </button>
                                 ) : null
                               ) : null}
 
@@ -556,9 +550,9 @@ function Challenges(props) {
                                     data-toggle="modal"
                                     data-target="#modal"
                                     className="btn btn-outline-danger btn-shadow"
+                                    title="Code Snippet"
                                   >
-                                    <span className="fa-solid fa-laptop-code mr-2"></span>
-                                    Code Snippet
+                                    <span className="fa-solid fa-laptop-code"/>
                                   </a>
                                 ) : null
                               ) : null}
@@ -574,9 +568,9 @@ function Challenges(props) {
                                       data-toggle="modal"
                                       data-target="#modal"
                                       className="btn btn-outline-danger btn-shadow"
+                                      title={"Hint#"+ (i + 1)}
                                     >
-                                      <span className="fa-solid fa-lightbulb mr-2"></span>
-                                      Hint#{i + 1}
+                                      <span className="fa-solid fa-lightbulb" />
                                     </a>
                                   )
                                 ) : (
@@ -595,9 +589,10 @@ function Challenges(props) {
                                     data-toggle="modal"
                                     data-target="#confirmModal"
                                     className="btn btn-outline-danger btn-shadow"
+                                    title={"Buy Hint#" + (i + 1)}
                                   >
                                     <span className="fa-solid fa-lightbulb mr-2"></span>
-                                    Buy Hint#{i + 1} ({hint.cost.toString()})
+                                    (-{hint.cost.toString()}pts)
                                   </a>
                                 )
                               )}
