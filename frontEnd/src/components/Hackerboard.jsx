@@ -271,8 +271,9 @@ function Hackerboard(props) {
                   onClick={() => {
                     changeSelection("main");
                   }}
+                  title={selectionMain == "Users" ? "View Teams" :  "View Users" }
                 >
-                  {selectionMain == "Users" ? "View Teams" : "View Users"}
+                  {selectionMain == "Users" ? <span className="fa-solid fa-user" /> :  <span className="fa-solid fa-users" /> }
                 </button>
                 <div>
                   <input
@@ -291,12 +292,14 @@ function Hackerboard(props) {
                   <button
                     className="btn btn-outline-danger btn-shadow"
                     onClick={previousPage}
+                    title="Prev Page"
                   >
                     <span className="fa-solid fa-arrow-left"></span>
                   </button>
                   <button
                     className="btn btn-outline-danger btn-shadow"
                     onClick={nextPage}
+                    title="Next Page"
                   >
                     <span className="fa-solid fa-arrow-right"></span>
                   </button>
