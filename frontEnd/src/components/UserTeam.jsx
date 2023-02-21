@@ -369,6 +369,56 @@ function UserTeam(props) {
                   Leave Team
                 </button>
               </div>
+              <table className="table table-hover table-striped">
+                <thead className="thead-dark hackerFont">
+                  <tr>
+                    <th scope="col" style={{ textAlign: "center" }}>
+                      #
+                    </th>
+                    <th scope="col"> Username </th>
+                    <th scope="col"> User Score </th>
+                    <th scope="col"> User Solves </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {userTeam.users.map((user, index) => {
+                    return (
+                      <tr key={user.username}>
+                        <th scope="row" style={{ textAlign: "center" }}>
+                          {index}
+                        </th>
+                        <td>
+                          {userTeam.teamCaptain ==
+                            globalData.userData.username &&
+                          globalData.userData.username != user.username ? (
+                            <button
+                              className="btn btn-outline-danger btn-shadow"
+                              data-toggle="modal"
+                              data-target="#confirmModal"
+                              onClick={(e) => {
+                                setAction({
+                                  function: kickUser,
+                                  e: e,
+                                  data: user.username,
+                                });
+                              }}
+                            >
+                              <span className="fa-solid fa-minus"></span>
+                            </button>
+                          ) : null}
+                          <Link to={`/user/${user.username}`}>
+                            <a className="p-3 text-decoration-none text-light bold">
+                              {user.username}
+                            </a>
+                          </Link>
+                        </td>
+                        <td> {user.score} </td>
+                        <td> {user.solved.length} </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
               {userTeam.solved.length > 0 && (
                 <>
                   <div className="row" style={{ textAlign: "center" }}>
@@ -431,56 +481,6 @@ function UserTeam(props) {
                   </div>
                 </>
               )}
-              <table className="table table-hover table-striped">
-                <thead className="thead-dark hackerFont">
-                  <tr>
-                    <th scope="col" style={{ textAlign: "center" }}>
-                      #
-                    </th>
-                    <th scope="col"> Username </th>
-                    <th scope="col"> User Score </th>
-                    <th scope="col"> User Solves </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {userTeam.users.map((user, index) => {
-                    return (
-                      <tr key={user.username}>
-                        <th scope="row" style={{ textAlign: "center" }}>
-                          {index}
-                        </th>
-                        <td>
-                          {userTeam.teamCaptain ==
-                            globalData.userData.username &&
-                          globalData.userData.username != user.username ? (
-                            <button
-                              className="btn btn-outline-danger btn-shadow"
-                              data-toggle="modal"
-                              data-target="#confirmModal"
-                              onClick={(e) => {
-                                setAction({
-                                  function: kickUser,
-                                  e: e,
-                                  data: user.username,
-                                });
-                              }}
-                            >
-                              <span className="fa-solid fa-minus"></span>
-                            </button>
-                          ) : null}
-                          <Link to={`/user/${user.username}`}>
-                            <a className="p-3 text-decoration-none text-light bold">
-                              {user.username}
-                            </a>
-                          </Link>
-                        </td>
-                        <td> {user.score} </td>
-                        <td> {user.solved.length} </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
             </div>
           )}
         </div>
