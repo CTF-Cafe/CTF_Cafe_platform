@@ -102,12 +102,14 @@ function Teams(props) {
           <button
             className="btn btn-outline-danger btn-shadow"
             onClick={previousPage}
+            title="Prev Page"
           >
             <span className="fa-solid fa-arrow-left"></span>
           </button>
           <button
             className="btn btn-outline-danger btn-shadow"
             onClick={nextPage}
+            title="Next Page"
           >
             <span className="fa-solid fa-arrow-right"></span>
           </button>
@@ -157,6 +159,7 @@ function Teams(props) {
                       });
                     }}
                     style={{ marginRight: "30px" }}
+                    title="Delete Team"
                   >
                     <span className="fa-solid fa-minus"></span>
                   </button>

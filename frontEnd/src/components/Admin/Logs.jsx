@@ -61,12 +61,14 @@ function Stats() {
           <button
             className="btn btn-outline-danger btn-shadow"
             onClick={() => getLogs(page - 1)}
+            title="Prev Page"
           >
             <span className="fa-solid fa-arrow-left"></span>
           </button>
           <button
             className="btn btn-outline-danger btn-shadow"
             onClick={() => getLogs(page + 1)}
+            title="Next Page"
           >
             <span className="fa-solid fa-arrow-right"></span>
           </button>
@@ -76,8 +78,9 @@ function Stats() {
               JSON.stringify(logs)
             )}`}
             download="logs.json"
+            title="Export Logs"
           >
-            Export Logs
+            <span className="fa-solid fa-file-export"/>
           </a>
         </div>
         <div>

@@ -82,4 +82,12 @@ router.post('/getDockers', (req, res) => {
     adminController.getDockers(req, res);
 });
 
+router.post('/shutdownDocker', (req, res) => {
+    adminController.shutdownDocker(req, res);
+});
+
+router.post('/restartDocker', (req, res) => {
+    adminController.restartDocker(req, res);
+});
+
 module.exports = router;

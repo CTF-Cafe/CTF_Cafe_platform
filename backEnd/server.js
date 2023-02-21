@@ -132,10 +132,11 @@ app.use("/api", globalRouter);
 app.use("/api/user", checkAuth, userRouter);
 app.use("/api/admin", checkAdminAuth, adminRouter);
 
-app.use("/api/assets", express.static("assets"));
+app.use("/api/assets", express.static("./assets"));
 
 process.on("uncaughtException", function (err) {
   console.log("Uncaught exception: " + err.stack);
+  console.log("NODE NOT EXITING");
 });
 
 app.listen(port, () => {
