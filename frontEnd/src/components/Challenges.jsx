@@ -497,7 +497,7 @@ function Challenges(props) {
                                     if (challenge.progress === "finished")
                                       shutdownDocker(challenge);
                                   }}
-                                  title={!challenge.progress ? "Start" : challenge.progress === "finished" ? "Stop" : challenge.progress === "stopping" ? "Stopping" : "Building"}
+                                  title={!challenge.progress ? "Start Docker" : challenge.progress === "finished" ? "Stop Docker" : challenge.progress === "stopping" ? "Stopping Docker..." : "Building Docker..."}
                                 >
                                   {!challenge.progress ? (
                                     <>
