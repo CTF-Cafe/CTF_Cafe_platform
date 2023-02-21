@@ -1,4 +1,4 @@
-import { Outlet, Routes, Route, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import AppContext from "../Data/AppContext";
@@ -307,7 +307,11 @@ function Users(props) {
                       <span className="fa-solid fa-minus"></span>
                     </button>
                   )}
-                  {user.username}
+                  <Link to={`/user/${user.username}`}>
+                    <a className="p-3 text-decoration-none text-light bold">
+                      {user.username}
+                    </a>
+                  </Link>
                 </td>
                 <td>{user.score}</td>
                 <td>{user.solved.length}</td>

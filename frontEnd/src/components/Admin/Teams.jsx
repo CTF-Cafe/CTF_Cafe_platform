@@ -1,4 +1,4 @@
-import { Outlet, Routes, Route, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import AppContext from "../Data/AppContext";
@@ -19,7 +19,7 @@ function Teams(props) {
         process.env.REACT_APP_BACKEND_URI + "/api/getTeams",
         {
           page: index,
-          search: searchQuery
+          search: searchQuery,
         },
         { withCredentials: true }
       )
@@ -163,7 +163,11 @@ function Teams(props) {
                   >
                     <span className="fa-solid fa-minus"></span>
                   </button>
-                  {team.name}
+                  <Link to={`/team/${team.name}`}>
+                    <a className="p-3 text-decoration-none text-light bold">
+                      {team.name}
+                    </a>
+                  </Link>
                 </td>
                 <td>
                   {team.users.map((user) => {
