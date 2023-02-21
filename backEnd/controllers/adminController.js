@@ -579,21 +579,133 @@ exports.getDockers = async function (req, res) {
     if ((page - 1) * 100 > logCount) throw Error("No more pages!");
     if (isNaN(page)) page = 1;
 
-    const dockers = (await axios.post(
-      `${process.env.DEPLOYER_API}/api/getAllDockers`,
+    const dockers = (
+      await axios.post(
+        `${process.env.DEPLOYER_API}/api/getAllDockers`,
+        {
+          page: page,
+        },
+        {
+          headers: {
+            "X-API-KEY": process.env.DEPLOYER_SECRET,
+          },
+        }
+      )
+    ).data.dockers;
+
+    res.send(dockers);
+  } catch (e) {
+    res.send({ state: "error", message: e.message });
+  }
+};
+
+exports.restartDocker = async function (req, res) {
+  try {
+    const dockerToRestart = req.body.docker;
+
+    let resAxios = await axios.post(
+      `${process.env.DEPLOYER_API}/api/shutdownDocker`,
       {
-        page: page
+        ownerId: dockerToRestart.ownerId,
+        challengeId: dockerToRestart.challengeId,
       },
       {
         headers: {
           "X-API-KEY": process.env.DEPLOYER_SECRET,
         },
       }
-    )).data.dockers;
+    );
 
+    if (resAxios.data.state == "error") throw new Error(resAxios.data.message);
+    
+    resAxios = await axios.post(
+      `${process.env.DEPLOYER_API}/api/deployDocker`,
+      {
+        githubUrl: dockerToRestart.githubUrl,
+        ownerId: dockerToRestart.ownerId,
+        challengeId: dockerToRestart.challengeId,
+        randomFlag: dockerToRestart.randomFlag != "false" ? true : false,
+      },
+      {
+        headers: {
+          "X-API-KEY": process.env.DEPLOYER_SECRET,
+        },
+      }
+    );
+    
+    if (resAxios.data.state == "error") throw new Error(resAxios.data.message);
 
-    res.send(dockers);
-  } catch (e) {
-    res.send({ state: "error", message: e.message });
+    const challenge = await challenges.findById(dockerToRestart.challengeId);
+    if (challenge && challenge.randomFlag) {
+      if (challenge.randomFlags.find((x) => x.id == dockerToRestart.ownerId)) {
+        await challenges.updateOne(
+          { id: challenge._id },
+          {
+            $pull: {
+              randomFlags: { id: dockerToRestart.ownerId },
+            },
+          }
+        );
+      }
+
+      await challenges.updateOne(
+        { id: challenge._id },
+        {
+          $push: {
+            randomFlags: {
+              id: dockerToRestart.ownerId,
+              flag: resAxios.data.flag,
+            },
+          },
+        }
+      );
+
+      //COMBINE PULL & PUSH
+    }
+
+    res.send({ state: "success", message: "Restarted Docker!" });
+  } catch (error) {
+    if (error.response?.data?.message)
+      return res.send({ state: "error", message: error.response.data.message });
+    res.send({ state: "error", message: error.message });
+  }
+};
+
+exports.shutdownDocker = async function (req, res) {
+  try {
+    const dockerToStop = req.body.docker;
+
+    const resAxios = await axios.post(
+      `${process.env.DEPLOYER_API}/api/shutdownDocker`,
+      {
+        ownerId: dockerToStop.ownerId,
+        challengeId: dockerToStop.challengeId,
+      },
+      {
+        headers: {
+          "X-API-KEY": process.env.DEPLOYER_SECRET,
+        },
+      }
+    );
+
+    if (resAxios.data.state == "error") throw new Error(resAxios.data.message);
+
+    const challenge = await challenges.findById(dockerToStop.challengeId);
+    if (challenge && challenge.randomFlag) {
+      await challenges.updateOne(
+        { id: challenge._id },
+        {
+          $pull: {
+            randomFlags: { id: dockerToStop.ownerId },
+          },
+        }
+      );
+    }
+
+    res.send({ state: "success", message: "Docker shutdown!" });
+  } catch (error) {
+    if (error.response?.data?.message)
+      return res.send({ state: "error", message: error.response.data.message });
+    res.send({ state: "error", message: error.message });
   }
 };

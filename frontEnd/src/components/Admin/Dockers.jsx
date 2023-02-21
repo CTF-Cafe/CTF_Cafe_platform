@@ -28,7 +28,7 @@ function Dockers(props) {
         } else if (response.data.state == "error") {
           globalData.alert.error(response.data.message);
         } else {
-            setDockers(response.data);
+          setDockers(response.data);
           setPage(index);
         }
       })
@@ -40,6 +40,74 @@ function Dockers(props) {
   useEffect(() => {
     getDockers(page);
   }, [searchQuery]);
+
+  const shutdownDocker = (docker) => {
+    docker.progress = "stopping";
+    setDockers([...dockers]);
+
+    axios
+      .post(
+        process.env.REACT_APP_BACKEND_URI + "/api/admin/shutdownDocker",
+        {
+          docker: docker,
+        },
+        {
+          withCredentials: true,
+        }
+      )
+      .then((response) => {
+        if (response.data.state == "sessionError") {
+          globalData.alert.error("Session expired!");
+          globalData.setUserData({});
+          globalData.setLoggedIn(false);
+          globalData.navigate("/", { replace: true });
+        } else if (response.data.state == "error") {
+          globalData.alert.error(response.data.message);
+          delete docker.progress;
+          setDockers([...dockers]);
+        } else {
+          globalData.alert.success("Docker stopped!");
+          getDockers();
+        }
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+  };
+
+  const restartDocker = (docker) => {
+    docker.progress = "restarting";
+    setDockers([...dockers]);
+
+    axios
+      .post(
+        process.env.REACT_APP_BACKEND_URI + "/api/admin/restartDocker",
+        {
+          docker: docker,
+        },
+        {
+          withCredentials: true,
+        }
+      )
+      .then((response) => {
+        if (response.data.state == "sessionError") {
+          globalData.alert.error("Session expired!");
+          globalData.setUserData({});
+          globalData.setLoggedIn(false);
+          globalData.navigate("/", { replace: true });
+        } else if (response.data.state == "error") {
+          globalData.alert.error(response.data.message);
+          delete docker.progress;
+          setDockers([...dockers]);
+        } else {
+          globalData.alert.success("Docker restarted!");
+          getDockers();
+        }
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+  };
 
   return (
     <div>
@@ -59,19 +127,22 @@ function Dockers(props) {
         <div>
           <button
             className="btn btn-outline-danger btn-shadow"
-            onClick={() =>  getDockers(page - 1)}
+            onClick={() => getDockers(page - 1)}
+            title="Prev Page"
           >
             <span className="fa-solid fa-arrow-left"></span>
           </button>
           <button
             className="btn btn-outline-danger btn-shadow"
-            onClick={() =>  getDockers(page + 1)}
+            onClick={() => getDockers(page + 1)}
+            title="Next Page"
           >
             <span className="fa-solid fa-arrow-right"></span>
           </button>
           <button
             className="btn btn-outline-danger btn-shadow"
             onClick={() => setEditMode(!editMode)}
+            title="Edit Mode"
           >
             <span className="fa-solid fa-pencil"></span>
           </button>
@@ -99,7 +170,7 @@ function Dockers(props) {
             <th scope="col">mappedPort</th>
             <th scope="col">deployTime</th>
             <th scope="col">randomFlag</th>
-            <th scope="col">Actions</th>
+            {editMode && <th scope="col">Actions</th>}
           </tr>
         </thead>
         <tbody>
@@ -109,14 +180,48 @@ function Dockers(props) {
                 <th scope="row" style={{ textAlign: "center" }}>
                   {index + (page - 1) * 100}
                 </th>
-                <td>
-                  {docker.dockerId}
-                </td>
+                <td>{docker.dockerId.substr(0, 5)}</td>
                 <td>{docker.mappedPort}</td>
                 <td>{docker.deployTime}</td>
-                <td>{docker.randomFlag}</td>
-                <td>
-                </td>
+                <td>{docker.randomFlag.substr(0, 5)}</td>
+                {editMode && (
+                  <td>
+                    <button
+                      className="btn btn-outline-danger btn-shadow"
+                      onClick={() => {
+                        restartDocker(docker);
+                      }}
+                      title={
+                        docker.progress === "restarting" ||
+                        docker.progress === "starting"
+                          ? "Restarting..."
+                          : "Restart"
+                      }
+                    >
+                      {docker.progress === "restarting" ||
+                      docker.progress === "starting" ? (
+                        <span className="fa-solid fa-spinner fa-spin" />
+                      ) : (
+                        <span className="fa-solid fa-arrows-rotate" />
+                      )}
+                    </button>
+                    <button
+                      className="btn btn-outline-danger btn-shadow"
+                      onClick={() => {
+                        shutdownDocker(docker);
+                      }}
+                      title={
+                        docker.progress === "stopping" ? "Stopping..." : "Stop"
+                      }
+                    >
+                      {docker.progress === "stopping" ? (
+                        <span className="fa-solid fa-spinner fa-spin" />
+                      ) : (
+                        <span className="fa-solid fa-power-off" />
+                      )}
+                    </button>
+                  </td>
+                )}
               </tr>
             );
           })}

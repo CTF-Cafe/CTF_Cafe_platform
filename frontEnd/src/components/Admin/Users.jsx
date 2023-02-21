@@ -235,18 +235,21 @@ function Users(props) {
           <button
             className="btn btn-outline-danger btn-shadow"
             onClick={previousPage}
+            title="Prev Page"
           >
             <span className="fa-solid fa-arrow-left"></span>
           </button>
           <button
             className="btn btn-outline-danger btn-shadow"
             onClick={nextPage}
+            title="Next Page"
           >
             <span className="fa-solid fa-arrow-right"></span>
           </button>
           <button
             className="btn btn-outline-danger btn-shadow"
             onClick={() => setEditMode(!editMode)}
+            title="Edit Mode"
           >
             <span className="fa-solid fa-pencil"></span>
           </button>
@@ -299,6 +302,7 @@ function Users(props) {
                         });
                       }}
                       style={{ marginRight: "30px" }}
+                      title="Delete"
                     >
                       <span className="fa-solid fa-minus"></span>
                     </button>
@@ -323,6 +327,7 @@ function Users(props) {
                             data: user,
                           });
                         }}
+                        title="Promote"
                       >
                         <span className="fa-solid fa-arrow-up"></span>
                       </button>
@@ -338,6 +343,7 @@ function Users(props) {
                             data: user,
                           });
                         }}
+                        title="Demote"
                       >
                         <span className="fa-solid fa-arrow-down"></span>
                       </button>
@@ -358,6 +364,7 @@ function Users(props) {
                             data: user,
                           });
                         }}
+                        title="Shadow Ban"
                       >
                         <span className="fa-solid fa-thumbs-down"></span>
                       </button>
@@ -373,6 +380,7 @@ function Users(props) {
                             data: user,
                           });
                         }}
+                        title="UnShadow Ban"
                       >
                         <span className="fa-solid fa-thumbs-up"></span>
                       </button>

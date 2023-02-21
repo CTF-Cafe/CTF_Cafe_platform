@@ -413,6 +413,7 @@ function Challenges(props) {
                 onClick={(e) => {
                   createChallenge(e, category);
                 }}
+                title="Create Challenge"
               >
                 <span className="fa-solid fa-plus"> </span>
               </a>

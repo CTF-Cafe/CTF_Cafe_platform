@@ -130,7 +130,7 @@ function Admin(props) {
           ) : pathName == "/logs/" || pathName == "/logs" ? (
             <Logs />
           ) : pathName == "/dockers/" || pathName == "/dockers" ? (
-            <Dockers />
+            <Dockers setAction={setAction} />
           ) : (
             <h1 className="display-1 bold color_white content__title">
               404<span className="vim-caret">&nbsp;</span>

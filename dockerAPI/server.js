@@ -59,6 +59,11 @@ app.use(apiKeyCheck);
 
 app.use("/api", apiRouter);
 
+process.on("uncaughtException", function (err) {
+  console.log("Uncaught exception: " + err.stack);
+  console.log("NODE NOT EXITING");
+});
+
 app.listen(port, () => {
   console.log(`dockerAPI listening on port ${port}`);
 });
