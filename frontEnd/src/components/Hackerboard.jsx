@@ -1,9 +1,6 @@
-import { Outlet, Routes, Route, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import { useState, useEffect, useContext } from "react";
-import goldMask from "./img/goldMask.png";
-import silverMask from "./img/silverMask.png";
-import bronzeMask from "./img/bronzeMask.png";
 import LoadingScreen from "react-loading-screen";
 import AppContext from "./Data/AppContext";
 import Navbar from "./Global/Navbar";
@@ -53,10 +50,14 @@ function Hackerboard(props) {
 
   const getUsers = (index) => {
     axios
-      .post(process.env.REACT_APP_BACKEND_URI + "/api/getUsers", {
-        page: index,
-        search: searchQuery,
-      }, { withCredentials: true })
+      .post(
+        process.env.REACT_APP_BACKEND_URI + "/api/getUsers",
+        {
+          page: index,
+          search: searchQuery,
+        },
+        { withCredentials: true }
+      )
       .then((response) => {
         if (response.data.state == "error") {
           globalData.alert.error(response.data.message);
@@ -77,10 +78,14 @@ function Hackerboard(props) {
 
   const getTeams = (index) => {
     axios
-      .post(process.env.REACT_APP_BACKEND_URI + "/api/getTeams", {
-        page: index,
-        search: searchQuery,
-      }, { withCredentials: true })
+      .post(
+        process.env.REACT_APP_BACKEND_URI + "/api/getTeams",
+        {
+          page: index,
+          search: searchQuery,
+        },
+        { withCredentials: true }
+      )
       .then((response) => {
         if (response.data.state == "error") {
           globalData.alert.error(response.data.message);
@@ -142,7 +147,11 @@ function Hackerboard(props) {
 
     console.log(globalData.userData.team);
     var team = teams.find((obj) => {
-      if (obj) {
+      if (obj) {                                <img
+        src={globalData.theme.top1_icon}
+        style={{ width: "50px" }}
+        onError={(event) => (event.target.src = "")}
+      />
         return obj.name === globalData.userData.team.name;
       } else {
         return false;
@@ -215,7 +224,7 @@ function Hackerboard(props) {
       />
 
       <div className="bg" />
-      
+
       <Navbar />
 
       {/* Hidden Stuff */}
@@ -227,7 +236,10 @@ function Hackerboard(props) {
       />
       <canvas id="canvas" hidden /> */}
 
-      <div className="jumbotron bg-transparent mb-0 pt-3 radius-0" style={{ position: "relative" }}>
+      <div
+        className="jumbotron bg-transparent mb-0 pt-3 radius-0"
+        style={{ position: "relative" }}
+      >
         <div className="container">
           <div className="row">
             <div className="col-xl-12">
@@ -257,7 +269,12 @@ function Hackerboard(props) {
           <div className="row mt-5  justify-content-center">
             <div className="col-xl-10">
               <div style={{ marginBottom: "25px" }}>
-                <LineChart startTime={globalData.startTime} endTime={globalData.endTime} data={selectionMain == "Users" ? users : teams} selection={selectionMain} />
+                <LineChart
+                  startTime={globalData.startTime}
+                  endTime={globalData.endTime}
+                  data={selectionMain == "Users" ? users : teams}
+                  selection={selectionMain}
+                />
               </div>
               <div
                 style={{
@@ -271,9 +288,13 @@ function Hackerboard(props) {
                   onClick={() => {
                     changeSelection("main");
                   }}
-                  title={selectionMain == "Users" ? "View Teams" :  "View Users" }
+                  title={selectionMain == "Users" ? "View Teams" : "View Users"}
                 >
-                  {selectionMain == "Users" ? <span className="fa-solid fa-users" /> :  <span className="fa-solid fa-user" /> }
+                  {selectionMain == "Users" ? (
+                    <span className="fa-solid fa-users" />
+                  ) : (
+                    <span className="fa-solid fa-user" />
+                  )}
                 </button>
                 <div>
                   <input
@@ -347,7 +368,14 @@ function Hackerboard(props) {
                                       (users.length - 1) ==
                                     0
                               ) ? (
-                                <img src={goldMask} style={{ width: "50px" }} />
+                                globalData.theme.top1_icon ? (
+                                  <img
+                                    src={globalData.theme.top1_icon}
+                                    style={{ width: "50px" }}
+                                  />
+                                ) : (
+                                  1
+                                )
                               ) : (
                                   selectionScore == "up"
                                     ? index + (page - 1) * 100 == 1
@@ -356,10 +384,14 @@ function Hackerboard(props) {
                                         (users.length - 1) ==
                                       1
                                 ) ? (
-                                <img
-                                  src={silverMask}
-                                  style={{ width: "40px" }}
-                                />
+                                  globalData.theme.top2_icon ? (
+                                    <img
+                                      src={globalData.theme.top2_icon}
+                                      style={{ width: "40px" }}
+                                    />
+                                  ) : (
+                                    2
+                                  )
                               ) : (
                                   selectionScore == "up"
                                     ? index + (page - 1) * 100 == 2
@@ -368,14 +400,20 @@ function Hackerboard(props) {
                                         (users.length - 1) ==
                                       2
                                 ) ? (
-                                <img
-                                  src={bronzeMask}
-                                  style={{ width: "30px" }}
-                                />
+                                  globalData.theme.top3_icon ? (
+                                    <img
+                                      src={globalData.theme.top3_icon}
+                                      style={{ width: "30px" }}
+                                    />
+                                  ) : (
+                                    3
+                                  )
                               ) : selectionScore == "up" ? (
                                 index + 1 + (page - 1) * 100
                               ) : (
-                                index * -1 + (page - 1) * 100 + (users.length - 1)
+                                index * -1 +
+                                (page - 1) * 100 +
+                                (users.length - 1)
                               )}
                             </th>
                             <td style={{ textAlign: "left" }}>
@@ -405,7 +443,14 @@ function Hackerboard(props) {
                                       (teams.length - 1) ==
                                     0
                               ) ? (
-                                <img src={goldMask} style={{ width: "50px" }} />
+                                globalData.theme.top1_icon ? (
+                                  <img
+                                    src={globalData.theme.top1_icon}
+                                    style={{ width: "50px" }}
+                                  />
+                                ) : (
+                                  1
+                                )
                               ) : (
                                   selectionScore == "up"
                                     ? index + (page - 1) * 100 == 1
@@ -414,10 +459,14 @@ function Hackerboard(props) {
                                         (teams.length - 1) ==
                                       1
                                 ) ? (
-                                <img
-                                  src={silverMask}
-                                  style={{ width: "40px" }}
-                                />
+                                globalData.theme.top2_icon ? (
+                                  <img
+                                    src={globalData.theme.top2_icon}
+                                    style={{ width: "40px" }}
+                                  />
+                                ) : (
+                                  2
+                                )
                               ) : (
                                   selectionScore == "up"
                                     ? index + (page - 1) * 100 == 2
@@ -426,14 +475,20 @@ function Hackerboard(props) {
                                         (teams.length - 1) ==
                                       2
                                 ) ? (
-                                <img
-                                  src={bronzeMask}
-                                  style={{ width: "30px" }}
-                                />
+                                globalData.theme.top3_icon ? (
+                                  <img
+                                    src={globalData.theme.top3_icon}
+                                    style={{ width: "30px" }}
+                                  />
+                                ) : (
+                                  3
+                                )
                               ) : selectionScore == "up" ? (
                                 index + (page - 1) * 100 + 1
                               ) : (
-                                index * -1 + (page - 1) * 100 + (teams.length - 1)
+                                index * -1 +
+                                (page - 1) * 100 +
+                                (teams.length - 1)
                               )}
                             </th>
                             <td style={{ textAlign: "left" }}>

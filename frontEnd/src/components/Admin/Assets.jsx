@@ -64,8 +64,9 @@ function Assets(props) {
     axios.post(process.env.REACT_APP_BACKEND_URI + "/api/admin/uploadAsset", formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
-        }
-    }, { withCredentials: true }).then((response) => {
+        },
+        withCredentials: true
+    }).then((response) => {
       if (response.data.state == "sessionError") {
         globalData.alert.error("Session expired!");
         globalData.setUserData({});

@@ -65,6 +65,9 @@ function Config(props) {
           color_1: document.getElementById("theme_color_1").value,
           color_2: document.getElementById("theme_color_2").value,
           bg_img: document.getElementById("theme_img").textContent,
+          top1_icon: document.getElementById("theme_top1").textContent,
+          top2_icon: document.getElementById("theme_top2").textContent,
+          top3_icon: document.getElementById("theme_top3").textContent,
         },
         { withCredentials: true }
       )
@@ -100,13 +103,13 @@ function Config(props) {
       <table className="table table-hover table-striped">
         <thead className="thead-dark hackerFont">
           <tr>
-            <th scope="col"> COLOR #1</th>
-            <th scope="col"> COLOR #2</th>
-            <th scope="col"> BACKROUND IMAGE </th>
+            <th scope="col">Config Name</th>
+            <th scope="col">Config Value</th>
           </tr>
         </thead>
         <tbody>
           <tr>
+            <td>COLOR #1</td>
             <td>
               <input
                 type="color"
@@ -114,6 +117,9 @@ function Config(props) {
                 defaultValue={globalData.theme.color_1}
               />
             </td>
+          </tr>
+          <tr>
+            <td>COLOR #2</td>
             <td>
               <input
                 type="color"
@@ -121,8 +127,29 @@ function Config(props) {
                 defaultValue={globalData.theme.color_2}
               />
             </td>
-            <td contenteditable="true" id={"theme_img"}>
+          </tr>
+          <tr>
+            <td>BACKROUND IMAGE</td>
+            <td contenteditable="true" id="theme_img">
               {globalData.theme.bg_img}
+            </td>
+          </tr>
+          <tr>
+            <td>TOP1 Icon</td>
+            <td contenteditable="true" id="theme_top1">
+              {globalData.theme.top1_icon}
+            </td>
+          </tr>
+          <tr>
+            <td>TOP2 Icon</td>
+            <td contenteditable="true" id="theme_top2">
+              {globalData.theme.top2_icon}
+            </td>
+          </tr>
+          <tr>
+            <td>TOP3 Icon</td>
+            <td contenteditable="true" id="theme_top3">
+              {globalData.theme.top3_icon}
             </td>
           </tr>
         </tbody>
