@@ -344,7 +344,7 @@ function Hackerboard(props) {
                                   ? index + (page - 1) * 100 == 0
                                   : index * -1 +
                                       (page - 1) * 100 +
-                                      users.length ==
+                                      (users.length - 1) ==
                                     0
                               ) ? (
                                 <img src={goldMask} style={{ width: "50px" }} />
@@ -353,7 +353,7 @@ function Hackerboard(props) {
                                     ? index + (page - 1) * 100 == 1
                                     : index * -1 +
                                         (page - 1) * 100 +
-                                        users.length ==
+                                        (users.length - 1) ==
                                       1
                                 ) ? (
                                 <img
@@ -365,7 +365,7 @@ function Hackerboard(props) {
                                     ? index + (page - 1) * 100 == 2
                                     : index * -1 +
                                         (page - 1) * 100 +
-                                        users.length ==
+                                        (users.length - 1) ==
                                       2
                                 ) ? (
                                 <img
@@ -375,7 +375,7 @@ function Hackerboard(props) {
                               ) : selectionScore == "up" ? (
                                 index + 1 + (page - 1) * 100
                               ) : (
-                                index * -1 + (page - 1) * 100 + users.length
+                                index * -1 + (page - 1) * 100 + (users.length - 1)
                               )}
                             </th>
                             <td style={{ textAlign: "left" }}>
@@ -402,7 +402,7 @@ function Hackerboard(props) {
                                   ? index + (page - 1) * 100 == 0
                                   : index * -1 +
                                       (page - 1) * 100 +
-                                      teams.length ==
+                                      (teams.length - 1) ==
                                     0
                               ) ? (
                                 <img src={goldMask} style={{ width: "50px" }} />
@@ -411,7 +411,7 @@ function Hackerboard(props) {
                                     ? index + (page - 1) * 100 == 1
                                     : index * -1 +
                                         (page - 1) * 100 +
-                                        teams.length ==
+                                        (teams.length - 1) ==
                                       1
                                 ) ? (
                                 <img
@@ -423,7 +423,7 @@ function Hackerboard(props) {
                                     ? index + (page - 1) * 100 == 2
                                     : index * -1 +
                                         (page - 1) * 100 +
-                                        teams.length ==
+                                        (teams.length - 1) ==
                                       2
                                 ) ? (
                                 <img
@@ -433,7 +433,7 @@ function Hackerboard(props) {
                               ) : selectionScore == "up" ? (
                                 index + (page - 1) * 100 + 1
                               ) : (
-                                index * -1 + (page - 1) * 100 + teams.length
+                                index * -1 + (page - 1) * 100 + (teams.length - 1)
                               )}
                             </th>
                             <td style={{ textAlign: "left" }}>
