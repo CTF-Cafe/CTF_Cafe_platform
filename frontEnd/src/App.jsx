@@ -62,7 +62,7 @@ function App() {
 
   const getConfigs = () => {
     axios
-      .get(process.env.REACT_APP_SERVER_URI + "/api/getConfigs")
+      .get(process.env.REACT_APP_BACKEND_URI + "/api/getConfigs")
       .then((response) => {
         if (response.data.state === "sessionError") {
           globalData.alert.error("Session expired!");
@@ -103,7 +103,7 @@ function App() {
 
   const getNotifications = () => {
     axios
-      .get(process.env.REACT_APP_SERVER_URI + "/api/user/getNotifications", {
+      .get(process.env.REACT_APP_BACKEND_URI + "/api/user/getNotifications", {
         withCredentials: true,
       })
       .then((response) => {
@@ -120,7 +120,7 @@ function App() {
   useLayoutEffect(() => {
     const root = document.documentElement;
     axios
-      .get(process.env.REACT_APP_SERVER_URI + "/api/getTheme")
+      .get(process.env.REACT_APP_BACKEND_URI + "/api/getTheme")
       .then((res) => {
         root.style.setProperty(
           "--color-1",
@@ -136,7 +136,7 @@ function App() {
         );
         root.style.setProperty(
           "--bg-img",
-          res.data.theme.bg_img ? `url(${res.data.theme.bg_img})` : "none"
+          res.data.theme.bg_img.trim().length > 0 ? `url(${res.data.theme.bg_img})` : "none"
         );
 
         setTheme(res.data.theme);
@@ -151,7 +151,7 @@ function App() {
   useEffect(() => {
     if (!loggedIn) {
       axios
-        .get(process.env.REACT_APP_SERVER_URI + "/api/checkSession", {
+        .get(process.env.REACT_APP_BACKEND_URI + "/api/checkSession", {
           withCredentials: true,
         })
         .then((res) => {

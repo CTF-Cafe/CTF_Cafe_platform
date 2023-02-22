@@ -9,29 +9,14 @@ function Index(props) {
   return (
     <div>
       <div className="glitch">
-        <div className="glitch__img"></div>
-        <div className="glitch__img"></div>
-        <div className="glitch__img"></div>
-        <div className="glitch__img"></div>
-        <div className="glitch__img"></div>
+        <div className="glitch_bg"></div>
+        <div className="glitch_bg"></div>
+        <div className="glitch_bg"></div>
+        <div className="glitch_bg"></div>
+        <div className="glitch_bg"></div>
       </div>
 
       <Navbar />
-
-      <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-header">
-          <img src="..." class="rounded me-2" alt="..." />
-          <strong class="me-auto">Bootstrap</strong>
-          <small>11 mins ago</small>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="toast"
-            aria-label="Close"
-          ></button>
-        </div>
-        <div class="toast-body">Hello, world! This is a toast message.</div>
-      </div>
 
       <div className="jumbotron bg-transparent mb-0 pt-3 radius-0">
         <div className="container">
@@ -41,94 +26,104 @@ function Index(props) {
                 {process.env.REACT_APP_CTF_NAME}
                 <span className="vim-caret">&nbsp;</span>
               </h1>
-              <h1 className="display-1 bold color_white content__title2">
-                INC {new Date().getFullYear()}
-              </h1>
+              <p>
+                {`${new Date(globalData.startTime).toDateString()} ${new Date(
+                  globalData.startTime
+                ).getHours()}:${new Date(
+                  globalData.startTime
+                ).getMinutes()} - ${new Date(
+                  globalData.endTime
+                ).toDateString()} ${new Date(
+                  globalData.endTime
+                ).getHours()}:${new Date(globalData.endTime).getMinutes()}`}
+              </p>
             </div>
           </div>
           <div className="row">
             <div className="col-xl-4">
-              <p className="mt-5 text-grey text-spacey hackerFont lead">
-                The quieter you become the more you are able to hear.
-              </p>
               {globalData.loggedIn ? (
-                <Link to={`/challenges`} style={{ display: "block" }}>
-                  <button
-                    className="btn btn-outline-danger btn-shadow px-3 my-2 ml-0 ml-sm-1 text-center"
-                    ref={(element) => {
-                      if (element)
-                        element.style.setProperty(
-                          "padding-right",
-                          "14px",
-                          "important"
-                        );
-                      if (element)
-                        element.style.setProperty(
-                          "padding-left",
-                          "14px",
-                          "important"
-                        );
-                    }}
-                  >
-                    <h4 style={{ fontSize: "1.4rem" }}>Challenges</h4>
-                  </button>
+                <Link
+                  to={`/challenges`}
+                  className="btn btn-outline-danger btn-shadow px-3 my-2 ml-0 ml-sm-1 text-center"
+                  ref={(element) => {
+                    if (element)
+                      element.style.setProperty(
+                        "padding-right",
+                        "14px",
+                        "important"
+                      );
+                    if (element)
+                      element.style.setProperty(
+                        "padding-left",
+                        "14px",
+                        "important"
+                      );
+                  }}
+                >
+                  <h4 style={{ fontSize: "1.4rem" }}>Challenges</h4>
                 </Link>
               ) : (
-                <Link to={`/login`} style={{ display: "block" }}>
-                  <button
-                    className="btn btn-outline-danger btn-shadow px-3 my-2 ml-0 ml-sm-1 text-center"
-                    ref={(element) => {
-                      if (element)
-                        element.style.setProperty(
-                          "padding-right",
-                          "52px",
-                          "important"
-                        );
-                      if (element)
-                        element.style.setProperty(
-                          "padding-left",
-                          "52px",
-                          "important"
-                        );
-                    }}
-                  >
-                    <h4>Login</h4>
-                  </button>
+                <Link
+                  to={`/login`}
+                  className="btn btn-outline-danger btn-shadow px-3 my-2 ml-0 ml-sm-1 text-center"
+                  ref={(element) => {
+                    if (element)
+                      element.style.setProperty(
+                        "padding-right",
+                        "52px",
+                        "important"
+                      );
+                    if (element)
+                      element.style.setProperty(
+                        "padding-left",
+                        "52px",
+                        "important"
+                      );
+                  }}
+                >
+                  <h4>Login</h4>
                 </Link>
               )}
-              <a
-                href="https://discord.gg/HzcxNgRmjx"
-                className="btn btn-outline-danger btn-shadow mr-2 ml-0 ml-sm-1"
-                target="_blank"
-                style={{ paddingRight: "8px" }}
-              >
-                <span
-                  className="fa-brands fa-discord"
-                  style={{ fontSize: "32px" }}
-                ></span>
-              </a>
-              <a
-                href="https://twitter.com/CTFCafe"
-                className="btn btn-outline-danger btn-shadow mr-2 ml-0 ml-sm-1"
-                target="_blank"
-                style={{ paddingRight: "8px" }}
-              >
-                <span
-                  className="fa-brands fa-twitter"
-                  style={{ fontSize: "32px" }}
-                ></span>
-              </a>
-              <a
-                href="https://github.com/CTF-Cafe/CTF_Cafe"
-                className="btn btn-outline-danger btn-shadow mr-2 ml-0 ml-sm-1"
-                target="_blank"
-                style={{ paddingRight: "8px" }}
-              >
-                <span
-                  className="fa-brands fa-github"
-                  style={{ fontSize: "32px" }}
-                ></span>
-              </a>
+              <br />
+              {process.env.REACT_APP_DISCORD_URI && (
+                <a
+                  href={process.env.REACT_APP_DISCORD_URI}
+                  className="btn btn-outline-danger btn-shadow mr-2 ml-0 ml-sm-1"
+                  target="_blank"
+                  style={{ padding: "8px" }}
+                >
+                  <span
+                    className="fa-brands fa-discord"
+                    style={{ fontSize: "32px" }}
+                  ></span>
+                </a>
+              )}
+              {process.env.REACT_APP_TWITTER_URI && (
+                <a
+                  href={process.env.REACT_APP_TWITTER_URI}
+                  className="btn btn-outline-danger btn-shadow mr-2 ml-0 ml-sm-1"
+                  target="_blank"
+                  style={{ padding: "8px" }}
+                >
+                  <span
+                    className="fa-brands fa-twitter"
+                    style={{ fontSize: "32px" }}
+                  ></span>
+                </a>
+              )}
+              {process.env.REACT_APP_GITHUB_URI && (
+                <a
+                  href={process.env.REACT_APP_GITHUB_URI}
+                  className="btn btn-outline-danger btn-shadow mr-2 ml-0 ml-sm-1"
+                  target="_blank"
+                  style={{ padding: "8px" }}
+                >
+                  <span
+                    className="fa-brands fa-github"
+                    style={{ fontSize: "32px" }}
+                  ></span>
+                </a>
+              )}
             </div>
           </div>
 

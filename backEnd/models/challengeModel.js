@@ -3,6 +3,10 @@ const mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var challengeSchema = new Schema({
+    hidden: {
+        type: Boolean,
+        default: true
+    },
     name: {
         type: String,
         required: true
@@ -13,14 +17,11 @@ var challengeSchema = new Schema({
     },
     flag: {
         type: String,
-        required: true
+        default: "FLAG{HELLO}"
     },
-    hint: {
-        type: String,
-    },
-    hintCost: {
-        type: Number,
-        default: 0
+    hints: {
+        type: Array,
+        default: [{ content: "Easy Peasy", cost: 0, id: Math.random().toString().substr(2, 4) }]
     },
     points: {
         type: Number,
@@ -40,7 +41,7 @@ var challengeSchema = new Schema({
     },
     info: {
         type: String,
-        required: true
+        default: "Beep. Boop."
     },
     level: {
         type: Number,
@@ -60,23 +61,27 @@ var challengeSchema = new Schema({
     },
     codeLanguage: {
         type: String,
-        default: 'python'
+        default: 'none'
     },
     firstBlood: {
         type: String,
         default: 'none'
     },
-    dockerCompose: {
+    githubUrl: {
         type: String,
-        default: ''
+        default: null
     },
-    dockerLaunchers: {
-        type: Array,
-        default: []
+    isInstance: {
+        type: Boolean,
+        default: false
     },
     randomFlag: {
         type: Boolean,
         default: false
+    },
+    randomFlags: {
+        type: Array,
+        default: []
     },
 });
 

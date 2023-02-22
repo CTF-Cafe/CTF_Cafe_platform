@@ -12,7 +12,7 @@ function Login(props) {
 
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/login",
+        process.env.REACT_APP_BACKEND_URI + "/api/login",
         {
           username: username,
           password: password,
@@ -23,7 +23,7 @@ function Login(props) {
         if (response.data.state == "success") {
           // Logged in, now get all needed data from session
           axios
-            .get(process.env.REACT_APP_SERVER_URI + "/api/checkSession", {
+            .get(process.env.REACT_APP_BACKEND_URI + "/api/checkSession", {
               withCredentials: true,
             })
             .then((res) => {
@@ -76,17 +76,11 @@ function Login(props) {
 
   return (
     <div>
-      <div className="glitch">
-        <div className="glitch__img"></div>
-        <div className="glitch__img"></div>
-        <div className="glitch__img"></div>
-        <div className="glitch__img"></div>
-        <div className="glitch__img"></div>
-      </div>
+      <div className="bg" />
 
       <Navbar />
 
-      <div className="jumbotron bg-transparent mb-0 pt-3 radius-0">
+      <div className="jumbotron bg-transparent mb-0 pt-3 radius-0" style={{ position: "relative" }}>
         <div className="container">
           <div className="row">
             <div className="col-xl-8">

@@ -25,18 +25,9 @@ function Challenges(props) {
 
         await axios
           .post(
-            process.env.REACT_APP_SERVER_URI + "/api/admin/createChallenge",
+            process.env.REACT_APP_BACKEND_URI + "/api/admin/createChallenge",
             {
-              name: challenge.name,
-              points: challenge.value,
-              minimumPoints: 50,
-              level: 0,
-              info: challenge.description,
-              hint: "",
-              file: "",
-              flag: "FLAG{H3LL0_W0RLD}",
               category: challenge.category,
-              dockerCompose: false,
             },
             { withCredentials: true }
           )
@@ -59,9 +50,11 @@ function Challenges(props) {
 
       await axios
         .post(
-          process.env.REACT_APP_SERVER_URI + "/api/admin/saveConfigs",
+          process.env.REACT_APP_BACKEND_URI + "/api/admin/saveConfigs",
           {
-            newConfigs: [{ name: "categories", value: JSON.stringify(categoriesArray) }],
+            newConfigs: [
+              { name: "categories", value: JSON.stringify(categoriesArray) },
+            ],
           },
           { withCredentials: true }
         )
@@ -90,7 +83,7 @@ function Challenges(props) {
 
   const getChallenges = () => {
     axios
-      .get(process.env.REACT_APP_SERVER_URI + "/api/admin/getAssets", {
+      .get(process.env.REACT_APP_BACKEND_URI + "/api/admin/getAssets", {
         withCredentials: true,
       })
       .then((response) => {
@@ -109,7 +102,7 @@ function Challenges(props) {
 
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/admin/getStats",
+        process.env.REACT_APP_BACKEND_URI + "/api/admin/getStats",
         {
           name: "challenges&categories",
         },
@@ -162,6 +155,9 @@ function Challenges(props) {
 
     formData.append("id", oldChallenge._id);
 
+    const hidden = document.getElementById("hidden" + oldChallenge._id).value;
+    formData.append("hidden", hidden);
+
     const name = document.getElementById("name" + oldChallenge._id).textContent;
     formData.append("name", name);
 
@@ -186,11 +182,22 @@ function Challenges(props) {
     const info = document.getElementById("info" + oldChallenge._id).textContent;
     formData.append("info", info);
 
-    const hint = document.getElementById("hint" + oldChallenge._id).textContent;
-    formData.append("hint", hint);
+    let hints = [];
+    let i = 0;
+    while (document.getElementById(i + "hintId" + oldChallenge._id)) {
+      const id = document.getElementById(i + "hintId" + oldChallenge._id).textContent;
+      const content = document.getElementById(
+        i + "hintContent" + oldChallenge._id
+      ).textContent;
+      const cost = document.getElementById(
+        i + "hintCost" + oldChallenge._id
+      ).textContent;
 
-    const hintCost = document.getElementById("hintCost" + oldChallenge._id).textContent;
-    formData.append("hintCost", hintCost);
+      hints.push({ id: id, content: content, cost: cost });
+      i += 1;
+    }
+
+    formData.append("hints", JSON.stringify(hints));
 
     const file = document.getElementById("file" + oldChallenge._id).value;
     formData.append("file", file);
@@ -208,15 +215,15 @@ function Challenges(props) {
     const flag = document.getElementById("flag" + oldChallenge._id).textContent;
     formData.append("flag", flag);
 
-    const dockerCompose = document.getElementById(
-      "dockerCompose" + oldChallenge._id
-    );
-    if (dockerCompose != null) {
-      formData.append("dockerZip", dockerCompose.files[0]);
-      formData.append("dockerCompose", dockerCompose.files[0] ? true : false);
-    } else {
-      formData.append("dockerCompose", oldChallenge.dockerCompose);
-    }
+    const githubUrl = document.getElementById(
+      "githubUrl" + oldChallenge._id
+    ).textContent;
+    formData.append("githubUrl", githubUrl);
+
+    const isInstance = document.getElementById(
+      "isInstance" + oldChallenge._id
+    ).value;
+    formData.append("isInstance", isInstance);
 
     const randomFlag = document.getElementById(
       "randomFlag" + oldChallenge._id
@@ -225,10 +232,9 @@ function Challenges(props) {
 
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/admin/saveChallenge",
+        process.env.REACT_APP_BACKEND_URI + "/api/admin/saveChallenge",
         formData,
-        { headers: { "Content-Type": "multipart/form-data" } },
-        { withCredentials: true }
+        { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true },
       )
       .then((response) => {
         if (response.data.state == "sessionError") {
@@ -248,37 +254,10 @@ function Challenges(props) {
       .catch((error) => console.log(error.message));
   };
 
-  const removeDockerCompose = (e, challenge) => {
-    axios
-      .post(
-        process.env.REACT_APP_SERVER_URI + "/api/admin/removeDockerCompose",
-        {
-          id: challenge._id,
-        },
-        { withCredentials: true }
-      )
-      .then((response) => {
-        if (response.data.state == "sessionError") {
-          globalData.alert.error("Session expired!");
-          globalData.setUserData({});
-          globalData.setLoggedIn(false);
-          globalData.navigate("/", { replace: true });
-        } else {
-          if (response.data.state == "success") {
-            globalData.alert.success("Docker compose removed!");
-            getChallenges();
-          } else {
-            globalData.alert.error(response.data.message);
-          }
-        }
-      })
-      .catch((error) => console.log(error.message));
-  };
-
   const deleteChallenge = (e, oldChallenge) => {
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/admin/deleteChallenge",
+        process.env.REACT_APP_BACKEND_URI + "/api/admin/deleteChallenge",
         {
           id: oldChallenge._id,
         },
@@ -343,7 +322,7 @@ function Challenges(props) {
     if (newCategory.children[0].id != oldCategory.children[0].id) {
       axios
         .post(
-          process.env.REACT_APP_SERVER_URI +
+          process.env.REACT_APP_BACKEND_URI +
             "/api/admin/updateChallengeCategory",
           {
             id: challenge.id.replace("challenge-top", ""),
@@ -376,19 +355,9 @@ function Challenges(props) {
     e.preventDefault();
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/admin/createChallenge",
+        process.env.REACT_APP_BACKEND_URI + "/api/admin/createChallenge",
         {
-          name: "Challenge",
-          points: 100,
-          minimumPoints: 50,
-          level: 0,
-          info: "I am a challenge!",
-          hint: "Easy Peasy Lemon Squeezy!",
-          hintCost: 0,
-          file: "",
-          flag: "FLAG{H3LL0_W0RLD}",
           category: category,
-          dockerCompose: false,
         },
         { withCredentials: true }
       )
@@ -444,6 +413,7 @@ function Challenges(props) {
                 onClick={(e) => {
                   createChallenge(e, category);
                 }}
+                title="Create Challenge"
               >
                 <span className="fa-solid fa-plus"> </span>
               </a>
@@ -456,7 +426,6 @@ function Challenges(props) {
                     drag={drag}
                     saveChallenge={saveChallenge}
                     deleteChallenge={deleteChallenge}
-                    removeDockerCompose={removeDockerCompose}
                     key={challenge._id}
                     assets={assets}
                     setAction={setAction}

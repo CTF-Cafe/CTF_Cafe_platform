@@ -9,7 +9,7 @@ function Tools(props) {
 
   const getTeams = () => {
     axios
-      .get(process.env.REACT_APP_SERVER_URI + "/api/getTeams")
+      .get(process.env.REACT_APP_BACKEND_URI + "/api/getTeams")
       .then((response) => {
         if (response.data.state == "sessionError") {
           globalData.alert.error("Session expired!");
@@ -121,7 +121,7 @@ function Tools(props) {
     const globalMessage = document.getElementById("global_message").value;
 
     axios
-      .post(process.env.REACT_APP_SERVER_URI + "/api/admin/sendGlobalMessage", {
+      .post(process.env.REACT_APP_BACKEND_URI + "/api/admin/sendGlobalMessage", {
         globalMessage: globalMessage
       }, { withCredentials: true })
       .then((response) => {
@@ -163,14 +163,14 @@ function Tools(props) {
         {/* Hidden Stuff */}
         <img
           style={{ display: "none" }}
-          src={process.env.REACT_APP_SERVER_URI + "/api/assets/template.jpg"}
+          src={process.env.REACT_APP_BACKEND_URI + "/api/assets/template.jpg"}
           crossorigin="anonymous"
           id="certImg"
         />
         <canvas id="canvas" hidden />
 
         <tbody>
-          <tr>
+          {/* <tr>
             <td>Generate Certificate</td>
             <td>
               <select id={"cert_team"}>
@@ -196,7 +196,7 @@ function Tools(props) {
                 Run
               </button>
             </td>
-          </tr>
+          </tr> */}
           <tr>
             <td>Send Global Message</td>
             <td>

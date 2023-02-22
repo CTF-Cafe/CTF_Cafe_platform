@@ -36,6 +36,7 @@ exports.register = async function (req, res) {
                 score: userToCheck.score,
                 solved: userToCheck.solved,
                 hintsBought: userToCheck.hintsBought,
+                shadowBanned: userToCheck.shadowBanned,
               },
             ],
           })
@@ -115,6 +116,7 @@ exports.joinTeam = async function (req, res) {
                   score: userToCheck.score,
                   solved: userToCheck.solved,
                   hintsBought: userToCheck.hintsBought,
+                  shadowBanned: userToCheck.shadowBanned,
                 },
               },
             },
@@ -170,7 +172,23 @@ exports.getTeams = async function (req, res) {
         allTeams = await teams
           .aggregate([
             {
-              $match: { name: new RegExp(search, "i") },
+              $match: {
+                name: new RegExp(search, "i"),
+                $or: [
+                  {
+                    users: {
+                      $elemMatch: { username: req.session.username },
+                    },
+                  },
+                  {
+                    users: {
+                      $not: {
+                        $elemMatch: { shadowBanned: false },
+                      },
+                    },
+                  },
+                ],
+              },
             },
             {
               $addFields: {
@@ -349,7 +367,7 @@ exports.getUserTeam = async function (req, res) {
             let: {
               chalId: "$users.solved._id",
               timestamp: "$users.solved.timestamp",
-              userId: { $toString: "$users._id" }
+              userId: { $toString: "$users._id" },
             },
             pipeline: [
               {
@@ -363,12 +381,16 @@ exports.getUserTeam = async function (req, res) {
                   solve: {
                     _id: "$_id",
                     points: {
-                        $cond: {
-                          if: { $eq: ["$firstBlood", "$$userId"] },
-                          then: { $add: ["$points", "$firstBloodPoints"] },
-                          else: "$points",
-                        },
+                      $cond: {
+                        if: { $eq: ["$firstBlood", "$$userId"] },
+                        then: { $add: ["$points", "$firstBloodPoints"] },
+                        else: "$points",
+                      },
                     },
+                    firstBlood: "$firstBlood",
+                    name: "$name",
+                    category: "$category",
+                    timestamp: "$$timestamp",
                   },
                 },
               },
@@ -473,7 +495,7 @@ exports.getTeam = async function (req, res) {
         let: {
           chalId: "$users.solved._id",
           timestamp: "$users.solved.timestamp",
-          userId: { $toString: "$users._id" }
+          userId: { $toString: "$users._id" },
         },
         pipeline: [
           {
@@ -487,12 +509,16 @@ exports.getTeam = async function (req, res) {
               solve: {
                 _id: "$_id",
                 points: {
-                    $cond: {
-                      if: { $eq: ["$firstBlood", "$$userId"] },
-                      then: { $add: ["$points", "$firstBloodPoints"] },
-                      else: "$points",
-                    },
+                  $cond: {
+                    if: { $eq: ["$firstBlood", "$$userId"] },
+                    then: { $add: ["$points", "$firstBloodPoints"] },
+                    else: "$points",
+                  },
                 },
+                firstBlood: "$firstBlood",
+                name: "$name",
+                category: "$category",
+                timestamp: "$$timestamp",
               },
             },
           },

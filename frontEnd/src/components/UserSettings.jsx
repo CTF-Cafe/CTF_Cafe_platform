@@ -12,7 +12,7 @@ function User(props) {
 
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/user/updateUsername",
+        process.env.REACT_APP_BACKEND_URI + "/api/user/updateUsername",
         {
           newUsername: newUsername,
         },
@@ -38,8 +38,9 @@ function User(props) {
 
   return (
     <div>
+      <div className="bg" />
       <Navbar />
-      <div className="jumbotron bg-transparent mb-0 pt-3 radius-0">
+      <div className="jumbotron bg-transparent mb-0 pt-3 radius-0" style={{ position: "relative" }}>
         <div className="container">
           {globalData.userData.username ? (
             <div>

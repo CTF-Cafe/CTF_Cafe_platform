@@ -13,7 +13,7 @@ function User(props) {
 
   const getUser = (username) => {
     axios
-      .post(process.env.REACT_APP_SERVER_URI + "/api/getUser", {
+      .post(process.env.REACT_APP_BACKEND_URI + "/api/getUser", {
         username: username,
       })
       .then((response) => {
@@ -25,7 +25,6 @@ function User(props) {
             let finalDataDifficulty = [];
 
             response.data.solved.forEach((solve) => {
-              console.log(solve)
               var category = finalDataCategory.find((obj) => {
                 return obj.name == solve.challenge.category;
               });
@@ -90,8 +89,10 @@ function User(props) {
 
   return (
     <div>
+      <div className="bg" />
+
       <Navbar />
-      <div className="jumbotron bg-transparent mb-0 pt-3 radius-0">
+      <div className="jumbotron bg-transparent mb-0 pt-3 radius-0" style={{ position: "relative" }}>
         <div className="container">
           {user.username ? (
             <div>
@@ -139,10 +140,14 @@ function User(props) {
                                 {index}
                               </th>
                               <td>
-                                {solve.challenge.firstBlood == user.username ? (
+                                {solve.challenge.firstBlood == user._id ? (
                                   <span
                                     class="fa-solid fa-droplet"
-                                    style={{ fontSize: "22px", color: "red", marginRight: '5px' }}
+                                    style={{
+                                      fontSize: "22px",
+                                      color: "red",
+                                      marginRight: "5px",
+                                    }}
                                   ></span>
                                 ) : null}
                                 {solve.challenge.name}

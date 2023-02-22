@@ -6,7 +6,6 @@ const db = mongoose.connection;
 const dotenv = require("dotenv");
 dotenv.config();
 const bodyparser = require("body-parser");
-const path = require("path");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const fileUpload = require("express-fileupload");
@@ -116,8 +115,6 @@ function checkAuth(req, res, next) {
 }
 
 function checkAdminAuth(req, res, next) {
-  // next();
-  // REMOVE FOR LOCAL TESTS
   users.findOne({ username: req.session.username }).then(function (user) {
     if (!user) {
       res.send({ state: "sessionError" });
@@ -135,10 +132,11 @@ app.use("/api", globalRouter);
 app.use("/api/user", checkAuth, userRouter);
 app.use("/api/admin", checkAdminAuth, adminRouter);
 
-app.use("/api/assets", express.static("assets"));
+app.use("/api/assets", express.static("./assets"));
 
 process.on("uncaughtException", function (err) {
   console.log("Uncaught exception: " + err.stack);
+  console.log("NODE NOT EXITING");
 });
 
 app.listen(port, () => {
