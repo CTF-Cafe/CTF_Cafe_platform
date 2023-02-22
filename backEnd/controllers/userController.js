@@ -28,6 +28,7 @@ exports.login = async function (req, res) {
           { key: newKey.toString() }
         );
 
+        // Create log for admins
         logController.createLog(req, user, {
           state: "success",
           message: "Logged In",
@@ -94,34 +95,24 @@ exports.register = async function (req, res) {
     // }
 
     // Username to short
-    if (username.length < 4) {
-      throw new Error("Username is to short! 4 characters minimum!");
-    }
+    if (username.length < 4) throw new Error("Username is to short! 4 characters minimum!");
 
     // Username to long
-    if (username.length > 32) {
-      throw new Error("Username is to long! 32 characters maximum!");
-    }
+    if (username.length > 32) throw new Error("Username is to long! 32 characters maximum!");
 
     // Check password length
-    if (req.body.password.trim().length < 8) {
-      throw new Error("Password is to short 8 characters minimum!!");
-    }
+    if (req.body.password.trim().length < 8) throw new Error("Password is to short 8 characters minimum!!");
 
     if (
       !email.match(
         /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
       )
-    ) {
-      throw new Error("Invalid email!");
-    }
+    ) throw new Error("Invalid email!");
 
     // Check if username exists
     const userExists = await users.findOne({ username: username });
 
-    if (userExists) {
-      throw new Error("User name Exists!");
-    }
+    if (userExists) throw new Error("User name Exists!");
 
     // Check admin has deleted the admin:admin account before allowing others.
     const defaultAdminCheck = await users.findOne({
