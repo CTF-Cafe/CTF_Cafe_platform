@@ -582,7 +582,7 @@ exports.getDockers = async function (req, res) {
     if ((page - 1) * 100 > logCount) throw Error("No more pages!");
     if (isNaN(page)) page = 1;
 
-    const dockers = (
+    let dockers = (
       await axios.post(
         `${process.env.DEPLOYER_API}/api/getAllDockers`,
         {
@@ -595,6 +595,22 @@ exports.getDockers = async function (req, res) {
         }
       )
     ).data.dockers;
+
+    dockers = await Promise.all(
+      dockers.map(async (x) => {
+        x.team = await teams.findById(x.ownerId, { name: 1 });
+        x.challenge = await challenges.findById(x.challengeId, { name: 1 });
+        if (
+          new RegExp(search).test(x.team.name) ||
+          new RegExp(search).test(x.challenge.name) ||
+          new RegExp(search).test(x.randomFlag) ||
+          new RegExp(search).test(x.mappedPort)
+        )
+          return x;
+      })
+    );
+
+    dockers = dockers.filter((x) => x !== undefined);
 
     res.send(dockers);
   } catch (e) {
@@ -620,7 +636,7 @@ exports.restartDocker = async function (req, res) {
     );
 
     if (resAxios.data.state == "error") throw new Error(resAxios.data.message);
-    
+
     resAxios = await axios.post(
       `${process.env.DEPLOYER_API}/api/deployDocker`,
       {
@@ -635,7 +651,7 @@ exports.restartDocker = async function (req, res) {
         },
       }
     );
-    
+
     if (resAxios.data.state == "error") throw new Error(resAxios.data.message);
 
     const challenge = await challenges.findById(dockerToRestart.challengeId);

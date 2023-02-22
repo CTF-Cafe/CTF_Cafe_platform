@@ -26,53 +26,62 @@ function Index(props) {
                 {process.env.REACT_APP_CTF_NAME}
                 <span className="vim-caret">&nbsp;</span>
               </h1>
+              <p>
+                {`${new Date(globalData.startTime).toDateString()} ${new Date(
+                  globalData.startTime
+                ).getHours()}:${new Date(
+                  globalData.startTime
+                ).getMinutes()} - ${new Date(
+                  globalData.endTime
+                ).toDateString()} ${new Date(
+                  globalData.endTime
+                ).getHours()}:${new Date(globalData.endTime).getMinutes()}`}
+              </p>
             </div>
           </div>
           <div className="row">
             <div className="col-xl-4">
               {globalData.loggedIn ? (
-                <Link to={`/challenges`} style={{ display: "block" }}>
-                  <button
-                    className="btn btn-outline-danger btn-shadow px-3 my-2 ml-0 ml-sm-1 text-center"
-                    ref={(element) => {
-                      if (element)
-                        element.style.setProperty(
-                          "padding-right",
-                          "14px",
-                          "important"
-                        );
-                      if (element)
-                        element.style.setProperty(
-                          "padding-left",
-                          "14px",
-                          "important"
-                        );
-                    }}
-                  >
-                    <h4 style={{ fontSize: "1.4rem" }}>Challenges</h4>
-                  </button>
+                <Link
+                  to={`/challenges`}
+                  className="btn btn-outline-danger btn-shadow px-3 my-2 ml-0 ml-sm-1 text-center"
+                  ref={(element) => {
+                    if (element)
+                      element.style.setProperty(
+                        "padding-right",
+                        "14px",
+                        "important"
+                      );
+                    if (element)
+                      element.style.setProperty(
+                        "padding-left",
+                        "14px",
+                        "important"
+                      );
+                  }}
+                >
+                  <h4 style={{ fontSize: "1.4rem" }}>Challenges</h4>
                 </Link>
               ) : (
-                <Link to={`/login`} style={{ display: "block" }}>
-                  <button
-                    className="btn btn-outline-danger btn-shadow px-3 my-2 ml-0 ml-sm-1 text-center"
-                    ref={(element) => {
-                      if (element)
-                        element.style.setProperty(
-                          "padding-right",
-                          "52px",
-                          "important"
-                        );
-                      if (element)
-                        element.style.setProperty(
-                          "padding-left",
-                          "52px",
-                          "important"
-                        );
-                    }}
-                  >
-                    <h4>Login</h4>
-                  </button>
+                <Link
+                  to={`/login`}
+                  className="btn btn-outline-danger btn-shadow px-3 my-2 ml-0 ml-sm-1 text-center"
+                  ref={(element) => {
+                    if (element)
+                      element.style.setProperty(
+                        "padding-right",
+                        "52px",
+                        "important"
+                      );
+                    if (element)
+                      element.style.setProperty(
+                        "padding-left",
+                        "52px",
+                        "important"
+                      );
+                  }}
+                >
+                  <h4>Login</h4>
                 </Link>
               )}
               {process.env.REACT_APP_DISCORD_URI && (

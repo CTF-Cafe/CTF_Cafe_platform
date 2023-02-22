@@ -1,4 +1,6 @@
 import { useState, useEffect, useContext } from "react";
+import { Link } from "react-router-dom";
+
 import axios from "axios";
 import AppContext from "../Data/AppContext";
 
@@ -147,7 +149,7 @@ function Dockers(props) {
             <span className="fa-solid fa-pencil"></span>
           </button>
         </div>
-        {/* <div>
+        <div>
           <input
             type="text"
             className="form-control"
@@ -158,7 +160,7 @@ function Dockers(props) {
               setSearchQuery(e.target.value);
             }}
           />
-        </div> */}
+        </div>
       </div>
       <table className="table table-hover table-striped">
         <thead className="thead-dark hackerFont">
@@ -166,10 +168,11 @@ function Dockers(props) {
             <th scope="col" style={{ textAlign: "center" }}>
               #
             </th>
-            <th scope="col">dockerId</th>
-            <th scope="col">mappedPort</th>
-            <th scope="col">deployTime</th>
-            <th scope="col">randomFlag</th>
+            <th scope="col">Challenge</th>
+            <th scope="col">Team</th>
+            <th scope="col">Port</th>
+            <th scope="col">Deploy Time</th>
+            <th scope="col">Random Flag</th>
             {editMode && <th scope="col">Actions</th>}
           </tr>
         </thead>
@@ -180,10 +183,21 @@ function Dockers(props) {
                 <th scope="row" style={{ textAlign: "center" }}>
                   {index + (page - 1) * 100}
                 </th>
-                <td>{docker.dockerId.substr(0, 5)}</td>
+                <td>{docker.challenge.name}</td>
+                <td>
+                  <Link to={`/team/${docker.team.name}`}>
+                    <a className="p-3 text-decoration-none text-light bold">
+                      {docker.team.name}
+                    </a>
+                  </Link>
+                </td>
                 <td>{docker.mappedPort}</td>
                 <td>{docker.deployTime}</td>
-                <td>{docker.randomFlag.substr(0, 5)}</td>
+                <td>
+                  {docker.randomFlag
+                    ? docker.randomFlag.substr(0, 10) + "..."
+                    : "none"}
+                </td>
                 {editMode && (
                   <td>
                     <button
