@@ -17,7 +17,7 @@ function Stats(props) {
   const getStats = () => {
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/admin/getStats",
+        process.env.REACT_APP_BACKEND_URI + "/api/admin/getStats",
         {
           name: "counts",
         },
@@ -39,7 +39,7 @@ function Stats(props) {
 
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/admin/getStats",
+        process.env.REACT_APP_BACKEND_URI + "/api/admin/getStats",
         {
           name: "challenges",
         },

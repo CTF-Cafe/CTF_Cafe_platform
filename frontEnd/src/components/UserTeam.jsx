@@ -5,28 +5,26 @@ import copy from "copy-to-clipboard";
 import AppContext from "./Data/AppContext";
 import Navbar from "./Global/Navbar";
 import ConfirmModal from "./Global/ConfirmModal";
+import PieChart from "./Charts/PieChart";
 
 function UserTeam(props) {
   const globalData = useContext(AppContext);
   const [action, setAction] = useState({});
   const [userTeam, setUserTeam] = useState({});
+  const [challengeStatsCategory, setChallengeStatsCategory] = useState([]);
+  const [challengeStatsDifficulty, setChallengeStatsDifficulty] = useState([]);
 
   const getTeam = () => {
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/user/getUserTeam",
+        process.env.REACT_APP_BACKEND_URI + "/api/user/getUserTeam",
         {
           teamId: globalData.userData.teamId,
         },
         { withCredentials: true }
       )
       .then((response) => {
-        if (response.data.state == "sessionError") {
-          globalData.alert.error("Session expired!");
-          globalData.setUserData({});
-          globalData.setLoggedIn(false);
-          globalData.navigate("/", { replace: true });
-        } else if (response.data.state != "error") {
+        if (response.data.state != "error") {
           const clubArray = (arr) => {
             return arr.reduce((acc, val, ind) => {
               const index = acc.findIndex((el) => el.username === val.username);
@@ -42,15 +40,73 @@ function UserTeam(props) {
 
           response.data.users = clubArray(response.data.users);
 
-          response.data.users.forEach((user) => {
-            user.solved.forEach((solved) => {
-              user.score += solved.points;
-            });
+          let finalDataCategory = [];
+          let finalDataDifficulty = [];
 
+          response.data.solved = [];
+          response.data.users.forEach((user) => {
+            user.solved.forEach((solve) => {
+              response.data.solved.push({
+                ...solve,
+                userId: user._id,
+                username: user.username,
+              });
+              user.score += solve.points;
+
+              var category = finalDataCategory.find((obj) => {
+                return obj.name == solve.category;
+              });
+
+              if (category) {
+                finalDataCategory[
+                  finalDataCategory.indexOf(category)
+                ].value += 1;
+              } else {
+                finalDataCategory.push({
+                  name: solve.category,
+                  value: 1,
+                });
+              }
+
+              var difficulty = finalDataDifficulty.find((obj) => {
+                return (
+                  obj.name ==
+                  (solve.level == 3
+                    ? "Ninja"
+                    : solve.level == 2
+                    ? "Hard"
+                    : solve.level == 1
+                    ? "Medium"
+                    : "Easy")
+                );
+              });
+
+              if (difficulty) {
+                finalDataDifficulty[
+                  finalDataDifficulty.indexOf(difficulty)
+                ].value += 1;
+              } else {
+                finalDataDifficulty.push({
+                  name:
+                    solve.level == 3
+                      ? "Ninja"
+                      : solve.level == 2
+                      ? "Hard"
+                      : solve.level == 1
+                      ? "Medium"
+                      : "Easy",
+                  value: 1,
+                });
+              }
+            });
             user.hintsBought.forEach((hint) => {
               user.score -= hint.cost;
             });
           });
+
+          setChallengeStatsCategory(finalDataCategory);
+
+          setChallengeStatsDifficulty(finalDataDifficulty);
 
           globalData.userData.team = response.data;
           setUserTeam(response.data);
@@ -71,7 +127,7 @@ function UserTeam(props) {
 
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/user/registerTeam",
+        process.env.REACT_APP_BACKEND_URI + "/api/user/registerTeam",
         {
           teamName: teamName,
         },
@@ -110,7 +166,7 @@ function UserTeam(props) {
 
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/user/joinTeam",
+        process.env.REACT_APP_BACKEND_URI + "/api/user/joinTeam",
         {
           teamCode: teamCode,
         },
@@ -140,7 +196,7 @@ function UserTeam(props) {
   const copyCode = (e) => {
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/user/getTeamCode",
+        process.env.REACT_APP_BACKEND_URI + "/api/user/getTeamCode",
         {
           teamName: globalData.userData.team.name,
         },
@@ -166,7 +222,7 @@ function UserTeam(props) {
 
   const leaveTeam = (e) => {
     axios
-      .get(process.env.REACT_APP_SERVER_URI + "/api/user/leaveTeam", {
+      .get(process.env.REACT_APP_BACKEND_URI + "/api/user/leaveTeam", {
         withCredentials: true,
       })
       .then((response) => {
@@ -193,7 +249,7 @@ function UserTeam(props) {
   const kickUser = (e, userToKick) => {
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/user/kickUser",
+        process.env.REACT_APP_BACKEND_URI + "/api/user/kickUser",
         {
           userToKick: userToKick,
         },
@@ -222,9 +278,13 @@ function UserTeam(props) {
 
   return (
     <div>
+      <div className="bg" />
       <Navbar />
       <ConfirmModal action={action} />
-      <div className="jumbotron bg-transparent mb-0 pt-3 radius-0">
+      <div
+        className="jumbotron bg-transparent mb-0 pt-3 radius-0"
+        style={{ position: "relative" }}
+      >
         <div className="container">
           {!userTeam.name ? (
             <div className="jumbotron bg-transparent mb-0 pt-3 radius-0">
@@ -359,6 +419,68 @@ function UserTeam(props) {
                   })}
                 </tbody>
               </table>
+              {userTeam.solved.length > 0 && (
+                <>
+                  <div className="row" style={{ textAlign: "center" }}>
+                    <div className="col-md-6 mb-3">
+                      <div>
+                        <h3>Solves by Category</h3>
+                        <PieChart data={challengeStatsCategory} />
+                      </div>
+                    </div>
+                    <div className="col-md-6 mb-3">
+                      <div>
+                        <h3>Solves by Difficulty</h3>
+                        <PieChart data={challengeStatsDifficulty} />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="row">
+                    <table className="table table-hover table-striped">
+                      <thead className="thead-dark hackerFont">
+                        <tr>
+                          <th scope="col" style={{ textAlign: "center" }}>
+                            #
+                          </th>
+                          <th scope="col">Challenge Name</th>
+                          <th scope="col">Challenge Points</th>
+                          <th scope="col">Challenge Category</th>
+                          <th scope="col">Time Solved</th>
+                          <th scope="col">Flagger</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {userTeam.solved.map((solve, index) => {
+                          return (
+                            <tr key={solve._id}>
+                              <th scope="row" style={{ textAlign: "center" }}>
+                                {index}
+                              </th>
+                              <td>
+                                {solve.firstBlood == solve.userId ? (
+                                  <span
+                                    class="fa-solid fa-droplet"
+                                    style={{
+                                      fontSize: "22px",
+                                      color: "red",
+                                      marginRight: "5px",
+                                    }}
+                                  ></span>
+                                ) : null}
+                                {solve.name}
+                              </td>
+                              <td>{solve.points}</td>
+                              <td>{solve.category}</td>
+                              <td>{solve.timestamp}</td>
+                              <td>{solve.username}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              )}
             </div>
           )}
         </div>

@@ -1,4 +1,4 @@
-import { Outlet, Routes, Route, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import AppContext from "../Data/AppContext";
@@ -8,6 +8,7 @@ function Users(props) {
   const [users, setUsers] = useState([]);
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
+  const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
     getUsers(page);
@@ -16,7 +17,7 @@ function Users(props) {
   const getUsers = (index) => {
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/admin/getUsers",
+        process.env.REACT_APP_BACKEND_URI + "/api/admin/getUsers",
         {
           page: index,
           search: searchQuery,
@@ -60,7 +61,7 @@ function Users(props) {
   const deleteUser = (e, user) => {
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/admin/deleteUser",
+        process.env.REACT_APP_BACKEND_URI + "/api/admin/deleteUser",
         {
           user: user,
         },
@@ -90,7 +91,7 @@ function Users(props) {
   const addAdmin = (e, user) => {
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/admin/addAdmin",
+        process.env.REACT_APP_BACKEND_URI + "/api/admin/addAdmin",
         {
           user: user,
         },
@@ -120,7 +121,7 @@ function Users(props) {
   const removeAdmin = (e, user) => {
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/admin/removeAdmin",
+        process.env.REACT_APP_BACKEND_URI + "/api/admin/removeAdmin",
         {
           user: user,
         },
@@ -135,6 +136,66 @@ function Users(props) {
         } else {
           if (response.data.state == "success") {
             globalData.alert.success("Admin removed!");
+            getUsers(page);
+          } else {
+            globalData.alert.error(response.data.message);
+            getUsers(page);
+          }
+        }
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+  };
+
+  const shadowBan = (e, user) => {
+    axios
+      .post(
+        process.env.REACT_APP_BACKEND_URI + "/api/admin/shadowBan",
+        {
+          user: user,
+        },
+        { withCredentials: true }
+      )
+      .then((response) => {
+        if (response.data.state == "sessionError") {
+          globalData.alert.error("Session expired!");
+          globalData.setUserData({});
+          globalData.setLoggedIn(false);
+          globalData.navigate("/", { replace: true });
+        } else {
+          if (response.data.state == "success") {
+            globalData.alert.success("User shadow banned!");
+            getUsers(page);
+          } else {
+            globalData.alert.error(response.data.message);
+            getUsers(page);
+          }
+        }
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+  };
+
+  const unShadowBan = (e, user) => {
+    axios
+      .post(
+        process.env.REACT_APP_BACKEND_URI + "/api/admin/unShadowBan",
+        {
+          user: user,
+        },
+        { withCredentials: true }
+      )
+      .then((response) => {
+        if (response.data.state == "sessionError") {
+          globalData.alert.error("Session expired!");
+          globalData.setUserData({});
+          globalData.setLoggedIn(false);
+          globalData.navigate("/", { replace: true });
+        } else {
+          if (response.data.state == "success") {
+            globalData.alert.success("User unShadow banned!");
             getUsers(page);
           } else {
             globalData.alert.error(response.data.message);
@@ -174,14 +235,23 @@ function Users(props) {
           <button
             className="btn btn-outline-danger btn-shadow"
             onClick={previousPage}
+            title="Prev Page"
           >
             <span className="fa-solid fa-arrow-left"></span>
           </button>
           <button
             className="btn btn-outline-danger btn-shadow"
             onClick={nextPage}
+            title="Next Page"
           >
             <span className="fa-solid fa-arrow-right"></span>
+          </button>
+          <button
+            className="btn btn-outline-danger btn-shadow"
+            onClick={() => setEditMode(!editMode)}
+            title="Edit Mode"
+          >
+            <span className="fa-solid fa-pencil"></span>
           </button>
         </div>
         <div>
@@ -208,6 +278,7 @@ function Users(props) {
             <th scope="col">User Solves</th>
             <th scope="col">Verified</th>
             <th scope="col">Admin</th>
+            <th scope="col">SBanned</th>
           </tr>
         </thead>
         <tbody>
@@ -218,58 +289,106 @@ function Users(props) {
                   {index + (page - 1) * 100}
                 </th>
                 <td>
-                  <button
-                    className="btn btn-outline-danger btn-shadow"
-                    data-toggle="modal"
-                    data-target="#confirmModal"
-                    onClick={(e) => {
-                      props.setAction({
-                        function: deleteUser,
-                        e: e,
-                        data: user,
-                      });
-                    }}
-                    style={{ marginRight: "30px" }}
-                  >
-                    <span className="fa-solid fa-minus"></span>
-                  </button>
-                  {user.username}
+                  {editMode && (
+                    <button
+                      className="btn btn-outline-danger btn-shadow"
+                      data-toggle="modal"
+                      data-target="#confirmModal"
+                      onClick={(e) => {
+                        props.setAction({
+                          function: deleteUser,
+                          e: e,
+                          data: user,
+                        });
+                      }}
+                      style={{ marginRight: "30px" }}
+                      title="Delete"
+                    >
+                      <span className="fa-solid fa-minus"></span>
+                    </button>
+                  )}
+                  <Link to={`/user/${user.username}`}>
+                    <a className="p-3 text-decoration-none text-light bold">
+                      {user.username}
+                    </a>
+                  </Link>
                 </td>
                 <td>{user.score}</td>
                 <td>{user.solved.length}</td>
                 <td>{user.verified.toString()}</td>
                 <td>
                   {user.isAdmin.toString()}{" "}
-                  <button
-                    className="btn btn-outline-danger btn-shadow"
-                    data-toggle="modal"
-                    data-target="#confirmModal"
-                    onClick={(e) => {
-                      props.setAction({
-                        function: addAdmin,
-                        e: e,
-                        data: user,
-                      });
-                    }}
-                    style={{ marginLeft: "15px" }}
-                  >
-                    <span className="fa-solid fa-arrow-up"></span>
-                  </button>
-                  <button
-                    className="btn btn-outline-danger btn-shadow"
-                    data-toggle="modal"
-                    data-target="#confirmModal"
-                    onClick={(e) => {
-                      props.setAction({
-                        function: removeAdmin,
-                        e: e,
-                        data: user,
-                      });
-                    }}
-                    style={{ marginLeft: "5px" }}
-                  >
-                    <span className="fa-solid fa-arrow-down"></span>
-                  </button>
+                  {editMode &&
+                    (user.isAdmin.toString() == "false" ? (
+                      <button
+                        className="btn btn-outline-danger btn-shadow"
+                        data-toggle="modal"
+                        data-target="#confirmModal"
+                        onClick={(e) => {
+                          props.setAction({
+                            function: addAdmin,
+                            e: e,
+                            data: user,
+                          });
+                        }}
+                        title="Promote"
+                      >
+                        <span className="fa-solid fa-arrow-up"></span>
+                      </button>
+                    ) : (
+                      <button
+                        className="btn btn-outline-danger btn-shadow"
+                        data-toggle="modal"
+                        data-target="#confirmModal"
+                        onClick={(e) => {
+                          props.setAction({
+                            function: removeAdmin,
+                            e: e,
+                            data: user,
+                          });
+                        }}
+                        title="Demote"
+                      >
+                        <span className="fa-solid fa-arrow-down"></span>
+                      </button>
+                    ))}
+                </td>
+                <td>
+                  {user.shadowBanned.toString()}
+                  {editMode &&
+                    (user.shadowBanned.toString() == "false" ? (
+                      <button
+                        className="btn btn-outline-danger btn-shadow"
+                        data-toggle="modal"
+                        data-target="#confirmModal"
+                        onClick={(e) => {
+                          props.setAction({
+                            function: shadowBan,
+                            e: e,
+                            data: user,
+                          });
+                        }}
+                        title="Shadow Ban"
+                      >
+                        <span className="fa-solid fa-thumbs-down"></span>
+                      </button>
+                    ) : (
+                      <button
+                        className="btn btn-outline-danger btn-shadow"
+                        data-toggle="modal"
+                        data-target="#confirmModal"
+                        onClick={(e) => {
+                          props.setAction({
+                            function: unShadowBan,
+                            e: e,
+                            data: user,
+                          });
+                        }}
+                        title="UnShadow Ban"
+                      >
+                        <span className="fa-solid fa-thumbs-up"></span>
+                      </button>
+                    ))}
                 </td>
               </tr>
             );

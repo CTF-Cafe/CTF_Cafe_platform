@@ -299,7 +299,11 @@ exports.getUsers = async function (req, res) {
         allUsers = await users
           .aggregate([
             {
-              $match: { username: new RegExp(search, "i"), verified: true },
+              $match: {
+                username: new RegExp(search, "i"),
+                verified: true,
+                $or: [{ username: req.session.username }, { shadowBanned: false }],
+              },
             },
             {
               $unwind: {
@@ -412,6 +416,9 @@ exports.getUser = async function (req, res) {
       if (challenge) {
         user.solved[i].challenge = challenge;
         user.score += challenge.points;
+      } else {
+        user.solved.splice(i, 1);
+        i--;
       }
     }
 
@@ -450,6 +457,9 @@ exports.getTheme = async function (req, res) {
 exports.getScoreboard = async function (req, res) {
   let allTeams = await teams
     .aggregate([
+      {
+        $match: { users: { $not: { $elemMatch: { shadowBanned: true } } } },
+      },
       {
         $addFields: {
           oldUsers: "$users",

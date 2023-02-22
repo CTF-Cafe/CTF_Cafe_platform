@@ -18,6 +18,18 @@ var themeSchema = new Schema({
     bg_img: {
         type: String,
         default: 'none'
+    },
+    top1_icon: {
+        type: String,
+        default: 'none'
+    },
+    top2_icon: {
+        type: String,
+        default: 'none'
+    },
+    top3_icon: {
+        type: String,
+        default: 'none'
     }
 });
 

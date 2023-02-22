@@ -26,6 +26,14 @@ router.post('/removeAdmin', (req, res) => {
     adminController.removeAdmin(req, res);
 });
 
+router.post('/shadowBan', (req, res) => {
+    adminController.shadowBan(req, res);
+});
+
+router.post('/unShadowBan', (req, res) => {
+    adminController.unShadowBan(req, res);
+});
+
 router.post('/getStats', (req, res) => {
     adminController.getStats(req, res);
 });
@@ -54,10 +62,6 @@ router.post('/createChallenge', (req, res) => {
     adminController.createChallenge(req, res);
 });
 
-router.post('/removeDockerCompose', (req, res) => {
-    adminController.removeDockerCompose(req, res);
-});
-
 router.post('/updateChallengeCategory', (req, res) => {
     adminController.updateChallengeCategory(req, res);
 });
@@ -72,6 +76,18 @@ router.post('/saveTheme', (req, res) => {
 
 router.post('/sendGlobalMessage', (req, res) => {
     adminController.sendGlobalMessage(req, res);
+});
+
+router.post('/getDockers', (req, res) => {
+    adminController.getDockers(req, res);
+});
+
+router.post('/shutdownDocker', (req, res) => {
+    adminController.shutdownDocker(req, res);
+});
+
+router.post('/restartDocker', (req, res) => {
+    adminController.restartDocker(req, res);
 });
 
 module.exports = router;

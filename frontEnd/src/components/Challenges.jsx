@@ -62,13 +62,13 @@ function Challenges(props) {
     };
   }, [counter]);
 
-  const buyHint = (e, challengeId) => {
-
+  const buyHint = (e, data) => {
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/user/buyHint",
+        process.env.REACT_APP_BACKEND_URI + "/api/user/buyHint",
         {
-          challengeId: challengeId,
+          challengeId: data.challId,
+          hintId: data.hintId,
         },
         {
           withCredentials: true,
@@ -95,7 +95,7 @@ function Challenges(props) {
 
   const getChallenges = () => {
     axios
-      .get(process.env.REACT_APP_SERVER_URI + "/api/user/getChallenges", {
+      .get(process.env.REACT_APP_BACKEND_URI + "/api/user/getChallenges", {
         withCredentials: true,
       })
       .then((response) => {
@@ -137,6 +137,16 @@ function Challenges(props) {
 
             return 0;
           });
+
+          response.data.challenges.forEach((c) => {});
+          for (let c of response.data.challenges) {
+            if (c.progress && c.progress !== "finished") {
+              setTimeout(() => {
+                getChallenges();
+              }, 500);
+              break;
+            }
+          }
           setChallenges(response.data.challenges);
           setCategories(response.data.categories);
           setEndTime(response.data.endTime);
@@ -149,7 +159,7 @@ function Challenges(props) {
   };
 
   const downloadFile = (file, name) => {
-    saveAs(process.env.REACT_APP_SERVER_URI + "/api/assets/" + file, name); // Put your image url here.
+    saveAs(process.env.REACT_APP_BACKEND_URI + "/api/assets/" + file, name); // Put your image url here.
   };
 
   useEffect(() => {
@@ -160,13 +170,13 @@ function Challenges(props) {
     getChallenges();
   }, []);
 
-  const launchDocker = (challenge) => {
-    challenge.dockerLoading = true;
+  const shutdownDocker = (challenge) => {
+    challenge.progress = "stopping";
     setChallenges([...challenges]);
 
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/user/launchDocker",
+        process.env.REACT_APP_BACKEND_URI + "/api/user/shutdownDocker",
         {
           challengeId: challenge._id,
         },
@@ -182,10 +192,10 @@ function Challenges(props) {
           globalData.navigate("/", { replace: true });
         } else if (response.data.state == "error") {
           globalData.alert.error(response.data.message);
-          challenge.dockerLoading = false;
+          delete challenge.progress;
           setChallenges([...challenges]);
         } else {
-          globalData.alert.success("Docker launched!");
+          globalData.alert.success("Challenge docker stopped!");
           getChallenges();
         }
       })
@@ -194,13 +204,13 @@ function Challenges(props) {
       });
   };
 
-  const stopDocker = (challenge) => {
-    challenge.dockerStopping = true;
+  const createDocker = (challenge) => {
+    challenge.progress = "deploying";
     setChallenges([...challenges]);
 
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/user/stopDocker",
+        process.env.REACT_APP_BACKEND_URI + "/api/user/deployDocker",
         {
           challengeId: challenge._id,
         },
@@ -216,10 +226,10 @@ function Challenges(props) {
           globalData.navigate("/", { replace: true });
         } else if (response.data.state == "error") {
           globalData.alert.error(response.data.message);
-          challenge.dockerStopping = false;
+          delete challenge.progress;
           setChallenges([...challenges]);
         } else {
-          globalData.alert.success("Docker stopped!");
+          globalData.alert.success("Challenge docker started!");
           getChallenges();
         }
       })
@@ -233,7 +243,7 @@ function Challenges(props) {
 
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/user/submitFlag",
+        process.env.REACT_APP_BACKEND_URI + "/api/user/submitFlag",
         {
           flag: flag,
           challengeId: challenge._id,
@@ -281,9 +291,14 @@ function Challenges(props) {
         spinnerColor="#ef121b"
       />
 
+      <div className="bg" />
+
       <Navbar />
 
-      <div className="jumbotron bg-transparent mb-0 pt-0 radius-0">
+      <div
+        className="jumbotron bg-transparent mb-0 pt-0 radius-0"
+        style={{ position: "relative" }}
+      >
         <div className="container">
           <div className="row">
             <div className="col-xl-12  text-center">
@@ -473,71 +488,40 @@ function Challenges(props) {
                                   })}
                               </p>
 
-                              {challenge.dockerLaunchers.find(
-                                (item) =>
-                                  item.team === globalData.userData.team._id
-                              ) != undefined ? (
-                                <>
-                                  <p>
-                                    Port:{" "}
-                                    {
-                                      challenge.dockerLaunchers.find(
-                                        (item) =>
-                                          item.team ===
-                                          globalData.userData.team._id
-                                      ).port
-                                    }
-                                  </p>
-                                </>
-                              ) : null}
-
-                              {challenge.dockerCompose == "true" ? (
-                                <a
-                                  href="#"
+                              {challenge.isInstance ? (
+                                <button
                                   className="btn btn-outline-danger btn-shadow"
                                   onClick={(e) => {
-                                    e.preventDefault();
-                                    challenge.dockerLaunchers.find(
-                                      (item) =>
-                                        item.team ===
-                                        globalData.userData.team._id
-                                    ) == undefined
-                                      ? launchDocker(challenge)
-                                      : stopDocker(challenge);
+                                    if (!challenge.progress)
+                                      createDocker(challenge);
+                                    if (challenge.progress === "finished")
+                                      shutdownDocker(challenge);
                                   }}
+                                  title={!challenge.progress ? "Start Docker" : challenge.progress === "finished" ? "Stop Docker" : challenge.progress === "stopping" ? "Stopping Docker..." : "Building Docker..."}
                                 >
-                                  {challenge.dockerLoading ? (
+                                  {!challenge.progress ? (
                                     <>
-                                      <span className="fa-solid fa-spinner fa-spin mr-2"></span>
-                                      Loading
+                                      <span className="fa-solid fa-circle-play"></span>
                                     </>
-                                  ) : challenge.dockerStopping ? (
+                                  ) : challenge.progress === "finished" ? (
                                     <>
-                                      <span className="fa-solid fa-spinner fa-spin mr-2"></span>
-                                      Stopping
+                                      <span className="fa-solid fa-power-off"></span>
                                     </>
-                                  ) : challenge.dockerLaunchers.find(
-                                      (item) =>
-                                        item.team ===
-                                        globalData.userData.team._id
-                                    ) == undefined ? (
+                                  ) : challenge.progress === "stopping" ? (
                                     <>
-                                      <span className="fa-solid fa-circle-play mr-2"></span>
-                                      Start
+                                      <span className="fa-solid fa-spinner fa-spin"></span>
                                     </>
                                   ) : (
                                     <>
-                                      <span className="fa-solid fa-power-off mr-2"></span>
-                                      Stop
+                                      <span className="fa-solid fa-spinner fa-spin"></span>
                                     </>
                                   )}
-                                </a>
+                                </button>
                               ) : null}
 
                               {challenge.file ? (
                                 challenge.file.length > 0 ? (
-                                  <a
-                                    href="#"
+                                  <button
                                     className="btn btn-outline-danger btn-shadow"
                                     onClick={() => {
                                       downloadFile(
@@ -545,10 +529,10 @@ function Challenges(props) {
                                         challenge.name
                                       );
                                     }}
+                                    title="Download File"
                                   >
-                                    <span className="fa-solid fa-download mr-2"></span>
-                                    Files
-                                  </a>
+                                    <span className="fa-solid fa-download"/>
+                                  </button>
                                 ) : null
                               ) : null}
 
@@ -566,46 +550,53 @@ function Challenges(props) {
                                     data-toggle="modal"
                                     data-target="#modal"
                                     className="btn btn-outline-danger btn-shadow"
+                                    title="Code Snippet"
                                   >
-                                    <span className="fa-solid fa-laptop-code mr-2"></span>
-                                    Code Snippet
+                                    <span className="fa-solid fa-laptop-code"/>
                                   </a>
                                 ) : null
                               ) : null}
 
-                              {challenge.hint && challenge.hintCost === 0 ? (
-                                challenge.hint.trim().length > 0 ? (
+                              {challenge.hints.map((hint, i) =>
+                                hint.cost == 0 ? (
+                                  hint.content.trim().length > 0 && (
+                                    <a
+                                      onClick={() => {
+                                        setCurrentHint(hint.content);
+                                      }}
+                                      href="#modal"
+                                      data-toggle="modal"
+                                      data-target="#modal"
+                                      className="btn btn-outline-danger btn-shadow"
+                                      title={"Hint#"+ (i + 1)}
+                                    >
+                                      <span className="fa-solid fa-lightbulb" />
+                                    </a>
+                                  )
+                                ) : (
                                   <a
-                                    onClick={() => {
-                                      setCurrentHint(challenge.hint);
+                                    onClick={(e) => {
+                                      setAction({
+                                        function: buyHint,
+                                        e: e,
+                                        data: {
+                                          challId: challenge._id,
+                                          hintId: hint.id,
+                                        },
+                                      });
                                     }}
-                                    href="#modal"
+                                    href="#confirmModal"
                                     data-toggle="modal"
-                                    data-target="#modal"
+                                    data-target="#confirmModal"
                                     className="btn btn-outline-danger btn-shadow"
+                                    title={"Buy Hint#" + (i + 1)}
                                   >
                                     <span className="fa-solid fa-lightbulb mr-2"></span>
-                                    Hint
+                                    (-{hint.cost.toString()}pts)
                                   </a>
-                                ) : null
-                              ) : (
-                                <a
-                                  onClick={(e) => {
-                                    setAction({
-                                      function: buyHint,
-                                      e: e,
-                                      data: challenge._id,
-                                    });
-                                  }}
-                                  href="#confirmModal"
-                                  data-toggle="modal"
-                                  data-target="#confirmModal"
-                                  className="btn btn-outline-danger btn-shadow"
-                                >
-                                  <span className="fa-solid fa-lightbulb mr-2"></span>
-                                  Buy Hint
-                                </a>
+                                )
                               )}
+
                               <div className="input-group mt-3">
                                 <input
                                   type="text"
@@ -631,6 +622,17 @@ function Challenges(props) {
                                   </button>
                                 </div>
                               </div>
+
+                              {challenge.url ? (
+                                <a
+                                  href={`${challenge.url}`}
+                                  target="_blank"
+                                  className="btn btn-outline-danger btn-shadow mt-3"
+                                  rel="noreferrer"
+                                >
+                                  {challenge.url}
+                                </a>
+                              ) : null}
                             </blockquote>
                           </div>
                         </div>

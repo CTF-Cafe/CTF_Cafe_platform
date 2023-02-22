@@ -1,4 +1,4 @@
-import { Outlet, Routes, Route, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import AppContext from "../Data/AppContext";
@@ -16,10 +16,10 @@ function Teams(props) {
   const getTeams = (index) => {
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/getTeams",
+        process.env.REACT_APP_BACKEND_URI + "/api/getTeams",
         {
           page: index,
-          search: searchQuery
+          search: searchQuery,
         },
         { withCredentials: true }
       )
@@ -48,7 +48,7 @@ function Teams(props) {
   const deleteTeam = (e, team) => {
     axios
       .post(
-        process.env.REACT_APP_SERVER_URI + "/api/admin/deleteTeam",
+        process.env.REACT_APP_BACKEND_URI + "/api/admin/deleteTeam",
         {
           team: team,
         },
@@ -102,12 +102,14 @@ function Teams(props) {
           <button
             className="btn btn-outline-danger btn-shadow"
             onClick={previousPage}
+            title="Prev Page"
           >
             <span className="fa-solid fa-arrow-left"></span>
           </button>
           <button
             className="btn btn-outline-danger btn-shadow"
             onClick={nextPage}
+            title="Next Page"
           >
             <span className="fa-solid fa-arrow-right"></span>
           </button>
@@ -157,10 +159,15 @@ function Teams(props) {
                       });
                     }}
                     style={{ marginRight: "30px" }}
+                    title="Delete Team"
                   >
                     <span className="fa-solid fa-minus"></span>
                   </button>
-                  {team.name}
+                  <Link to={`/team/${team.name}`}>
+                    <a className="p-3 text-decoration-none text-light bold">
+                      {team.name}
+                    </a>
+                  </Link>
                 </td>
                 <td>
                   {team.users.map((user) => {
