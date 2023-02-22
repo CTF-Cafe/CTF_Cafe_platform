@@ -84,10 +84,11 @@ function Index(props) {
                   <h4>Login</h4>
                 </Link>
               )}
+              <br />
               {process.env.REACT_APP_DISCORD_URI && (
                 <a
                   href={process.env.REACT_APP_DISCORD_URI}
-                  className="btn btn-outline-danger btn-shadow mr-2 ml-0"
+                  className="btn btn-outline-danger btn-shadow mr-2 ml-0 ml-sm-1"
                   target="_blank"
                   style={{ padding: "8px" }}
                 >
@@ -100,7 +101,7 @@ function Index(props) {
               {process.env.REACT_APP_TWITTER_URI && (
                 <a
                   href={process.env.REACT_APP_TWITTER_URI}
-                  className="btn btn-outline-danger btn-shadow mr-2 ml-0"
+                  className="btn btn-outline-danger btn-shadow mr-2 ml-0 ml-sm-1"
                   target="_blank"
                   style={{ padding: "8px" }}
                 >
@@ -113,7 +114,7 @@ function Index(props) {
               {process.env.REACT_APP_GITHUB_URI && (
                 <a
                   href={process.env.REACT_APP_GITHUB_URI}
-                  className="btn btn-outline-danger btn-shadow mr-2 ml-0"
+                  className="btn btn-outline-danger btn-shadow mr-2 ml-0 ml-sm-1"
                   target="_blank"
                   style={{ padding: "8px" }}
                 >
