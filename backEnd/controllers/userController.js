@@ -81,11 +81,16 @@ const sendEmail = async (email, subject, text) => {
 
 exports.register = async function (req, res) {
   try {
+    if(req.body.username_old.trim() != req.body.username.trim() || req.body.password_old.trim() != req.body.password.trim()) {
+      throw new Error("Please dont use any 'sus' character's");
+    }
+
     const username = req.body.username.trim();
     const email = req.body.email.trim();
     const password = await encryptionController.encrypt(
       req.body.password.trim()
-    );
+    ); 
+
     // const startTime = await ctfConfig.findOne({ name: "startTime" });
 
     // Check if CTF has started
