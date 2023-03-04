@@ -81,6 +81,7 @@ const sendEmail = async (email, subject, text) => {
 
 exports.register = async function (req, res) {
   try {
+    // VERIFY DATA PHASE START
     const username = req.body.username.trim();
     const email = req.body.email.trim();
     const password = await encryptionController.encrypt(
@@ -124,11 +125,11 @@ exports.register = async function (req, res) {
     }
 
     // Check admin has deleted the admin:admin account before allowing others.
-    const defaultAdminCheck = await users.findOne({
-      username: "admin",
-      password: "admin",
-      isAdmin: true,
-    });
+    // const defaultAdminCheck = await users.findOne({
+    //   username: "admin",
+    //   password: "admin",
+    //   isAdmin: true,
+    // });
 
     // COOMMENTED OUT UNTIL WE ADD PASSWORD CHANGE FUNCTIONALITY
 
@@ -136,10 +137,14 @@ exports.register = async function (req, res) {
     //     throw new Error('Change the default admins password first!');
     // }
 
+    // VERIFY DATA PHASE END
+
+    // MANIPULATE DATA PHASE START
+
     // Create new User
     const newKey = v4();
 
-    await users
+    const user = await users
       .create({
         username: username,
         password: password,
@@ -149,27 +154,32 @@ exports.register = async function (req, res) {
         verified: process.env.MAIL_VERIFICATION == "true" ? false : true,
         token: process.env.MAIL_VERIFICATION == "true" ? v4() : "",
       })
-      .then(async function (user) {
-        if (process.env.MAIL_VERIFICATION == "true") {
-          const message = `Verify your email : ${process.env.BACKEND_URI}/api/verify/${user._id}/${user.token}`;
-          await sendEmail(user.email, "Verify Email CTF", message);
-
-          res.send({
-            state: "success",
-            message: "Registered! Now verify email!",
-          });
-        } else {
-          res.send({ state: "success", message: "Registered" });
-        }
-      })
       .catch(function (err) {
         throw new Error("User creation failed!");
       });
+
+    // MANIPULATE DATA PHASE END
+
+    // RESPONSE PHASE START
+    if (process.env.MAIL_VERIFICATION == "true") {
+      const message = `Verify your email : ${process.env.BACKEND_URI}/api/verify/${user._id}/${user.token}`;
+      await sendEmail(user.email, "Verify Email CTF", message);
+
+      res.send({
+        state: "success",
+        message: "Registered! Now verify email!",
+      });
+    } else {
+      res.send({ state: "success", message: "Registered" });
+    }
+
   } catch (err) {
     if (err) {
       res.send({ state: "error", message: err.message });
     }
   }
+
+  // RESPONSE PHASE END
 };
 
 exports.verifyMail = async function (req, res) {
@@ -311,7 +321,10 @@ exports.getUsers = async function (req, res) {
               $match: {
                 username: new RegExp(search, "i"),
                 verified: true,
-                $or: [{ username: req.session.username }, { shadowBanned: false }],
+                $or: [
+                  { username: req.session.username },
+                  { shadowBanned: false },
+                ],
               },
             },
             {
