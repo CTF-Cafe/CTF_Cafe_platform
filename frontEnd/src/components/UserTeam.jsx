@@ -180,10 +180,7 @@ function UserTeam(props) {
           globalData.navigate("/", { replace: true });
         } else if (response.data.state == "success") {
           globalData.alert.success("Team joined!");
-          globalData.userData = response.data.user;
-          globalData.userData.team = response.data.team;
-          setUserTeam(response.data.team);
-          globalData.setUserData(globalData.userData);
+          getTeam();
         } else {
           globalData.alert.error(response.data.message);
         }
