@@ -109,7 +109,7 @@ exports.deployDocker = async function (req, res) {
       throw new Error("docker-compose.yml not found in project");
     }
 
-    const randomFlag = crypto.randomBytes(16).toString("hex").toUpperCase();
+    const randomFlag = crypto.randomBytes(16).toString("hex");
 
     if (req.body.randomFlag) {
       // Create env
