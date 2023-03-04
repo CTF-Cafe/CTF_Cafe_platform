@@ -401,7 +401,7 @@ exports.submitFlag = async function (req, res) {
       }
     );
 
-    if (challenge.firstBlood == "none" || challenge.firstBlood == user._id) {
+    if (challenge.firstBlood == "none" || user._id.equals(challenge.firstBlood)) {
       await challenges.updateOne(
         { _id: req.body.challengeId },
         { $inc: { solveCount: 1 }, firstBlood: updatedUser._id }

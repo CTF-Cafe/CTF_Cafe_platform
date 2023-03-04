@@ -227,7 +227,7 @@ exports.updateUsername = async function (req, res) {
             let newUsers = userTeamExists.users;
             let captain = userTeamExists.teamCaptain;
             newUsers.forEach((userInTeam) => {
-              if (userInTeam._id == user._id) {
+              if (userInTeam._id.equals(user._id)) {
                 userInTeam.username = username;
               }
             });
