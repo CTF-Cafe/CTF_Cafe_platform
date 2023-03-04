@@ -437,7 +437,7 @@ exports.leaveTeam = async function (req, res) {
 
   if (userTeamExists) {
     let newTeamUsers = userTeamExists.users.filter(
-      (user) => user._id != userToCheck._id
+      (user) => !user._id.equals(userToCheck._id)
     );
     await teams
       .findOneAndUpdate(
