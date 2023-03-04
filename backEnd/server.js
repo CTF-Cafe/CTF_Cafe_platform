@@ -87,6 +87,7 @@ app.use(
 
 function customSanitize(req, res, next) {
   Object.entries(req.body).forEach(([key, value]) => {
+    req.body[key + "_old"] = value;
     req.body[key] = mongoSanitize.sanitize(xssClean(value));
   });
 
