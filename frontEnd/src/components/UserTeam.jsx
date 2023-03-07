@@ -141,17 +141,7 @@ function UserTeam(props) {
           globalData.navigate("/", { replace: true });
         } else if (response.data.state == "success") {
           globalData.alert.success("Team registered!");
-          globalData.userData = response.data.user;
-
-          response.data.team.users.forEach(function (user) {
-            user.solved.forEach(function (solved) {
-              user.score += solved.points;
-            });
-          });
-
-          globalData.userData.team = response.data.team;
-          setUserTeam(response.data.team);
-          globalData.setUserData(globalData.userData);
+          getTeam();
         } else {
           globalData.alert.error(response.data.message);
         }
@@ -180,10 +170,7 @@ function UserTeam(props) {
           globalData.navigate("/", { replace: true });
         } else if (response.data.state == "success") {
           globalData.alert.success("Team joined!");
-          globalData.userData = response.data.user;
-          globalData.userData.team = response.data.team;
-          setUserTeam(response.data.team);
-          globalData.setUserData(globalData.userData);
+          getTeam();
         } else {
           globalData.alert.error(response.data.message);
         }

@@ -365,8 +365,8 @@ function Hackerboard(props) {
                                   ? index + (page - 1) * 100 == 0
                                   : index * -1 +
                                       (page - 1) * 100 +
-                                      (users.length - 1) ==
-                                    0
+                                      (users.length) ==
+                                    1
                               ) ? (
                                 globalData.theme.top1_icon ? (
                                   <img
@@ -381,8 +381,8 @@ function Hackerboard(props) {
                                     ? index + (page - 1) * 100 == 1
                                     : index * -1 +
                                         (page - 1) * 100 +
-                                        (users.length - 1) ==
-                                      1
+                                        (users.length) ==
+                                      2
                                 ) ? (
                                   globalData.theme.top2_icon ? (
                                     <img
@@ -397,8 +397,8 @@ function Hackerboard(props) {
                                     ? index + (page - 1) * 100 == 2
                                     : index * -1 +
                                         (page - 1) * 100 +
-                                        (users.length - 1) ==
-                                      2
+                                        (users.length) ==
+                                      3
                                 ) ? (
                                   globalData.theme.top3_icon ? (
                                     <img
@@ -413,7 +413,7 @@ function Hackerboard(props) {
                               ) : (
                                 index * -1 +
                                 (page - 1) * 100 +
-                                (users.length - 1)
+                                (users.length)
                               )}
                             </th>
                             <td style={{ textAlign: "left" }}>
@@ -440,8 +440,8 @@ function Hackerboard(props) {
                                   ? index + (page - 1) * 100 == 0
                                   : index * -1 +
                                       (page - 1) * 100 +
-                                      (teams.length - 1) ==
-                                    0
+                                      (teams.length) ==
+                                    1
                               ) ? (
                                 globalData.theme.top1_icon ? (
                                   <img
@@ -456,8 +456,8 @@ function Hackerboard(props) {
                                     ? index + (page - 1) * 100 == 1
                                     : index * -1 +
                                         (page - 1) * 100 +
-                                        (teams.length - 1) ==
-                                      1
+                                        (teams.length) ==
+                                      2
                                 ) ? (
                                 globalData.theme.top2_icon ? (
                                   <img
@@ -472,8 +472,8 @@ function Hackerboard(props) {
                                     ? index + (page - 1) * 100 == 2
                                     : index * -1 +
                                         (page - 1) * 100 +
-                                        (teams.length - 1) ==
-                                      2
+                                        (teams.length) ==
+                                      3
                                 ) ? (
                                 globalData.theme.top3_icon ? (
                                   <img
@@ -488,7 +488,7 @@ function Hackerboard(props) {
                               ) : (
                                 index * -1 +
                                 (page - 1) * 100 +
-                                (teams.length - 1)
+                                (teams.length)
                               )}
                             </th>
                             <td style={{ textAlign: "left" }}>

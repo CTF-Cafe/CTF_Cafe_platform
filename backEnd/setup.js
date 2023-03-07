@@ -4,20 +4,20 @@ const users = require('./models/userModel.js');
 const encryptionController = require('./controllers/encryptionController.js');
 
 exports.setupDB = async function() {
-    const endTimeConfig = await ctfConfig.findOne({ name: 'endTime' });
-
-    if (!endTimeConfig) {
-        await ctfConfig.create({
-            name: 'endTime',
-            value: new Date().getTime()
-        });
-    }
-
     const startTimeConfig = await ctfConfig.findOne({ name: 'startTime' });
 
     if (!startTimeConfig) {
         await ctfConfig.create({
             name: 'startTime',
+            value: new Date().getTime()
+        });
+    }
+    
+    const endTimeConfig = await ctfConfig.findOne({ name: 'endTime' });
+
+    if (!endTimeConfig) {
+        await ctfConfig.create({
+            name: 'endTime',
             value: new Date().getTime()
         });
     }
