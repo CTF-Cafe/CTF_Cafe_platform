@@ -49,6 +49,7 @@ var sess = {
 if (process.env.NODE_ENV === "production") {
   app.set("trust proxy", 1); // trust first proxy
   sess.cookie.secure = true; // serve secure cookies
+  sess.proxy = true;
 }
 
 app.use(session(sess));
@@ -86,6 +87,7 @@ app.use(
 
 function customSanitize(req, res, next) {
   Object.entries(req.body).forEach(([key, value]) => {
+    req.body[key + "_old"] = value;
     req.body[key] = mongoSanitize.sanitize(xssClean(value));
   });
 
