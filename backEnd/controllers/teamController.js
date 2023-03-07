@@ -183,7 +183,7 @@ exports.getTeams = async function (req, res) {
                   {
                     users: {
                       $not: {
-                        $elemMatch: { shadowBanned: false },
+                        $elemMatch: { shadowBanned: true },
                       },
                     },
                   },
