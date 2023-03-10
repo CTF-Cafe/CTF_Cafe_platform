@@ -1,7 +1,6 @@
 const teams = require("../models/teamModel");
 const users = require("../models/userModel");
 const { v4 } = require("uuid");
-const ctfConfig = require("../models/ctfConfigModel.js");
 const ObjectId = require("mongoose").Types.ObjectId;
 
 exports.register = async function (req, res) {
