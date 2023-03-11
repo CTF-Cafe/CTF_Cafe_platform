@@ -440,7 +440,7 @@ exports.submitFlag = async function (req, res) {
               ...currentNotifications.value,
               ...[
                 {
-                  message: `${updatedUser.username} has first blood ${challenge.name}!`,
+                  message: `${updatedUser.username}@${team.name} has first blood ${challenge.name}!`,
                   type: "first_blood",
                   seenBy: [],
                 },
