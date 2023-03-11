@@ -5,6 +5,14 @@ const ctfConfig = require("../models/ctfConfigModel.js");
 const logController = require("./logController");
 const ObjectId = require("mongoose").Types.ObjectId;
 const axios = require("axios");
+const { Webhook } = require("discord-webhook-node");
+
+if (process.env.WEBHOOK) {
+  const hook = new Webhook(process.env.WEBHOOK);
+  const IMAGE_URL = "https://cdn-icons-png.flaticon.com/512/205/205916.png";
+  hook.setUsername("FirstBlood");
+  hook.setAvatar(IMAGE_URL);
+}
 
 exports.getChallenges = async function (req, res) {
   let allChallenges = await challenges
@@ -47,7 +55,9 @@ exports.getChallenges = async function (req, res) {
               if (
                 team.users.filter((user) =>
                   user.hintsBought.find(
-                    (x) => challenge._id.equals(x.challId) && parseInt(x.hintId) == parseInt(hint.id)
+                    (x) =>
+                      challenge._id.equals(x.challId) &&
+                      parseInt(x.hintId) == parseInt(hint.id)
                   )
                 ).length > 0
               ) {
@@ -58,7 +68,9 @@ exports.getChallenges = async function (req, res) {
             // Show hint if bought
             if (
               !user.hintsBought.find(
-                (x) => challenge._id.equals(x.challId) && parseInt(x.hintId) == parseInt(hint.id)
+                (x) =>
+                  challenge._id.equals(x.challId) &&
+                  parseInt(x.hintId) == parseInt(hint.id)
               ) &&
               hint.cost > 0 &&
               teamHasBought == false
@@ -140,7 +152,7 @@ exports.deployDocker = async function (req, res) {
     if (resAxios.data.state == "error") throw new Error(resAxios.data.message);
 
     if (challenge.randomFlag) {
-      if(challenge.randomFlags.find(x => x.id == user.teamId)) {
+      if (challenge.randomFlags.find((x) => x.id == user.teamId)) {
         await challenges.updateOne(
           { id: challenge._id },
           {
@@ -401,11 +413,21 @@ exports.submitFlag = async function (req, res) {
       }
     );
 
-    if (challenge.firstBlood == "none" || user._id.equals(challenge.firstBlood)) {
+    if (
+      challenge.firstBlood == "none" ||
+      user._id.equals(challenge.firstBlood)
+    ) {
       await challenges.updateOne(
         { _id: req.body.challengeId },
         { $inc: { solveCount: 1 }, firstBlood: updatedUser._id }
       );
+
+      if (process.env.WEBHOOK) {
+        // DISCORD WEBHOOK FIRST BLOOD
+        hook.send(
+          `:drop_of_blood: ${user.username}@${team.name} has firstBlood ${challenge.name}`
+        );
+      }
 
       const currentNotifications = await ctfConfig.findOne({
         name: "notifications",
@@ -488,7 +510,9 @@ exports.buyHint = async function (req, res) {
     // Check user already bought hint
     if (
       user.hintsBought.find(
-        (x) => challenge._id.equals(x.challId) && parseInt(x.hintId) == parseInt(hint.id)
+        (x) =>
+          challenge._id.equals(x.challId) &&
+          parseInt(x.hintId) == parseInt(hint.id)
       )
     )
       throw new Error("Challenge hint already bought!");
@@ -507,7 +531,9 @@ exports.buyHint = async function (req, res) {
     if (
       team.users.filter((user) =>
         user.hintsBought.find(
-          (x) => challenge._id.equals(x.challId) && parseInt(x.hintId) == parseInt(hint.id)
+          (x) =>
+            challenge._id.equals(x.challId) &&
+            parseInt(x.hintId) == parseInt(hint.id)
         )
       ).length > 0
     )
