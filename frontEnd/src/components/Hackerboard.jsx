@@ -173,24 +173,26 @@ function Hackerboard(props) {
       totalCount = "0" + totalCount.toString();
     }
 
+    const color = getComputedStyle(canvas).getPropertyValue("--color-1");
+
     //   CTF Name
     ctx.font = "bold 55px Fira Code";
-    ctx.fillStyle = "red";
+    ctx.fillStyle = color;
     ctx.fillText(process.env.REACT_APP_CTF_NAME, 1350, 120);
 
     //   Team Nae
     ctx.font = "bold 34px Fira Code";
-    ctx.fillStyle = "red";
+    ctx.fillStyle = color;
     ctx.fillText(team.name, 410, 178);
 
     //   Team Placement
     ctx.font = "bold 80px Fira Code";
-    ctx.fillStyle = "red";
+    ctx.fillStyle = color;
     ctx.fillText(index, 1050, 275);
 
     //   Total Teams
     ctx.font = "bold 80px Fira Code";
-    ctx.fillStyle = "red";
+    ctx.fillStyle = color;
     ctx.fillText(totalCount, 1250, 275);
 
     var anchor = document.createElement("a");
@@ -228,13 +230,13 @@ function Hackerboard(props) {
       <Navbar />
 
       {/* Hidden Stuff */}
-      {/* <img
+      <img
         style={{ display: "none" }}
         src={process.env.REACT_APP_BACKEND_URI + "/api/assets/template.jpg"}
         crossorigin="anonymous"
         id="certImg"
       />
-      <canvas id="canvas" hidden /> */}
+      <canvas id="canvas" hidden />
 
       <div
         className="jumbotron bg-transparent mb-0 pt-3 radius-0"
@@ -249,7 +251,7 @@ function Hackerboard(props) {
               <p className="text-grey lead text-spacey text-center hackerFont">
                 Where the world 's greatest get ranked!
               </p>
-              {/* {new Date().getTime() > endTime ? (
+              {new Date().getTime() > endTime ? (
                 globalData.userData.team ? (
                   <div style={{ textAlign: "center" }}>
                     <button
@@ -263,7 +265,7 @@ function Hackerboard(props) {
                     </button>
                   </div>
                 ) : null
-              ) : null} */}
+              ) : null}
             </div>
           </div>
           <div className="row mt-5  justify-content-center">

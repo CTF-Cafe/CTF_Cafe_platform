@@ -7,6 +7,8 @@ const LineChart = (props) => {
   useEffect(() => {
     let rawData = [...props.data.slice(0, 10)];
 
+    console.log(rawData);
+
     let structuredData = [];
 
     if (props.selection == "Users") {
@@ -75,6 +77,9 @@ const LineChart = (props) => {
           points: team.totalScore,
           name: team.name,
         });
+        team.solved.sort(
+          (a, b) => a.timestamp - b.timestamp
+        );
         team.solved.forEach((solve) => {
           currentPoints += solve.points;
           d = new Date(solve.timestamp);
