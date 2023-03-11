@@ -7,7 +7,7 @@ const ObjectId = require("mongoose").Types.ObjectId;
 const axios = require("axios");
 const { Webhook } = require("discord-webhook-node");
 
-if (process.env.WEBHOOK) {
+if ("WEBHOOK" in process.env) {
   const hook = new Webhook(process.env.WEBHOOK);
   const IMAGE_URL = "https://cdn-icons-png.flaticon.com/512/205/205916.png";
   hook.setUsername("FirstBlood");
@@ -422,7 +422,7 @@ exports.submitFlag = async function (req, res) {
         { $inc: { solveCount: 1 }, firstBlood: updatedUser._id }
       );
 
-      if (process.env.WEBHOOK) {
+      if ("WEBHOOK" in process.env) {
         // DISCORD WEBHOOK FIRST BLOOD
         hook.send(
           `:drop_of_blood: ${user.username}@${team.name} has firstBlood ${challenge.name}`
