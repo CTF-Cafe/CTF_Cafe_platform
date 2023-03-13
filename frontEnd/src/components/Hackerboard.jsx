@@ -166,6 +166,10 @@ function Hackerboard(props) {
           }
         });
 
+        if(!team) {
+          throw Error("Team has no solves!");
+        }
+
         var index = team.pos;
         var totalCount = teamCount;
 
@@ -209,7 +213,7 @@ function Hackerboard(props) {
         anchor.click();
       })
       .catch((err) => {
-        console.log(err);
+        globalData.alert.error(err.message);
       });
   };
 
