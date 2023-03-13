@@ -166,7 +166,7 @@ function Hackerboard(props) {
           }
         });
 
-        var index = scoreboardTeams.indexOf(team) + 1;
+        var index = team.pos;
         var totalCount = teamCount;
 
         if (index < 10) {
@@ -209,7 +209,7 @@ function Hackerboard(props) {
         anchor.click();
       })
       .catch((err) => {
-        globalData.alert.error(err.message);
+        console.log(err);
       });
   };
 
