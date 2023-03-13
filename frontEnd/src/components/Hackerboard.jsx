@@ -195,7 +195,7 @@ function Hackerboard(props) {
         //   Team Nae
         ctx.font = "bold 40px Fira Code";
         ctx.fillStyle = color;
-        ctx.fillText(team.name, 415, 195);
+        ctx.fillText(team.team, 415, 195);
 
         //   Team Placement
         ctx.font = "bold 80px Fira Code";
