@@ -10,7 +10,7 @@ router.post("/registerTeam", (req, res) => {
   teamController.register(req, res);
 });
 
-router.post("/getTeamCount", (req, res) => {
+router.get("/getTeamCount", (req, res) => {
   userController.getTeamCount(req, res);
 });
 
