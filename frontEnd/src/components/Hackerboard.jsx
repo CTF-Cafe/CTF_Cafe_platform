@@ -153,11 +153,6 @@ function Hackerboard(props) {
 
     var team = teams.find((obj) => {
       if (obj) {
-        <img
-          src={globalData.theme.top1_icon}
-          style={{ width: "50px" }}
-          onError={(event) => (event.target.src = "")}
-        />;
         return obj.name === globalData.userData.team.name;
       } else {
         return false;
