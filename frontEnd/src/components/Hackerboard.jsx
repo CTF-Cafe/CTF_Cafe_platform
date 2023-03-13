@@ -36,9 +36,15 @@ function Hackerboard(props) {
       });
 
     axios
-      .get(process.env.REACT_APP_BACKEND_URI + "/api/user/getTeamCount")
+      .get(process.env.REACT_APP_BACKEND_URI + "/api/user/getTeamCount", {
+        withCredentials: true,
+      })
       .then((response) => {
-        setTeamCount(response.data);
+        if (response.data.state === "error") {
+          globalData.alert.error(response.data.message);
+        } else {
+          setTeamCount(response.data.count);
+        }
       })
       .catch((err) => {
         console.log(err.message);
@@ -145,13 +151,13 @@ function Hackerboard(props) {
 
     ctx.drawImage(document.querySelector("#certImg"), 0, 0);
 
-    console.log(globalData.userData.team);
     var team = teams.find((obj) => {
-      if (obj) {                                <img
-        src={globalData.theme.top1_icon}
-        style={{ width: "50px" }}
-        onError={(event) => (event.target.src = "")}
-      />
+      if (obj) {
+        <img
+          src={globalData.theme.top1_icon}
+          style={{ width: "50px" }}
+          onError={(event) => (event.target.src = "")}
+        />;
         return obj.name === globalData.userData.team.name;
       } else {
         return false;
@@ -169,7 +175,7 @@ function Hackerboard(props) {
 
     if (totalCount < 10) {
       totalCount = "00" + totalCount.toString();
-    } else if (index < 100) {
+    } else if (totalCount < 100) {
       totalCount = "0" + totalCount.toString();
     }
 
@@ -178,22 +184,22 @@ function Hackerboard(props) {
     //   CTF Name
     ctx.font = "bold 55px Fira Code";
     ctx.fillStyle = color;
-    ctx.fillText(process.env.REACT_APP_CTF_NAME, 1350, 120);
+    ctx.fillText(process.env.REACT_APP_CTF_NAME, 1280, 115);
 
     //   Team Nae
-    ctx.font = "bold 34px Fira Code";
+    ctx.font = "bold 40px Fira Code";
     ctx.fillStyle = color;
-    ctx.fillText(team.name, 410, 178);
+    ctx.fillText(team.name, 415, 195);
 
     //   Team Placement
     ctx.font = "bold 80px Fira Code";
     ctx.fillStyle = color;
-    ctx.fillText(index, 1050, 275);
+    ctx.fillText(index, 1050, 385);
 
     //   Total Teams
     ctx.font = "bold 80px Fira Code";
     ctx.fillStyle = color;
-    ctx.fillText(totalCount, 1250, 275);
+    ctx.fillText(totalCount, 1270, 385);
 
     var anchor = document.createElement("a");
     anchor.href = canvas.toDataURL("image/png");
@@ -251,8 +257,9 @@ function Hackerboard(props) {
               <p className="text-grey lead text-spacey text-center hackerFont">
                 Where the world 's greatest get ranked!
               </p>
-              {new Date().getTime() > endTime ? (
-                globalData.userData.team ? (
+              {globalData.loggedIn &&
+                new Date().getTime() > endTime &&
+                globalData.userData.team && (
                   <div style={{ textAlign: "center" }}>
                     <button
                       className="btn btn-outline-danger btn-shadow"
@@ -264,8 +271,7 @@ function Hackerboard(props) {
                       Download Certificate
                     </button>
                   </div>
-                ) : null
-              ) : null}
+                )}
             </div>
           </div>
           <div className="row mt-5  justify-content-center">
@@ -367,7 +373,7 @@ function Hackerboard(props) {
                                   ? index + (page - 1) * 100 == 0
                                   : index * -1 +
                                       (page - 1) * 100 +
-                                      (users.length) ==
+                                      users.length ==
                                     1
                               ) ? (
                                 globalData.theme.top1_icon ? (
@@ -383,39 +389,37 @@ function Hackerboard(props) {
                                     ? index + (page - 1) * 100 == 1
                                     : index * -1 +
                                         (page - 1) * 100 +
-                                        (users.length) ==
+                                        users.length ==
                                       2
                                 ) ? (
-                                  globalData.theme.top2_icon ? (
-                                    <img
-                                      src={globalData.theme.top2_icon}
-                                      style={{ width: "40px" }}
-                                    />
-                                  ) : (
-                                    2
-                                  )
+                                globalData.theme.top2_icon ? (
+                                  <img
+                                    src={globalData.theme.top2_icon}
+                                    style={{ width: "40px" }}
+                                  />
+                                ) : (
+                                  2
+                                )
                               ) : (
                                   selectionScore == "up"
                                     ? index + (page - 1) * 100 == 2
                                     : index * -1 +
                                         (page - 1) * 100 +
-                                        (users.length) ==
+                                        users.length ==
                                       3
                                 ) ? (
-                                  globalData.theme.top3_icon ? (
-                                    <img
-                                      src={globalData.theme.top3_icon}
-                                      style={{ width: "30px" }}
-                                    />
-                                  ) : (
-                                    3
-                                  )
+                                globalData.theme.top3_icon ? (
+                                  <img
+                                    src={globalData.theme.top3_icon}
+                                    style={{ width: "30px" }}
+                                  />
+                                ) : (
+                                  3
+                                )
                               ) : selectionScore == "up" ? (
                                 index + 1 + (page - 1) * 100
                               ) : (
-                                index * -1 +
-                                (page - 1) * 100 +
-                                (users.length)
+                                index * -1 + (page - 1) * 100 + users.length
                               )}
                             </th>
                             <td style={{ textAlign: "left" }}>
@@ -442,7 +446,7 @@ function Hackerboard(props) {
                                   ? index + (page - 1) * 100 == 0
                                   : index * -1 +
                                       (page - 1) * 100 +
-                                      (teams.length) ==
+                                      teams.length ==
                                     1
                               ) ? (
                                 globalData.theme.top1_icon ? (
@@ -458,7 +462,7 @@ function Hackerboard(props) {
                                     ? index + (page - 1) * 100 == 1
                                     : index * -1 +
                                         (page - 1) * 100 +
-                                        (teams.length) ==
+                                        teams.length ==
                                       2
                                 ) ? (
                                 globalData.theme.top2_icon ? (
@@ -474,7 +478,7 @@ function Hackerboard(props) {
                                     ? index + (page - 1) * 100 == 2
                                     : index * -1 +
                                         (page - 1) * 100 +
-                                        (teams.length) ==
+                                        teams.length ==
                                       3
                                 ) ? (
                                 globalData.theme.top3_icon ? (
@@ -488,9 +492,7 @@ function Hackerboard(props) {
                               ) : selectionScore == "up" ? (
                                 index + (page - 1) * 100 + 1
                               ) : (
-                                index * -1 +
-                                (page - 1) * 100 +
-                                (teams.length)
+                                index * -1 + (page - 1) * 100 + teams.length
                               )}
                             </th>
                             <td style={{ textAlign: "left" }}>

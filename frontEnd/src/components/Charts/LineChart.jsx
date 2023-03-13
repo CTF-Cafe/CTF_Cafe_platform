@@ -7,11 +7,9 @@ const LineChart = (props) => {
   useEffect(() => {
     let rawData = [...props.data.slice(0, 10)];
 
-    console.log(rawData);
-
     let structuredData = [];
 
-    if (props.selection == "Users") {
+    if (props.selection === "Users") {
       rawData.forEach((user) => {
         let currentPoints = 0;
         let d = new Date(props.startTime);

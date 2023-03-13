@@ -636,5 +636,5 @@ exports.getScoreboard = async function (req, res) {
 
 exports.getTeamCount = async function (req, res) {
   let teamsCount = await teams.countDocuments({});
-  res.send(teamsCount);
+  res.send({ state: "success", count: teamsCount });
 };
