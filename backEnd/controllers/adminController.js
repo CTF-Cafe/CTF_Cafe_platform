@@ -242,7 +242,8 @@ exports.uploadAsset = async function (req, res) {
       let file = req.files.file;
 
       //Use the mv() method to place the file in upload directory (i.e. "assets")
-      file.mv("./assets/" + file.name.split('.')[0] + Math.floor(100000 + Math.random() * 900000) + '.' + file.name.split('.')[1]);
+      // file.mv("./assets/" + file.name.split('.')[0] + Math.floor(100000 + Math.random() * 900000) + '.' + file.name.split('.')[1]);
+      file.mv("./assets/" + file.name);
 
       //send response
       res.send({ state: "success", message: "File uploaded!" });
