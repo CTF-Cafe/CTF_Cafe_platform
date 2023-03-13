@@ -139,7 +139,7 @@ function Hackerboard(props) {
     }
   };
 
-  const downloadCert = () => {
+  const downloadCert = async () => {
     var canvas = document.getElementById("canvas"),
       ctx = canvas.getContext("2d");
 
@@ -151,55 +151,66 @@ function Hackerboard(props) {
 
     ctx.drawImage(document.querySelector("#certImg"), 0, 0);
 
-    var team = teams.find((obj) => {
-      if (obj) {
-        return obj.name === globalData.userData.team.name;
-      } else {
-        return false;
-      }
-    });
+    await axios
+      .get(process.env.REACT_APP_BACKEND_URI + "/api/getScoreboard", {
+        withCredentials: true,
+      })
+      .then((response) => {
+        const scoreboardTeams = response.data.standings;
 
-    var index = teams.indexOf(team) + 1;
-    var totalCount = teamCount;
+        var team = scoreboardTeams.find((obj) => {
+          if (obj) {
+            return obj.team === globalData.userData.team.name;
+          } else {
+            return false;
+          }
+        });
 
-    if (index < 10) {
-      index = "00" + index.toString();
-    } else if (index < 100) {
-      index = "0" + index.toString();
-    }
+        var index = scoreboardTeams.indexOf(team) + 1;
+        var totalCount = teamCount;
 
-    if (totalCount < 10) {
-      totalCount = "00" + totalCount.toString();
-    } else if (totalCount < 100) {
-      totalCount = "0" + totalCount.toString();
-    }
+        if (index < 10) {
+          index = "00" + index.toString();
+        } else if (index < 100) {
+          index = "0" + index.toString();
+        }
 
-    const color = getComputedStyle(canvas).getPropertyValue("--color-1");
+        if (totalCount < 10) {
+          totalCount = "00" + totalCount.toString();
+        } else if (totalCount < 100) {
+          totalCount = "0" + totalCount.toString();
+        }
 
-    //   CTF Name
-    ctx.font = "bold 55px Fira Code";
-    ctx.fillStyle = color;
-    ctx.fillText(process.env.REACT_APP_CTF_NAME, 1280, 115);
+        const color = getComputedStyle(canvas).getPropertyValue("--color-1");
 
-    //   Team Nae
-    ctx.font = "bold 40px Fira Code";
-    ctx.fillStyle = color;
-    ctx.fillText(team.name, 415, 195);
+        //   CTF Name
+        ctx.font = "bold 55px Fira Code";
+        ctx.fillStyle = color;
+        ctx.fillText(process.env.REACT_APP_CTF_NAME, 1280, 115);
 
-    //   Team Placement
-    ctx.font = "bold 80px Fira Code";
-    ctx.fillStyle = color;
-    ctx.fillText(index, 1050, 385);
+        //   Team Nae
+        ctx.font = "bold 40px Fira Code";
+        ctx.fillStyle = color;
+        ctx.fillText(team.name, 415, 195);
 
-    //   Total Teams
-    ctx.font = "bold 80px Fira Code";
-    ctx.fillStyle = color;
-    ctx.fillText(totalCount, 1270, 385);
+        //   Team Placement
+        ctx.font = "bold 80px Fira Code";
+        ctx.fillStyle = color;
+        ctx.fillText(index, 1050, 385);
 
-    var anchor = document.createElement("a");
-    anchor.href = canvas.toDataURL("image/png");
-    anchor.download = "IMAGE.PNG";
-    anchor.click();
+        //   Total Teams
+        ctx.font = "bold 80px Fira Code";
+        ctx.fillStyle = color;
+        ctx.fillText(totalCount, 1270, 385);
+
+        var anchor = document.createElement("a");
+        anchor.href = canvas.toDataURL("image/png");
+        anchor.download = "Certificate.png";
+        anchor.click();
+      })
+      .catch((err) => {
+        globalData.alert.error(err.message);
+      });
   };
 
   const nextPage = () => {
