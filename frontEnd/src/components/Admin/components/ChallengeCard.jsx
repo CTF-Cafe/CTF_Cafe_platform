@@ -16,7 +16,7 @@ function ChallengeCard(props) {
     hints: false,
     content: false,
     instance: false,
-    flag: false
+    specifics: false
   });
 
   return (
@@ -438,22 +438,22 @@ function ChallengeCard(props) {
                   style={{ cursor: "pointer" }}
                   onClick={() => {
                     let newOpenStates = { ...openStates };
-                    newOpenStates.flag = !openStates.flag;
+                    newOpenStates.specifics = !openStates.specifics;
                     setOpenState(newOpenStates);
                   }}
                 >
-                  {openStates.flag ? (
+                  {openStates.specifics ? (
                     <span className="fa-solid fa-chevron-down" />
                   ) : (
                     <span className="fa-solid fa-chevron-right" />
                   )}{" "}
-                  Flag/Points
+                  Specifics
                 </span>
               </div>
               <div
                 style={{
-                  visibility: openStates.flag ? "visible" : "hidden",
-                  position: openStates.flag ? "relative" : "absolute",
+                  visibility: openStates.specifics ? "visible" : "hidden",
+                  position: openStates.specifics ? "relative" : "absolute",
                 }}
               >
                 <hr />
