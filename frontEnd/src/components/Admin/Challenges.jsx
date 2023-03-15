@@ -230,6 +230,11 @@ function Challenges(props) {
     ).value;
     formData.append("randomFlag", randomFlag);
 
+    const requirement = document.getElementById(
+      "requirement" + oldChallenge._id
+    ).value;
+    formData.append("requirement", requirement);
+
     axios
       .post(
         process.env.REACT_APP_BACKEND_URI + "/api/admin/saveChallenge",
@@ -428,6 +433,7 @@ function Challenges(props) {
                     deleteChallenge={deleteChallenge}
                     key={challenge._id}
                     assets={assets}
+                    challenges={challenges}
                     setAction={setAction}
                     dynamicScoring={globalData.dynamicScoring}
                   />

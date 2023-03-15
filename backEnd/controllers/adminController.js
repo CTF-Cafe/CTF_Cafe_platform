@@ -75,6 +75,8 @@ exports.saveChallenge = async function (req, res) {
 
     if (req.body.flag.length < 1) throw Error("Flag cannot be empty");
 
+    if (req.body.requirement != '' && !ObjectId.isValid(req.body.requirement)) throw Error("Requirement must be a valid ObjectId!");
+
     if (!challengeExists) throw Error("Challenge does not exist");
 
     await challenges.findByIdAndUpdate(req.body.id, {
@@ -94,6 +96,7 @@ exports.saveChallenge = async function (req, res) {
       isInstance: req.body.isInstance == "true",
       codeLanguage: req.body.codeLanguage,
       randomFlag: req.body.randomFlag == "true" ? true : false,
+      requirement: req.body.requirement
     });
     res.send({ state: "success", message: "Challenge Updated!" });
   } catch (err) {
