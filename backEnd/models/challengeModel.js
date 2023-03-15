@@ -83,6 +83,10 @@ var challengeSchema = new Schema({
         type: Array,
         default: []
     },
+    requirement: {
+        type: String,
+        default: ''
+    }
 });
 
 module.exports = mongoose.model('Challenges', challengeSchema);

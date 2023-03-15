@@ -47,6 +47,32 @@ exports.getChallenges = async function (req, res) {
             team = await teams.findById(user.teamId);
           }
 
+          if (ObjectId.isValid(challenge.requirement)) {
+            // CHECK CHALL UNLOCKED
+            let teamHasUnlocked = false;
+            if (team) {
+              // Check if hint bought by team
+              if (
+                team.users.filter((user) =>
+                  user.solved.find((x) =>
+                    new ObjectId(x._id).equals(challenge.requirement)
+                  )
+                ).length > 0
+              ) {
+                teamHasUnlocked = true;
+              }
+            }
+
+            if (
+              !user.solved.find((x) =>
+                new ObjectId(x._id).equals(challenge.requirement)
+              ) &&
+              teamHasBought == false
+            ) {
+              continue;
+            }
+          }
+
           copy.hints = challenge.hints.map((hint) => {
             hintCopy = { ...hint };
             // Check Team Exists

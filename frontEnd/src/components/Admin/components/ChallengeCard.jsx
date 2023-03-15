@@ -16,7 +16,7 @@ function ChallengeCard(props) {
     hints: false,
     content: false,
     instance: false,
-    specifics: false
+    specifics: false,
   });
 
   return (
@@ -497,6 +497,24 @@ function ChallengeCard(props) {
                     {challenge.minimumPoints}
                   </p>
                 )}
+
+                <hr />
+                <div>
+                  <label>Requirement:</label>{" "}
+                  <select
+                    defaultValue={challenge.requirement}
+                    id={"requirement" + challenge._id}
+                  >
+                    <option value="">None</option>
+                    {props.challenges.filter(x => x._id !== challenge._id).map((challenge) => {
+                      return (
+                        <option value={challenge._id} key={challenge.name}>
+                          {challenge.name}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
 
                 <hr />
                 {/* Only Show Flag if RandomFlag is Off */}
