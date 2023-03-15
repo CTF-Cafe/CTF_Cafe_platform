@@ -21,7 +21,7 @@ var challengeSchema = new Schema({
     },
     hints: {
         type: Array,
-        default: [{ content: "Easy Peasy", cost: 0, id: Math.random().toString().substr(2, 4) }]
+        default: []
     },
     points: {
         type: Number,
