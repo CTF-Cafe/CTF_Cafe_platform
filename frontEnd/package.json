@@ -1,11 +1,13 @@
 {
-    "name": "ctf-front",
+    "name": "ctf_cafe_frontend",
     "version": "0.1.0",
     "private": true,
     "dependencies": {
         "@ant-design/plots": "^1.2.3",
         "axios": "^0.26.1",
         "copy-to-clipboard": "^3.3.1",
+        "ctf_cafe_frontend": "file:release",
+        "dotenv": "^16.0.3",
         "file-saver": "^2.0.5",
         "prismjs": "^1.28.0",
         "react": "^17.0.2",
@@ -23,6 +25,7 @@
         "start": "npm run build && serve -s build",
         "start-react": "react-scripts start",
         "build": "react-scripts build",
+        "release": "npm run build && cd ./release && npm i && npx pkg .",
         "test": "react-scripts test",
         "eject": "react-scripts eject"
     },

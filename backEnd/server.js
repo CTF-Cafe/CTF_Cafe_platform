@@ -1,10 +1,10 @@
 const express = require("express");
 const app = express();
-const port = process.env.PORT || 3001;
 const mongoose = require("mongoose");
 const db = mongoose.connection;
 const dotenv = require("dotenv");
 dotenv.config();
+const port = process.env.PORT || 3001;
 const bodyparser = require("body-parser");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
