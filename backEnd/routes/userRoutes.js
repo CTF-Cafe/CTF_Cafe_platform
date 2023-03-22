@@ -46,14 +46,6 @@ router.post('/shutdownDocker', (req, res) => {
     challengesController.shutdownDocker(req, res);
 });
 
-router.post('/launchDocker', (req, res) => {
-    challengesController.launchDocker(req, res);
-});
-
-router.post("/stopDocker", (req, res) => {
-  challengesController.stopDocker(req, res);
-});
-
 router.post("/submitFlag", (req, res) => {
   challengesController.submitFlag(req, res);
 });

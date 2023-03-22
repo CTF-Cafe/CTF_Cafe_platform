@@ -7,7 +7,6 @@ const log = require("../models/logModel.js");
 const path = require("path");
 const fs = require("fs");
 const ObjectId = require("mongoose").Types.ObjectId;
-const axios = require("axios");
 
 exports.getStats = async function (req, res) {
   let allChallenges = await challenges.find({}).sort({ points: 1 });
@@ -75,7 +74,8 @@ exports.saveChallenge = async function (req, res) {
 
     if (req.body.flag.length < 1) throw Error("Flag cannot be empty");
 
-    if (req.body.requirement != '' && !ObjectId.isValid(req.body.requirement)) throw Error("Requirement must be a valid ObjectId!");
+    if (req.body.requirement != "" && !ObjectId.isValid(req.body.requirement))
+      throw Error("Requirement must be a valid ObjectId!");
 
     if (!challengeExists) throw Error("Challenge does not exist");
 
@@ -96,7 +96,7 @@ exports.saveChallenge = async function (req, res) {
       isInstance: req.body.isInstance == "true",
       codeLanguage: req.body.codeLanguage,
       randomFlag: req.body.randomFlag == "true" ? true : false,
-      requirement: req.body.requirement
+      requirement: req.body.requirement,
     });
     res.send({ state: "success", message: "Challenge Updated!" });
   } catch (err) {
@@ -118,36 +118,6 @@ exports.createChallenge = async function (req, res) {
   });
 
   res.send({ state: "success", message: "Challenge created!" });
-};
-
-exports.removeDockerCompose = async function (req, res) {
-  const challenge = await challenges.findById(req.body.id);
-
-  if (challenge) {
-    if (challenge.dockerCompose != "") {
-      const dockerComposePath = path.join(
-        __dirname,
-        "../dockers/" + challenge.dockerCompose
-      );
-      try {
-        fs.rmdirSync(dockerComposePath, { recursive: true });
-      } catch (err) {
-        console.error(err);
-      }
-      await challenges.findByIdAndUpdate(req.body.id, {
-        dockerCompose: "",
-        dockerLaunchers: [],
-      });
-      res.send({ state: "success", message: "Docker compose removed!" });
-    } else {
-      res.send({
-        state: "error",
-        message: "Challenge does not have a docker compose",
-      });
-    }
-  } else {
-    res.send({ state: "error", message: "Challenge does not exist" });
-  }
 };
 
 exports.updateChallengeCategory = async function (req, res) {
@@ -200,7 +170,12 @@ exports.deleteChallenge = async function (req, res) {
 };
 
 exports.getAssets = async function (req, res) {
-  const assetsPath = path.join(__dirname, "../assets/");
+  const assetsPath = path.join(process.cwd(), "./assets/");
+
+  // Create Assets dir if dosnt exist
+  if (!fs.existsSync(assetsPath)) {
+    fs.mkdirSync(assetsPath);
+  }
 
   await fs.readdir(assetsPath, function (err, files) {
     //handling error
@@ -224,7 +199,7 @@ exports.getAssets = async function (req, res) {
 };
 
 exports.deleteAsset = async function (req, res) {
-  const assetsPath = path.join(__dirname, "../assets/");
+  const assetsPath = path.join(process.cwd(), "./assets/");
 
   await fs.unlink(assetsPath + req.body.asset, async (err) => {
     if (err) {
@@ -241,6 +216,12 @@ exports.uploadAsset = async function (req, res) {
     if (!req.files) {
       res.send({ state: "error", message: "No file uploaded" });
     } else {
+      // Create Assets dir if dosnt exist
+      const dir = path.join(process.cwd(), "./assets/");
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir);
+      }
+
       //Use the name of the input field (i.e. "file") to retrieve the uploaded file
       let file = req.files.file;
 
@@ -587,18 +568,16 @@ exports.getDockers = async function (req, res) {
     if (isNaN(page)) page = 1;
 
     let dockers = (
-      await axios.post(
-        `${process.env.DEPLOYER_API}/api/getAllDockers`,
-        {
-          page: page,
+      await fetch(`${process.env.DEPLOYER_API}/api/getAllDockers`, {
+        method: "POST",
+        headers: {
+          "X-API-KEY": process.env.DEPLOYER_SECRET,
         },
-        {
-          headers: {
-            "X-API-KEY": process.env.DEPLOYER_SECRET,
-          },
-        }
-      )
-    ).data.dockers;
+        body: JSON.stringify({
+          page: page,
+        }),
+      })
+    ).json().dockers;
 
     dockers = await Promise.all(
       dockers.map(async (x) => {
@@ -626,37 +605,37 @@ exports.restartDocker = async function (req, res) {
   try {
     const dockerToRestart = req.body.docker;
 
-    let resAxios = await axios.post(
-      `${process.env.DEPLOYER_API}/api/shutdownDocker`,
-      {
-        ownerId: dockerToRestart.ownerId,
-        challengeId: dockerToRestart.challengeId,
-      },
-      {
+    let resFetch = (
+      await fetch(`${process.env.DEPLOYER_API}/api/shutdownDocker`, {
+        method: "POST",
         headers: {
           "X-API-KEY": process.env.DEPLOYER_SECRET,
         },
-      }
-    );
+        body: JSON.stringify({
+          ownerId: dockerToRestart.ownerId,
+          challengeId: dockerToRestart.challengeId,
+        }),
+      })
+    ).json();
 
-    if (resAxios.data.state == "error") throw new Error(resAxios.data.message);
+    if (resFetch.state == "error") throw new Error(resFetch.message);
 
-    resAxios = await axios.post(
-      `${process.env.DEPLOYER_API}/api/deployDocker`,
-      {
-        githubUrl: dockerToRestart.githubUrl,
-        ownerId: dockerToRestart.ownerId,
-        challengeId: dockerToRestart.challengeId,
-        randomFlag: dockerToRestart.randomFlag != "false" ? true : false,
-      },
-      {
+    resFetch = (
+      await fetch(`${process.env.DEPLOYER_API}/api/deployDocker`, {
+        method: "POST",
         headers: {
           "X-API-KEY": process.env.DEPLOYER_SECRET,
         },
-      }
-    );
+        body: JSON.stringify({
+          githubUrl: dockerToRestart.githubUrl,
+          ownerId: dockerToRestart.ownerId,
+          challengeId: dockerToRestart.challengeId,
+          randomFlag: dockerToRestart.randomFlag != "false" ? true : false,
+        }),
+      })
+    ).json();
 
-    if (resAxios.data.state == "error") throw new Error(resAxios.data.message);
+    if (resFetch.state == "error") throw new Error(resFetch.message);
 
     const challenge = await challenges.findById(dockerToRestart.challengeId);
     if (challenge && challenge.randomFlag) {
@@ -677,7 +656,7 @@ exports.restartDocker = async function (req, res) {
           $push: {
             randomFlags: {
               id: dockerToRestart.ownerId,
-              flag: resAxios.data.flag,
+              flag: resFetch.flag,
             },
           },
         }
@@ -698,20 +677,20 @@ exports.shutdownDocker = async function (req, res) {
   try {
     const dockerToStop = req.body.docker;
 
-    const resAxios = await axios.post(
-      `${process.env.DEPLOYER_API}/api/shutdownDocker`,
-      {
-        ownerId: dockerToStop.ownerId,
-        challengeId: dockerToStop.challengeId,
-      },
-      {
+    const resFetch = (
+      await fetch(`${process.env.DEPLOYER_API}/api/shutdownDocker`, {
+        method: "POST",
         headers: {
           "X-API-KEY": process.env.DEPLOYER_SECRET,
         },
-      }
-    );
+        body: JSON.stringify({
+          ownerId: dockerToStop.ownerId,
+          challengeId: dockerToStop.challengeId,
+        }),
+      })
+    ).json();
 
-    if (resAxios.data.state == "error") throw new Error(resAxios.data.message);
+    if (resFetch.state == "error") throw new Error(resFetch.message);
 
     const challenge = await challenges.findById(dockerToStop.challengeId);
     if (challenge && challenge.randomFlag) {
