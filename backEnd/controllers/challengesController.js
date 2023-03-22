@@ -4,13 +4,12 @@ const teams = require("../models/teamModel");
 const ctfConfig = require("../models/ctfConfigModel.js");
 const logController = require("./logController");
 const ObjectId = require("mongoose").Types.ObjectId;
-const axios = require("axios");
 const { Webhook } = require("discord-webhook-node");
 
 if ("WEBHOOK" in process.env) {
   const hook = new Webhook(process.env.WEBHOOK);
   const IMAGE_URL = "https://cdn-icons-png.flaticon.com/512/205/205916.png";
-  hook.setUsername("FirstBlood");
+  hook.setUsername("First Blood");
   hook.setAvatar(IMAGE_URL);
 }
 
@@ -160,22 +159,22 @@ exports.deployDocker = async function (req, res) {
     if (!challenge.githubUrl)
       throw new Error("Challenge doesn't have a github url!");
 
-    const resAxios = await axios.post(
-      `${process.env.DEPLOYER_API}/api/deployDocker`,
-      {
-        githubUrl: challenge.githubUrl,
-        ownerId: user.teamId,
-        challengeId: challenge.id,
-        randomFlag: challenge.randomFlag,
-      },
-      {
+    const resFetch = (
+      await fetch(`${process.env.DEPLOYER_API}/api/deployDocker`, {
+        method: "POST",
         headers: {
           "X-API-KEY": process.env.DEPLOYER_SECRET,
         },
-      }
-    );
+        body: JSON.stringify({
+          githubUrl: challenge.githubUrl,
+          ownerId: user.teamId,
+          challengeId: challenge.id,
+          randomFlag: challenge.randomFlag,
+        }),
+      })
+    ).json();
 
-    if (resAxios.data.state == "error") throw new Error(resAxios.data.message);
+    if (resFetch.state == "error") throw new Error(resFetch.message);
 
     if (challenge.randomFlag) {
       if (challenge.randomFlags.find((x) => x.id == user.teamId)) {
@@ -193,16 +192,15 @@ exports.deployDocker = async function (req, res) {
         { id: challenge._id },
         {
           $push: {
-            randomFlags: { id: user.teamId, flag: resAxios.data.flag },
+            randomFlags: { id: user.teamId, flag: resFetch.flag },
           },
         }
       );
     }
 
-    res.send({ state: "success", message: resAxios.data });
+    // TODO : FIX SENDING FLAG
+    res.send({ state: "success", message: resFetch });
   } catch (error) {
-    if (error.response?.data?.message)
-      return res.send({ state: "error", message: error.response.data.message });
     res.send({ state: "error", message: error.message });
   }
 };
@@ -225,20 +223,20 @@ exports.shutdownDocker = async function (req, res) {
     if (!challenge.githubUrl)
       throw new Error("Challenge doesn't have a github url!");
 
-    const resAxios = await axios.post(
-      `${process.env.DEPLOYER_API}/api/shutdownDocker`,
-      {
-        ownerId: user.teamId,
-        challengeId: challenge.id,
-      },
-      {
+    const resFetch = (
+      await fetch(`${process.env.DEPLOYER_API}/api/shutdownDocker`, {
+        method: "POST",
         headers: {
           "X-API-KEY": process.env.DEPLOYER_SECRET,
         },
-      }
-    );
+        body: JSON.stringify({
+          ownerId: user.teamId,
+          challengeId: challenge.id,
+        }),
+      })
+    ).json();
 
-    if (resAxios.data.state == "error") throw new Error(resAxios.data.message);
+    if (resFetch.state == "error") throw new Error(resFetch.message);
 
     if (challenge.randomFlag) {
       await challenges.updateOne(
@@ -251,7 +249,8 @@ exports.shutdownDocker = async function (req, res) {
       );
     }
 
-    res.send({ state: "success", message: resAxios.data });
+    // TODO : DELETE FLAG
+    res.send({ state: "success", message: resFetch });
   } catch (error) {
     if (error.response?.data?.message)
       return res.send({ state: "error", message: error.response.data.message });
@@ -261,19 +260,19 @@ exports.shutdownDocker = async function (req, res) {
 
 async function getDocker(teamId) {
   try {
-    const deployed = await axios.post(
-      `${process.env.DEPLOYER_API}/api/getDockers`,
-      {
-        ownerId: teamId,
-      },
-      {
+    const deployed = (
+      await fetch(`${process.env.DEPLOYER_API}/api/getDockers`, {
+        method: "POST",
         headers: {
           "X-API-KEY": process.env.DEPLOYER_SECRET,
         },
-      }
-    );
+        body: JSON.stringify({
+          ownerId: teamId,
+        }),
+      })
+    ).json();
 
-    return deployed.data.dockers.map((c) => {
+    return deployed.dockers.map((c) => {
       delete c.githubUrl;
       return c;
     });
