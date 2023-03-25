@@ -6,8 +6,9 @@ const logController = require("./logController");
 const ObjectId = require("mongoose").Types.ObjectId;
 const { Webhook } = require("discord-webhook-node");
 
+let hook;
 if ("WEBHOOK" in process.env) {
-  const hook = new Webhook(process.env.WEBHOOK);
+  hook = new Webhook(process.env.WEBHOOK);
   const IMAGE_URL = "https://cdn-icons-png.flaticon.com/512/205/205916.png";
   hook.setUsername("First Blood");
   hook.setAvatar(IMAGE_URL);
