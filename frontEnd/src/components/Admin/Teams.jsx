@@ -8,6 +8,7 @@ function Teams(props) {
   const [teams, setTeams] = useState([]);
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
+  const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
     getTeams(page);
@@ -113,6 +114,13 @@ function Teams(props) {
           >
             <span className="fa-solid fa-arrow-right"></span>
           </button>
+          <button
+            className="btn btn-outline-danger btn-shadow"
+            onClick={() => setEditMode(!editMode)}
+            title="Edit Mode"
+          >
+            <span className="fa-solid fa-pencil"></span>
+          </button>
         </div>
         <div>
           <input
@@ -137,6 +145,7 @@ function Teams(props) {
             <th scope="col">Team Users</th>
             <th scope="col">Team Score</th>
             <th scope="col">Team Solves</th>
+            {editMode && <th scope="col">Delete Team</th>}
           </tr>
         </thead>
         <tbody>
@@ -147,22 +156,6 @@ function Teams(props) {
                   {index + (page - 1) * 100}
                 </th>
                 <td>
-                  <button
-                    className="btn btn-outline-danger btn-shadow"
-                    data-toggle="modal"
-                    data-target="#confirmModal"
-                    onClick={(e) => {
-                      props.setAction({
-                        function: deleteTeam,
-                        e: e,
-                        data: team,
-                      });
-                    }}
-                    style={{ marginRight: "30px" }}
-                    title="Delete Team"
-                  >
-                    <span className="fa-solid fa-minus"></span>
-                  </button>
                   <Link to={`/team/${team.name}`}>
                     <a className="p-3 text-decoration-none text-light bold">
                       {team.name}
@@ -176,6 +169,25 @@ function Teams(props) {
                 </td>
                 <td>{team.totalScore}</td>
                 <td>{team.totalSolved}</td>
+                {editMode && (
+                  <td>
+                    <button
+                      className="btn btn-outline-danger btn-shadow"
+                      data-toggle="modal"
+                      data-target="#confirmModal"
+                      onClick={(e) => {
+                        props.setAction({
+                          function: deleteTeam,
+                          e: e,
+                          data: team,
+                        });
+                      }}
+                      title="Delete Team"
+                    >
+                      <span className="fa-solid fa-minus"></span>
+                    </button>
+                  </td>
+                )}
               </tr>
             );
           })}
