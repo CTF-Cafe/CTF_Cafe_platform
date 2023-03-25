@@ -38,7 +38,9 @@ function App() {
   const [endTime, setEndTime] = useState(0);
   const [startTime, setStartTime] = useState(0);
   const alert = useAlert();
-  const [notifications, setNotifications] = useState(JSON.parse(localStorage.getItem('notifications')) || []);
+  const [notifications, setNotifications] = useState(
+    JSON.parse(localStorage.getItem("notifications")) || []
+  );
   const navigate = useNavigate();
 
   const globalData = {
@@ -109,7 +111,10 @@ function App() {
       .then((response) => {
         if (response.data.state === "success") {
           setNotifications([...notifications, ...response.data.notifications]);
-          localStorage.setItem('notifications', JSON.stringify([...notifications, ...response.data.notifications]))
+          localStorage.setItem(
+            "notifications",
+            JSON.stringify([...notifications, ...response.data.notifications])
+          );
         }
       })
       .catch((err) => {
@@ -136,7 +141,9 @@ function App() {
         );
         root.style.setProperty(
           "--bg-img",
-          res.data.theme.bg_img.trim().length > 0 ? `url(${res.data.theme.bg_img})` : "none"
+          res.data.theme.bg_img.trim().length > 0
+            ? `url(${res.data.theme.bg_img})`
+            : "none"
         );
 
         setTheme(res.data.theme);
@@ -196,11 +203,13 @@ function App() {
 
   return (
     <AppContext.Provider value={globalData}>
-      <LoadingScreen
-        loading={loading}
-        bgColor="#0c0d16"
-        spinnerColor="#ef121b"
-      />
+      {loading !== undefined && (
+        <LoadingScreen
+          loading={loading}
+          bgColor="#0c0d16"
+          spinnerColor="#ef121b"
+        />
+      )}
       <div>
         <div id="main">
           <Routes>

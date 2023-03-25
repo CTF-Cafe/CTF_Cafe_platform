@@ -214,7 +214,7 @@ function Team(props) {
                               <td>
                                 {solve.firstBlood == solve.userId ? (
                                   <span
-                                    class="fa-solid fa-droplet"
+                                    className="fa-solid fa-droplet"
                                     style={{
                                       fontSize: "22px",
                                       color: "red",

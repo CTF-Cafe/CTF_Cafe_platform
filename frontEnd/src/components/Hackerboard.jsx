@@ -235,11 +235,13 @@ function Hackerboard(props) {
 
   return (
     <div>
-      <LoadingScreen
-        loading={loading}
-        bgColor="#0c0d16"
-        spinnerColor="#ef121b"
-      />
+      {loading !== undefined && (
+        <LoadingScreen
+          loading={loading}
+          bgColor="#0c0d16"
+          spinnerColor="#ef121b"
+        />
+      )}
 
       <div className="bg" />
 
