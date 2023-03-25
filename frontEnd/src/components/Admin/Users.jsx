@@ -279,6 +279,7 @@ function Users(props) {
             <th scope="col">Verified</th>
             <th scope="col">Admin</th>
             <th scope="col">SBanned</th>
+            {editMode && <th scope="col">Delete User</th>}
           </tr>
         </thead>
         <tbody>
@@ -289,24 +290,6 @@ function Users(props) {
                   {index + (page - 1) * 100}
                 </th>
                 <td>
-                  {editMode && (
-                    <button
-                      className="btn btn-outline-danger btn-shadow"
-                      data-toggle="modal"
-                      data-target="#confirmModal"
-                      onClick={(e) => {
-                        props.setAction({
-                          function: deleteUser,
-                          e: e,
-                          data: user,
-                        });
-                      }}
-                      style={{ marginRight: "30px" }}
-                      title="Delete"
-                    >
-                      <span className="fa-solid fa-minus"></span>
-                    </button>
-                  )}
                   <Link to={`/user/${user.username}`}>
                     <a className="p-3 text-decoration-none text-light bold">
                       {user.username}
@@ -390,6 +373,25 @@ function Users(props) {
                       </button>
                     ))}
                 </td>
+                {editMode && (
+                  <td>
+                    <button
+                      className="btn btn-outline-danger btn-shadow"
+                      data-toggle="modal"
+                      data-target="#confirmModal"
+                      onClick={(e) => {
+                        props.setAction({
+                          function: deleteUser,
+                          e: e,
+                          data: user,
+                        });
+                      }}
+                      title="Delete"
+                    >
+                      <span className="fa-solid fa-minus"></span>
+                    </button>
+                  </td>
+                )}
               </tr>
             );
           })}
