@@ -74,7 +74,7 @@ function Navbar() {
                       Logout
                     </a>
                   </Link>
-                  <a class="btn-group" style={{ marginRight: "10px" }}>
+                  <a className="btn-group" style={{ marginRight: "10px" }}>
                     {globalData.notifications.length > 0 ? (
                       <>
                         <span
@@ -113,14 +113,14 @@ function Navbar() {
                       ></span>
                     )}
                     <div
-                      class="dropdown-menu dropdown-menu-right"
+                      className="dropdown-menu dropdown-menu-right"
                       onClick={(e) => e.stopPropagation()}
                       style={{ padding: "30px" }}
                     >
                       {globalData.notifications.map((notification) => {
                         return (
                           <div
-                            class="card-header text-light"
+                            className="card-header text-light"
                             style={{
                               display: "flex",
                               justifyContent: "space-between",

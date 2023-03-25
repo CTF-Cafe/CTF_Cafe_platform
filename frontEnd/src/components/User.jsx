@@ -92,7 +92,10 @@ function User(props) {
       <div className="bg" />
 
       <Navbar />
-      <div className="jumbotron bg-transparent mb-0 pt-3 radius-0" style={{ position: "relative" }}>
+      <div
+        className="jumbotron bg-transparent mb-0 pt-3 radius-0"
+        style={{ position: "relative" }}
+      >
         <div className="container">
           {user.username ? (
             <div>
@@ -102,69 +105,102 @@ function User(props) {
               >
                 {user.username.toUpperCase()}
               </h1>
-
-              {user.solved.length > 0 ? (
-                <>
-                  <div className="row" style={{ textAlign: "center" }}>
-                    <div className="col-md-6 mb-3">
-                      <div>
-                        <h3>Solves by Category</h3>
-                        <PieChart data={challengeStatsCategory} />
-                      </div>
-                    </div>
-                    <div className="col-md-6 mb-3">
-                      <div>
-                        <h3>Solves by Difficulty</h3>
-                        <PieChart data={challengeStatsDifficulty} />
-                      </div>
-                    </div>
+              <div style={{ textAlign: "center" }}>
+                <p>Score : {user.score}</p>
+              </div>
+              {/* User Solve Stats */}
+              <div className="row" style={{ textAlign: "center" }}>
+                <div className="col-md-6 mb-3">
+                  <div>
+                    <h3>Solves by Category</h3>
+                    <PieChart data={challengeStatsCategory} />
                   </div>
-                  <div className="row">
-                    <table className="table table-hover table-striped">
-                      <thead className="thead-dark hackerFont">
-                        <tr>
-                          <th scope="col" style={{ textAlign: "center" }}>
-                            #
+                </div>
+                <div className="col-md-6 mb-3">
+                  <div>
+                    <h3>Solves by Difficulty</h3>
+                    <PieChart data={challengeStatsDifficulty} />
+                  </div>
+                </div>
+              </div>
+              {/* User Solves Table */}
+              <div className="row" style={{ marginBottom: "25px" }}>
+                <p>User Solves</p>
+                <table className="table table-hover table-striped">
+                  <thead className="thead-dark hackerFont">
+                    <tr>
+                      <th scope="col" style={{ textAlign: "center" }}>
+                        #
+                      </th>
+                      <th scope="col">Challenge Name</th>
+                      <th scope="col">Challenge Points</th>
+                      <th scope="col">Challenge Category</th>
+                      <th scope="col">Time Solved</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {user.solved.map((solve, index) => {
+                      return (
+                        <tr key={solve._id}>
+                          <th scope="row" style={{ textAlign: "center" }}>
+                            {index}
                           </th>
-                          <th scope="col">Challenge Name</th>
-                          <th scope="col">Challenge Points</th>
-                          <th scope="col">Challenge Category</th>
-                          <th scope="col">Time Solved</th>
+                          <td>
+                            {solve.challenge.firstBlood == user._id && (
+                              <span
+                                className="fa-solid fa-droplet"
+                                style={{
+                                  fontSize: "22px",
+                                  color: "red",
+                                  marginRight: "5px",
+                                }}
+                              ></span>
+                            )}
+                            {solve.challenge.name}
+                          </td>
+                          <td>
+                            {solve.challenge.points}{" "}
+                            {solve.challenge.firstBlood == user._id &&
+                              `(+${solve.challenge.firstBloodPoints})`}
+                          </td>
+                          <td>{solve.challenge.category}</td>
+                          <td>{solve.timestamp}</td>
                         </tr>
-                      </thead>
-                      <tbody>
-                        {user.solved.map((solve, index) => {
-                          return (
-                            <tr key={solve._id}>
-                              <th scope="row" style={{ textAlign: "center" }}>
-                                {index}
-                              </th>
-                              <td>
-                                {solve.challenge.firstBlood == user._id ? (
-                                  <span
-                                    class="fa-solid fa-droplet"
-                                    style={{
-                                      fontSize: "22px",
-                                      color: "red",
-                                      marginRight: "5px",
-                                    }}
-                                  ></span>
-                                ) : null}
-                                {solve.challenge.name}
-                              </td>
-                              <td>{solve.challenge.points}</td>
-                              <td>{solve.challenge.category}</td>
-                              <td>{solve.timestamp}</td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                </>
-              ) : (
-                <h3 style={{ textAlign: "center" }}>No Challenges Solved!</h3>
-              )}
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              {/* User Hints Bought */}
+              <div className="row">
+                <p>User Hints Bought</p>
+                <table className="table table-hover table-striped">
+                  <thead className="thead-dark hackerFont">
+                    <tr>
+                      <th scope="col" style={{ textAlign: "center" }}>
+                        #
+                      </th>
+                      <th scope="col">Challenge Name</th>
+                      <th scope="col">Hint Cost</th>
+                      <th scope="col">Time Bought</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {user.hintsBought.map((hint, index) => {
+                      return (
+                        <tr key={hint._id}>
+                          <th scope="row" style={{ textAlign: "center" }}>
+                            {index}
+                          </th>
+                          <td>{hint.challName}</td>
+                          <td>(-{hint.cost})</td>
+                          <td>{hint.timestamp}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
           ) : (
             <div>

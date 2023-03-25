@@ -14,6 +14,94 @@ function UserTeam(props) {
   const [challengeStatsCategory, setChallengeStatsCategory] = useState([]);
   const [challengeStatsDifficulty, setChallengeStatsDifficulty] = useState([]);
 
+  // Parse and Organize team data
+  const updateUserTeam = (response) => {
+    const clubArray = (arr) => {
+      return arr.reduce((acc, val, _) => {
+        const index = acc.findIndex((el) => el.username === val.username);
+        if (index !== -1) {
+          acc[index].solved.push(val.solved[0]);
+          acc[index].score += val.score;
+        } else {
+          acc.push(val);
+        }
+        return acc;
+      }, []);
+    };
+
+    response.data.users = clubArray(response.data.users);
+
+    let finalDataCategory = [];
+    let finalDataDifficulty = [];
+
+    response.data.solved = [];
+    response.data.users.forEach((user) => {
+      user.solved.forEach((solve) => {
+        response.data.solved.push({
+          ...solve,
+          userId: user._id,
+          username: user.username,
+        });
+        user.score += solve.points;
+
+        var category = finalDataCategory.find((obj) => {
+          return obj.name == solve.category;
+        });
+
+        if (category) {
+          finalDataCategory[finalDataCategory.indexOf(category)].value += 1;
+        } else {
+          finalDataCategory.push({
+            name: solve.category,
+            value: 1,
+          });
+        }
+
+        var difficulty = finalDataDifficulty.find((obj) => {
+          return (
+            obj.name ==
+            (solve.level == 3
+              ? "Ninja"
+              : solve.level == 2
+              ? "Hard"
+              : solve.level == 1
+              ? "Medium"
+              : "Easy")
+          );
+        });
+
+        if (difficulty) {
+          finalDataDifficulty[
+            finalDataDifficulty.indexOf(difficulty)
+          ].value += 1;
+        } else {
+          finalDataDifficulty.push({
+            name:
+              solve.level == 3
+                ? "Ninja"
+                : solve.level == 2
+                ? "Hard"
+                : solve.level == 1
+                ? "Medium"
+                : "Easy",
+            value: 1,
+          });
+        }
+      });
+      user.hintsBought.forEach((hint) => {
+        user.score -= hint.cost;
+      });
+    });
+
+    setChallengeStatsCategory(finalDataCategory);
+
+    setChallengeStatsDifficulty(finalDataDifficulty);
+
+    globalData.userData.team = response.data;
+    setUserTeam(response.data);
+    globalData.setUserData(globalData.userData);
+  };
+
   const getTeam = () => {
     axios
       .post(
@@ -25,92 +113,7 @@ function UserTeam(props) {
       )
       .then((response) => {
         if (response.data.state != "error") {
-          const clubArray = (arr) => {
-            return arr.reduce((acc, val, ind) => {
-              const index = acc.findIndex((el) => el.username === val.username);
-              if (index !== -1) {
-                acc[index].solved.push(val.solved[0]);
-                acc[index].score += val.score;
-              } else {
-                acc.push(val);
-              }
-              return acc;
-            }, []);
-          };
-
-          response.data.users = clubArray(response.data.users);
-
-          let finalDataCategory = [];
-          let finalDataDifficulty = [];
-
-          response.data.solved = [];
-          response.data.users.forEach((user) => {
-            user.solved.forEach((solve) => {
-              response.data.solved.push({
-                ...solve,
-                userId: user._id,
-                username: user.username,
-              });
-              user.score += solve.points;
-
-              var category = finalDataCategory.find((obj) => {
-                return obj.name == solve.category;
-              });
-
-              if (category) {
-                finalDataCategory[
-                  finalDataCategory.indexOf(category)
-                ].value += 1;
-              } else {
-                finalDataCategory.push({
-                  name: solve.category,
-                  value: 1,
-                });
-              }
-
-              var difficulty = finalDataDifficulty.find((obj) => {
-                return (
-                  obj.name ==
-                  (solve.level == 3
-                    ? "Ninja"
-                    : solve.level == 2
-                    ? "Hard"
-                    : solve.level == 1
-                    ? "Medium"
-                    : "Easy")
-                );
-              });
-
-              if (difficulty) {
-                finalDataDifficulty[
-                  finalDataDifficulty.indexOf(difficulty)
-                ].value += 1;
-              } else {
-                finalDataDifficulty.push({
-                  name:
-                    solve.level == 3
-                      ? "Ninja"
-                      : solve.level == 2
-                      ? "Hard"
-                      : solve.level == 1
-                      ? "Medium"
-                      : "Easy",
-                  value: 1,
-                });
-              }
-            });
-            user.hintsBought.forEach((hint) => {
-              user.score -= hint.cost;
-            });
-          });
-
-          setChallengeStatsCategory(finalDataCategory);
-
-          setChallengeStatsDifficulty(finalDataDifficulty);
-
-          globalData.userData.team = response.data;
-          setUserTeam(response.data);
-          globalData.setUserData(globalData.userData);
+          updateUserTeam(response);
         }
       })
       .catch((err) => {
@@ -141,7 +144,7 @@ function UserTeam(props) {
           globalData.navigate("/", { replace: true });
         } else if (response.data.state == "success") {
           globalData.alert.success("Team registered!");
-          getTeam();
+          updateUserTeam(response);
         } else {
           globalData.alert.error(response.data.message);
         }
@@ -170,7 +173,7 @@ function UserTeam(props) {
           globalData.navigate("/", { replace: true });
         } else if (response.data.state == "success") {
           globalData.alert.success("Team joined!");
-          getTeam();
+          updateUserTeam(response);
         } else {
           globalData.alert.error(response.data.message);
         }
@@ -446,7 +449,7 @@ function UserTeam(props) {
                               <td>
                                 {solve.firstBlood == solve.userId ? (
                                   <span
-                                    class="fa-solid fa-droplet"
+                                    className="fa-solid fa-droplet"
                                     style={{
                                       fontSize: "22px",
                                       color: "red",

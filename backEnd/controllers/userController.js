@@ -416,13 +416,26 @@ exports.getUser = async function (req, res) {
     user.isAdmin = false;
     user.score = 0;
 
+    // Fetch Challenges from solves
     for (let i = 0; i < user.solved.length; i++) {
-      let challenge = await challenges.findById(user.solved[i]._id, { _id: 1, name: 1, category: 1, points: 1, firstBlood: 1 });
+      let challenge = await challenges.findById(user.solved[i]._id, { _id: 1, name: 1, category: 1, points: 1, firstBlood: 1, firstBloodPoints: 1 });
       if (challenge) {
         user.solved[i].challenge = challenge;
+        if(user._id.equals(challenge.firstBlood)) user.score += challenge.firstBloodPoints;
         user.score += challenge.points;
       } else {
         user.solved.splice(i, 1);
+        i--;
+      }
+    }
+
+    // Fetch challenges from hintsBought
+    for (let i = 0; i < user.hintsBought.length; i++) {
+      let challenge = await challenges.findById(user.hintsBought[i].challId, { _id: 1, name: 1 });
+      if (challenge) {
+        user.hintsBought[i].challName = challenge.name;
+      } else {
+        user.hintsBought.splice(i, 1);
         i--;
       }
     }

@@ -285,11 +285,13 @@ function Challenges(props) {
 
   return (
     <div>
-      <LoadingScreen
-        loading={loading}
-        bgColor="#0c0d16"
-        spinnerColor="#ef121b"
-      />
+      {loading !== undefined && (
+        <LoadingScreen
+          loading={loading}
+          bgColor="#0c0d16"
+          spinnerColor="#ef121b"
+        />
+      )}
 
       <div className="bg" />
 
@@ -392,7 +394,7 @@ function Challenges(props) {
                                   }}
                                 >
                                   <span
-                                    class="fa-solid fa-droplet"
+                                    className="fa-solid fa-droplet"
                                     style={{ fontSize: "22px" }}
                                   ></span>
                                 </div>
@@ -497,7 +499,15 @@ function Challenges(props) {
                                     if (challenge.progress === "finished")
                                       shutdownDocker(challenge);
                                   }}
-                                  title={!challenge.progress ? "Start Docker" : challenge.progress === "finished" ? "Stop Docker" : challenge.progress === "stopping" ? "Stopping Docker..." : "Building Docker..."}
+                                  title={
+                                    !challenge.progress
+                                      ? "Start Docker"
+                                      : challenge.progress === "finished"
+                                      ? "Stop Docker"
+                                      : challenge.progress === "stopping"
+                                      ? "Stopping Docker..."
+                                      : "Building Docker..."
+                                  }
                                 >
                                   {!challenge.progress ? (
                                     <>
@@ -531,7 +541,7 @@ function Challenges(props) {
                                     }}
                                     title="Download File"
                                   >
-                                    <span className="fa-solid fa-download"/>
+                                    <span className="fa-solid fa-download" />
                                   </button>
                                 ) : null
                               ) : null}
@@ -552,7 +562,7 @@ function Challenges(props) {
                                     className="btn btn-outline-danger btn-shadow"
                                     title="Code Snippet"
                                   >
-                                    <span className="fa-solid fa-laptop-code"/>
+                                    <span className="fa-solid fa-laptop-code" />
                                   </a>
                                 ) : null
                               ) : null}
@@ -568,7 +578,7 @@ function Challenges(props) {
                                       data-toggle="modal"
                                       data-target="#modal"
                                       className="btn btn-outline-danger btn-shadow"
-                                      title={"Hint#"+ (i + 1)}
+                                      title={"Hint#" + (i + 1)}
                                     >
                                       <span className="fa-solid fa-lightbulb" />
                                     </a>
