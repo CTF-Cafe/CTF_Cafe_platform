@@ -166,7 +166,7 @@ function Hackerboard(props) {
           }
         });
 
-        if(!team) {
+        if (!team) {
           throw Error("Team has no solves!");
         }
 
@@ -344,10 +344,12 @@ function Hackerboard(props) {
                   </button>
                 </div>
               </div>
+
               {/* Scoreboard Title */}
               <div style={{ textAlign: "center" }}>
-                    <h1>{selectionMain.toUpperCase() + " SCOREBOARD"}</h1>
+                <h1>{selectionMain.toUpperCase() + " SCOREBOARD"}</h1>
               </div>
+
               <table className="table table-hover table-striped">
                 <thead className="thead-dark hackerFont">
                   <tr style={{ textAlign: "center" }}>
@@ -523,6 +525,31 @@ function Hackerboard(props) {
                       })}
                 </tbody>
               </table>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "end",
+                  marginBottom: "25px",
+                }}
+              >
+                {/* Pagination Div */}
+                <div>
+                  <button
+                    className="btn btn-outline-danger btn-shadow"
+                    onClick={previousPage}
+                    title="Prev Page"
+                  >
+                    <span className="fa-solid fa-arrow-left"></span>
+                  </button>
+                  <button
+                    className="btn btn-outline-danger btn-shadow"
+                    onClick={nextPage}
+                    title="Next Page"
+                  >
+                    <span className="fa-solid fa-arrow-right"></span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>

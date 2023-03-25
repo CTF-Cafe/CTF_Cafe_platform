@@ -241,6 +241,31 @@ function Dockers(props) {
           })}
         </tbody>
       </table>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "start",
+          marginBottom: "25px",
+        }}
+      >
+        {/* Pagination Div */}
+        <div>
+          <button
+            className="btn btn-outline-danger btn-shadow"
+            onClick={() => getDockers(page - 1)}
+            title="Prev Page"
+          >
+            <span className="fa-solid fa-arrow-left"></span>
+          </button>
+          <button
+            className="btn btn-outline-danger btn-shadow"
+            onClick={() => getDockers(page + 1)}
+            title="Next Page"
+          >
+            <span className="fa-solid fa-arrow-right"></span>
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
