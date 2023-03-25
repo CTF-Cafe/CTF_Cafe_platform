@@ -344,6 +344,10 @@ function Hackerboard(props) {
                   </button>
                 </div>
               </div>
+              {/* Scoreboard Title */}
+              <div style={{ textAlign: "center" }}>
+                    <h1>{selectionMain.toUpperCase() + " SCOREBOARD"}</h1>
+              </div>
               <table className="table table-hover table-striped">
                 <thead className="thead-dark hackerFont">
                   <tr style={{ textAlign: "center" }}>
