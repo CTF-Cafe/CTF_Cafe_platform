@@ -395,6 +395,31 @@ function Users(props) {
           })}
         </tbody>
       </table>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "start",
+          marginBottom: "25px",
+        }}
+      >
+        {/* Pagination Div */}
+        <div>
+          <button
+            className="btn btn-outline-danger btn-shadow"
+            onClick={previousPage}
+            title="Prev Page"
+          >
+            <span className="fa-solid fa-arrow-left"></span>
+          </button>
+          <button
+            className="btn btn-outline-danger btn-shadow"
+            onClick={nextPage}
+            title="Next Page"
+          >
+            <span className="fa-solid fa-arrow-right"></span>
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

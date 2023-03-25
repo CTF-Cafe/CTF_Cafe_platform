@@ -80,7 +80,7 @@ function Stats() {
             download="logs.json"
             title="Export Logs"
           >
-            <span className="fa-solid fa-file-export"/>
+            <span className="fa-solid fa-file-export" />
           </a>
         </div>
         <div>
@@ -125,6 +125,31 @@ function Stats() {
           })}
         </tbody>
       </table>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "start",
+          marginBottom: "25px",
+        }}
+      >
+        {/* Pagination Div */}
+        <div>
+          <button
+            className="btn btn-outline-danger btn-shadow"
+            onClick={() => getLogs(page - 1)}
+            title="Prev Page"
+          >
+            <span className="fa-solid fa-arrow-left"></span>
+          </button>
+          <button
+            className="btn btn-outline-danger btn-shadow"
+            onClick={() => getLogs(page + 1)}
+            title="Next Page"
+          >
+            <span className="fa-solid fa-arrow-right"></span>
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
