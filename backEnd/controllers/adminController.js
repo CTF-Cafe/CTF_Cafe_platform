@@ -7,6 +7,7 @@ const log = require("../models/logModel.js");
 const path = require("path");
 const fs = require("fs");
 const ObjectId = require("mongoose").Types.ObjectId;
+const { validateRequestBody } = require("./inputController");
 
 exports.getStats = async function (req, res) {
   let allChallenges = await challenges.find({}).sort({ points: 1 });
@@ -47,35 +48,25 @@ exports.saveChallenge = async function (req, res) {
   try {
     const challengeExists = await challenges.findById(req.body.id);
 
-    if (isNaN(req.body.points)) throw Error("points must be a number!");
+    const validationObject = {
+      points: { type: 'positiveNumber' },
+      level: { type: 'positiveNumber' },
+      firstBloodPoints: { type: 'positiveNumber' },
+      hints: {
+        type: 'array',
+        itemValidation: {
+          cost: { type: 'positiveNumber', required: true },
+          content: { required: true },
+          id: { required: true }
+        }
+      },
+      name: { required: true },
+      info: { required: true },
+      flag: { required: true },
+      requirement: { type: 'objectId' }
+    };
 
-    if (parseInt(req.body.points) < 0 || parseInt(req.body.level) < 0)
-      throw Error("Points and level must be positive numbers");
-
-    if (isNaN(req.body.firstBloodPoints))
-      throw Error("firstBloodPoints must be a number!");
-
-    if (parseInt(req.body.firstBloodPoints) < 0)
-      throw Error("firstBloodPoints must be positive number");
-
-    req.body.hints = JSON.parse(req.body.hints).map((hint) => {
-      if (!hint.cost) throw Error("hint must have a cost!");
-      if (!hint.content) throw Error("hint must have some content!");
-      if (!hint.id) throw Error("hint must have an id!");
-      if (isNaN(hint.cost)) throw Error("hint cost must be a number!");
-      if (parseInt(hint.cost) < 0)
-        throw Error("hint cost must be a positive number");
-      return { id: hint.id, content: hint.content, cost: parseInt(hint.cost) };
-    });
-
-    if (req.body.name.length < 1) throw Error("Name cannot be empty");
-
-    if (req.body.info.length < 1) throw Error("Info cannot be empty");
-
-    if (req.body.flag.length < 1) throw Error("Flag cannot be empty");
-
-    if (req.body.requirement != "" && !ObjectId.isValid(req.body.requirement))
-      throw Error("Requirement must be a valid ObjectId!");
+    validateRequestBody(req.body, validationObject);
 
     if (!challengeExists) throw Error("Challenge does not exist");
 
