@@ -3,12 +3,12 @@ import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import AppContext from "../Data/AppContext";
 const configsToShow = [
-  "endTime",
   "startTime",
-  "dynamicScoring",
+  "endTime",
   "rules",
   "sponsors",
   "categories",
+  "dynamicScoring",
 ];
 
 function ArrayEdit(props) {
@@ -16,7 +16,7 @@ function ArrayEdit(props) {
   const [array, setArray] = useState(config.value);
 
   const removeFromArray = (item) => {
-    setArray([ ...array.filter((x) => x != item)]);
+    setArray([...array.filter((x) => x != item)]);
   };
 
   const addToArray = () => {
@@ -25,7 +25,7 @@ function ArrayEdit(props) {
 
   const updateArray = (e, item) => {
     let tmpArray = array;
-    e.target.style = 'width: ' + (e.target.value.length + 2) + "ch;"
+    e.target.style = "width: " + (e.target.value.length + 2) + "ch;";
     tmpArray[tmpArray.indexOf(item)] = e.target.value;
     setArray([...tmpArray]);
   };
@@ -41,13 +41,19 @@ function ArrayEdit(props) {
       </button>
       {array.map((item) => {
         return (
-          <span style={{ margin: "5px", border: "1px solid var(--color-1)", whiteSpace: "pre-wrap" }}>
+          <span
+            style={{
+              margin: "5px",
+              border: "1px solid var(--color-1)",
+              whiteSpace: "pre-wrap",
+            }}
+          >
             <input
               onChange={(e) => updateArray(e, item)}
               className="min-input"
               defaultValue={item}
               type="text"
-              style={{ width: (item.length + 2) + "ch" }}
+              style={{ width: item.length + 2 + "ch" }}
               key={array.length}
             />
             <button
@@ -78,6 +84,11 @@ function Config(props) {
           globalData.setLoggedIn(false);
           globalData.navigate("/", { replace: true });
         } else {
+          response.data.sort((a, b) => {
+            const aIndex = configsToShow.indexOf(a.name);
+            const bIndex = configsToShow.indexOf(b.name);
+            return aIndex - bIndex;
+          });
           setConfigs(response.data);
         }
       })
@@ -101,9 +112,11 @@ function Config(props) {
             ? new Date(
                 document.getElementById("config-data" + config._id).value
               ).getTime()
-            : config.name == "categories"
-            ? document.getElementById("config-data" + config._id).attributes.value
-                .nodeValue
+            : config.name === "categories"
+            ? document.getElementById("config-data" + config._id).attributes
+                .value.nodeValue
+            : config.name === "dynamicScoring"
+            ? document.getElementById("config-data" + config._id).value
             : document.getElementById("config-data" + config._id).textContent,
         });
       }
@@ -118,13 +131,13 @@ function Config(props) {
         { withCredentials: true }
       )
       .then((response) => {
-        if (response.data.state == "sessionError") {
+        if (response.data.state === "sessionError") {
           globalData.alert.error("Session expired!");
           globalData.setUserData({});
           globalData.setLoggedIn(false);
           globalData.navigate("/", { replace: true });
         } else {
-          if (response.data.state == "success") {
+          if (response.data.state === "success") {
             globalData.alert.success("Updated config!");
             getConfigs();
           } else {
@@ -154,7 +167,7 @@ function Config(props) {
           </tr>
         </thead>
         <tbody>
-          {configs.map((config, index) => {
+          {configs.map((config, _) => {
             if (configsToShow.includes(config.name)) {
               return (
                 <tr key={config._id}>
@@ -170,11 +183,21 @@ function Config(props) {
                           .slice(0, -3)}
                       />
                     </td>
-                  ) : config.name == "categories" ? (
+                  ) : config.name === "categories" ? (
                     <ArrayEdit config={config} />
+                  ) : config.name === "dynamicScoring" ? (
+                    <div>
+                      <select
+                        defaultValue={JSON.stringify(config.value)}
+                        id={"config-data" + config._id}
+                      >
+                        <option value="true">True</option>
+                        <option value="false">False</option>
+                      </select>
+                    </div>
                   ) : (
                     <td contentEditable="true" id={"config-data" + config._id}>
-                      {JSON.stringify(config.value)}
+                      <pre style={{ color: "white" }}>{JSON.stringify(config.value, null, 2)}</pre>
                     </td>
                   )}
                 </tr>

@@ -3,6 +3,17 @@ const theme = require('./models/themeModel.js');
 const users = require('./models/userModel.js');
 const encryptionController = require('./controllers/encryptionController.js');
 
+function generatePassword(length) {
+    const characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+";
+    let password = "";
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      password += characters[randomIndex];
+    }
+    return password;
+}
+  
+
 exports.setupDB = async function() {
     const startTimeConfig = await ctfConfig.findOne({ name: 'startTime' });
 
@@ -72,10 +83,11 @@ exports.setupDB = async function() {
     const adminExists = await users.findOne({ isAdmin: true });
 
     if (!adminExists) {
-        const password = await encryptionController.encrypt('admin');
+        const rawPassword = generatePassword(10);
+        const password = await encryptionController.encrypt(rawPassword);
 
         await users.create({ username: 'admin', password: password, email: "admin@admin.com", verified: true, key: 'none', isAdmin: true });
-        console.log('Created default admin. admin:admin');
+        console.log(`Created default admin. admin:${rawPassword} (DELETE ASAP)`);
     }
 
     const categoriesConfig = await ctfConfig.findOne({ name: 'categories' });

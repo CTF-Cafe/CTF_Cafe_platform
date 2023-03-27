@@ -199,7 +199,7 @@ exports.deployDocker = async function (req, res) {
       );
     }
 
-    // TODO : FIX SENDING FLAG
+    delete resFetch.flag
     res.send({ state: "success", message: resFetch });
   } catch (error) {
     res.send({ state: "error", message: error.message });
@@ -250,7 +250,6 @@ exports.shutdownDocker = async function (req, res) {
       );
     }
 
-    // TODO : DELETE FLAG
     res.send({ state: "success", message: resFetch });
   } catch (error) {
     if (error.response?.data?.message)

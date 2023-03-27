@@ -38,12 +38,12 @@ router.post("/getUserTeam", (req, res) => {
   teamController.getUserTeam(req, res);
 });
 
-router.post('/deployDocker', (req, res) => {
-    challengesController.deployDocker(req, res);
+router.post("/deployDocker", (req, res) => {
+  challengesController.deployDocker(req, res);
 });
 
-router.post('/shutdownDocker', (req, res) => {
-    challengesController.shutdownDocker(req, res);
+router.post("/shutdownDocker", (req, res) => {
+  challengesController.shutdownDocker(req, res);
 });
 
 router.post("/submitFlag", (req, res) => {
@@ -58,38 +58,38 @@ router.get("/getChallenges", (req, res) => {
   challengesController.getChallenges(req, res);
 });
 
-// MAKE MORE EFFICIENT
 router.get("/getNotifications", async (req, res) => {
   const notifications = await ctfConfig.findOne({ name: "notifications" });
-  let notificationsNeeded = [];
 
-  if (notifications) {
-    if (notifications.value) {
-      if (notifications.value.length > 0) {
-        editedNotifications = [...notifications.value];
-
-        notifications.value.map(async (notification) => {
-          if (!notification.seenBy.includes(req.session.username)) {
-            editedNotifications[
-              editedNotifications.findIndex((x) => x == notification)
-            ].seenBy.push(req.session.username);
-            notificationsNeeded.push(notification);
-          }
-        });
-
-        if (
-          JSON.stringify(editedNotifications) != JSON.stringify(notifications)
-        ) {
-          await ctfConfig.updateOne(
-            { name: "notifications" },
-            { $set: { value: editedNotifications } }
-          );
+  if (notifications && notifications.value && notifications.value.length > 0) {
+    const editedNotifications = notifications.value.map((notification) => {
+      if (notification && notification.message && notification.seenBy) {
+        if (!notification.seenBy.includes(req.session.username)) {
+          return {
+            ...notification,
+            seenBy: [...notification.seenBy, req.session.username],
+          };
+        } else {
+          return notification;
         }
+      } else {
+        return undefined;
       }
-    }
-  }
+    }).filter(x => x !== undefined);
 
-  if (notificationsNeeded) {
+    if (
+      JSON.stringify(editedNotifications) !==
+      JSON.stringify(notifications.value)
+    ) {
+      await ctfConfig.updateOne(
+        { name: "notifications" },
+        { $set: { value: editedNotifications } }
+      );
+    }
+
+    const notificationsNeeded = editedNotifications.filter(
+      (notification) => !notification.seenBy.includes(req.session.username)
+    );
     res.send({ state: "success", notifications: notificationsNeeded });
   } else {
     res.send({ state: "error", notifications: [] });
