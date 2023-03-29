@@ -63,6 +63,7 @@ exports.resolveTeamsFull = function (match) {
           },
         },
         hintsBought: { $first: "$users.hintsBought" },
+        adminPoints: { $first: "$users.adminPoints" },
         username: { $first: "$users.username" },
         name: { $first: "$name" },
         teamCaptain: { $first: "$teamCaptain" },
@@ -77,6 +78,7 @@ exports.resolveTeamsFull = function (match) {
             username: "$username",
             solved: "$solved",
             hintsBought: "$hintsBought",
+            adminPoints: "$adminPoints",
           },
         },
         name: { $first: "$name" },
@@ -154,6 +156,7 @@ exports.resolveTeamsFull = function (match) {
           },
         },
         solved: { $first: "$users.solved" },
+        adminPoints: { $first: "$users.adminPoints" },
         username: { $first: "$users.username" },
         name: { $first: "$name" },
         teamCaptain: { $first: "$teamCaptain" },
@@ -168,6 +171,7 @@ exports.resolveTeamsFull = function (match) {
             username: "$username",
             solved: "$solved",
             hintsBought: "$hintsBought",
+            adminPoints: "$adminPoints",
             score: 0,
           },
         },
@@ -241,6 +245,30 @@ exports.resolveTeamsMin = function (match) {
       },
     },
     {
+      $unwind: {
+        path: "$users.adminPoints",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $group: {
+        _id: "$_id",
+        users: { $first: "$oldUsers" },
+        oldUsers: { $first: "$oldUsers" },
+        solved: { $first: "$solved" },
+        hintsBought: { $first: "$hintsBought" },
+        name: { $first: "$name" },
+        teamCaptain: { $first: "$teamCaptain" },
+        adminPoints: { $sum: "$users.adminPoints" },
+      },
+    },
+    {
+      $unwind: {
+        path: "$users",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
       $group: {
         _id: "$_id",
         userIds: { $push: { $toString: "$users._id" } },
@@ -248,6 +276,7 @@ exports.resolveTeamsMin = function (match) {
         oldUsers: { $first: "$oldUsers" },
         solved: { $first: "$solved" },
         hintsBought: { $first: "$hintsBought" },
+        adminPoints: { $first: "$adminPoints" },
         name: { $first: "$name" },
         teamCaptain: { $first: "$teamCaptain" },
       },
@@ -315,6 +344,7 @@ exports.resolveTeamsMin = function (match) {
         maxTimestamp: { $max: "$newSolved.timestamp" },
         name: { $first: "$name" },
         hintsBought: { $first: "$hintsBought" },
+        adminPoints: { $first: "$adminPoints" },
       },
     },
     {
@@ -391,12 +421,15 @@ exports.resolveTeamsMin = function (match) {
           $first: "$totalSolved",
         },
         hintsCost: { $sum: "$hintsBought.cost" },
+        adminPoints: { $first: "$adminPoints" },
         maxTimestamp: { $first: "$maxTimestamp" },
       },
     },
     {
       $addFields: {
-        totalScore: { $subtract: ["$totalScore", "$hintsCost"] },
+        totalScore: {
+          $subtract: [{ $add: ["$totalScore", "$adminPoints"] }, "$hintsCost"],
+        },
       },
     },
   ]);
@@ -462,6 +495,7 @@ exports.resolveUsers = function (match) {
         _id: "$_id",
         username: { $first: "$username" },
         hintsBought: { $first: "$hintsBought" },
+        adminPoints: { $first: "$adminPoints" },
         score: { $sum: "$solved.points" },
         solved: { $push: "$solved" },
         maxTimestamp: { $max: "$solved.timestamp" },
@@ -538,12 +572,33 @@ exports.resolveUsers = function (match) {
         score: { $first: "$score" },
         solved: { $first: "$solved" },
         hintsBought: { $push: "$hintsBought" },
+        adminPoints: { $first: "$adminPoints" },
+        maxTimestamp: { $first: "$maxTimestamp" },
+      },
+    },
+    {
+      $unwind: {
+        path: "$adminPoints",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $group: {
+        _id: "$_id",
+        username: { $first: "$username" },
+        hintsCost: { $first: "$hintsCost" },
+        score: { $first: "$score" },
+        solved: { $first: "$solved" },
+        hintsBought: { $first: "$hintsBought" },
+        adminPoints: { $sum: "$adminPoints" },
         maxTimestamp: { $first: "$maxTimestamp" },
       },
     },
     {
       $addFields: {
-        score: { $subtract: ["$score", "$hintsCost"] },
+        score: {
+          $subtract: [{ $add: ["$score", "$adminPoints"] }, "$hintsCost"],
+        },
       },
     },
   ]);

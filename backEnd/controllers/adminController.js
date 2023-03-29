@@ -402,6 +402,18 @@ exports.unShadowBan = async function (req, res) {
   }
 };
 
+// POINTS TO PENALIZE OR BOOST USERS
+exports.setUserAdminPoints = async function (req, res) {
+  const user = await users.findById(req.body.user._id);
+
+  if (user && req.body.adminPoints) {
+    await users.findByIdAndUpdate(req.body.user._id, { $set: { adminPoints: req.body.adminPoints } });
+    res.send({ state: "success" });
+  } else {
+    res.send({ state: "error", message: "User not found!" });
+  }
+};
+
 exports.getTeams = async function (req, res) {
   let page = req.body.page;
   let search = req.body.search;
