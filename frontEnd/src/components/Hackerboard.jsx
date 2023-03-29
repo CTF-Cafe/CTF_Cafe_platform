@@ -190,7 +190,7 @@ function Hackerboard(props) {
         //   CTF Name
         ctx.font = "bold 55px Fira Code";
         ctx.fillStyle = color;
-        ctx.fillText(process.env.REACT_APP_CTF_NAME, 1280, 115);
+        ctx.fillText(process.env.REACT_APP_CTF_NAME.toUpperCase(), 1280, 115);
 
         //   Team Nae
         ctx.font = "bold 40px Fira Code";
