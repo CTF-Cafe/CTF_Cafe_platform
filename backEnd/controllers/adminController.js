@@ -406,8 +406,30 @@ exports.unShadowBan = async function (req, res) {
 exports.setUserAdminPoints = async function (req, res) {
   const user = await users.findById(req.body.user._id);
 
-  if (user && req.body.adminPoints) {
-    await users.findByIdAndUpdate(req.body.user._id, { $set: { adminPoints: req.body.adminPoints } });
+  if (user) {
+    if(isNaN(parseInt(req.body.adminPoints))) {
+      res.send({ state: "error", message: "Admin points must be a number!" });
+      return;
+    }
+
+    await users.findByIdAndUpdate(req.body.user._id, {
+      $set: { adminPoints: req.body.adminPoints },
+    });
+
+    if (ObjectId.isValid(user.teamId)) {
+      await teams.findOneAndUpdate(
+        {
+          _id: user.teamId,
+          users: { $elemMatch: { username: user.username } },
+        },
+        {
+          $set: {
+            "users.$.adminPoints": parseInt(req.body.adminPoints),
+          },
+        }
+      );
+    }
+
     res.send({ state: "success" });
   } else {
     res.send({ state: "error", message: "User not found!" });

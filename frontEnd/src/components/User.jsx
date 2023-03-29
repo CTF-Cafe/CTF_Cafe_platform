@@ -106,7 +106,7 @@ function User(props) {
                 {user.username.toUpperCase()}
               </h1>
               <div style={{ textAlign: "center" }}>
-                <p>Score : {user.score}</p>
+                <p>Score : {user.score} {user.adminPoints !== 0 && `(${user.adminPoints > 0 ? '+' + user.adminPoints : user.adminPoints})`}</p>
               </div>
               {/* User Solve Stats */}
               <div className="row" style={{ textAlign: "center" }}>

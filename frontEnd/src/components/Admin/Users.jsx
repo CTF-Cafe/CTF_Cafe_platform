@@ -196,6 +196,39 @@ function Users(props) {
       });
   };
 
+  const saveUserAdminPoints = (e, user) => {
+    axios
+      .post(
+        process.env.REACT_APP_BACKEND_URI + "/api/admin/setUserAdminPoints",
+        {
+          user: user,
+          adminPoints: parseInt(
+            document.getElementById(user._id + "admin_points").textContent
+          ),
+        },
+        { withCredentials: true }
+      )
+      .then((response) => {
+        if (response.data.state === "sessionError") {
+          globalData.alert.error("Session expired!");
+          globalData.setUserData({});
+          globalData.setLoggedIn(false);
+          globalData.navigate("/", { replace: true });
+        } else {
+          if (response.data.state === "success") {
+            globalData.alert.success("User Admin Points Updated!");
+            getUsers(page);
+          } else {
+            globalData.alert.error(response.data.message);
+            getUsers(page);
+          }
+        }
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+  };
+
   const previousPage = () => {
     getUsers(page - 1);
   };
@@ -265,6 +298,7 @@ function Users(props) {
             <th scope="col">Verified</th>
             <th scope="col">Admin</th>
             <th scope="col">SBanned</th>
+            <th scope="col">Admin Points</th>
             {editMode && <th scope="col">Delete User</th>}
           </tr>
         </thead>
@@ -356,6 +390,33 @@ function Users(props) {
                         <span className="fa-solid fa-thumbs-up"></span>
                       </button>
                     ))}
+                </td>
+                <td>
+                  {editMode ? (
+                    <>
+                      <span
+                        id={user._id + "admin_points"}
+                        contentEditable={true}
+                      >
+                        {user.adminPoints}
+                      </span>
+                      <button
+                        className="btn btn-outline-danger btn-shadow"
+                        data-toggle="modal"
+                        data-target="#confirmModal"
+                        onClick={(e) => {
+                          props.setAction({
+                            function: saveUserAdminPoints,
+                            e: e,
+                            data: user,
+                          });
+                        }}
+                        title="Save Admin Points"
+                      >
+                        <span className="fa-solid fa-floppy-disk"></span>
+                      </button>
+                    </>
+                  ): user.adminPoints}
                 </td>
                 {editMode && (
                   <td>

@@ -38,6 +38,10 @@ router.post('/unShadowBan', (req, res) => {
     adminController.unShadowBan(req, res);
 });
 
+router.post('/setUserAdminPoints', (req, res) => {
+    adminController.setUserAdminPoints(req, res);
+});
+
 router.post('/getStats', (req, res) => {
     adminController.getStats(req, res);
 });

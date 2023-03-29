@@ -37,6 +37,7 @@ exports.register = async function (req, res) {
                 solved: userToCheck.solved,
                 hintsBought: userToCheck.hintsBought,
                 shadowBanned: userToCheck.shadowBanned,
+                adminPoints: userToCheck.adminPoints
               },
             ],
           })
@@ -117,6 +118,7 @@ exports.joinTeam = async function (req, res) {
                   solved: userToCheck.solved,
                   hintsBought: userToCheck.hintsBought,
                   shadowBanned: userToCheck.shadowBanned,
+                  adminPoints: userToCheck.adminPoints
                 },
               },
             },
