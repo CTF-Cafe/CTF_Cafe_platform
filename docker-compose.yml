@@ -6,8 +6,8 @@ services:
     image: mongo
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: raxo
-      MONGO_INITDB_ROOT_PASSWORD: jdHAKZ!172Lks
+      MONGO_INITDB_ROOT_USERNAME: dbuser
+      MONGO_INITDB_ROOT_PASSWORD: changeme
 
   backend:
     build: ./backEnd/
@@ -16,14 +16,14 @@ services:
       - '3001:3001'
     environment:
       # DB 
-      - SESSION_SECRET=<secure randomly generated session key for validating session cookies>
-      - MONGODB_CONNSTRING=<mongodb connect URI, e.g. "mongodb://localhost:27017" - you may need to surround it in quotes if you experience glitches or formatting issues>
+      - SESSION_SECRET=CHANGEME
+      - MONGODB_CONNSTRING=mongodb://dbuser:changeme@mongo:27017/ctfDB?authSource=admin
 
       # Routing
-      - FRONTEND_URI=<frontend url if local usually http://localhost:3000>
+      - FRONTEND_URI=http://localhost:3000
 
       # Mail Verification
-      - MAIL_VERIFICATION=<true/false>
+      - MAIL_VERIFICATION=false
       - BACKEND_URI=<backend url same as frontend unless testing locally, will then be port 3001>
       - HOST=<mail server>
       - MAIL_PORT=<mail server port>
@@ -35,7 +35,7 @@ services:
       - DEPLOYER_SECRET=<deployer secret token>
 
       # Config 
-      - NODE_ENV=<development/production>
+      - NODE_ENV=development
       - PORT=3001
 
       # First Blood Webhook
@@ -52,7 +52,7 @@ services:
       - '3000:3000'
     environment:
       - REACT_APP_BACKEND_URI=http://localhost:3001
-      - REACT_APP_CTF_NAME=<ctf_name_formatted_like_this>
+      - REACT_APP_CTF_NAME=TEST_CTF
       - GENERATE_SOURCEMAP=false
       - REACT_APP_DISCORD_URI=<optional>
       - REACT_APP_GITHUB_URI=<optional>
