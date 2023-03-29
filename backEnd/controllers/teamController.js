@@ -2,6 +2,7 @@ const teams = require("../models/teamModel");
 const users = require("../models/userModel");
 const { v4 } = require("uuid");
 const ObjectId = require("mongoose").Types.ObjectId;
+const dbController = require("./dbController");
 
 exports.register = async function (req, res) {
   const teamName = req.body.teamName.trim();
@@ -13,7 +14,7 @@ exports.register = async function (req, res) {
 
     if (!teamNameExists) {
       const userToCheck = await users.findOne({
-        username: req.session.username,
+        _id: req.session.userId,
         verified: true,
       });
 
@@ -27,7 +28,7 @@ exports.register = async function (req, res) {
           .create({
             name: teamName,
             inviteCode: v4(),
-            teamCaptain: userToCheck.username,
+            teamCaptain: userToCheck._id,
             users: [
               {
                 _id: userToCheck._id,
@@ -42,7 +43,7 @@ exports.register = async function (req, res) {
           .then(async function (team) {
             await users
               .findOneAndUpdate(
-                { username: req.session.username, verified: true },
+                { _id: req.session.userId, verified: true },
                 { teamId: team.id },
                 { returnOriginal: false }
               )
@@ -75,7 +76,7 @@ exports.getCode = async function (req, res) {
 
   if (teamNameExists) {
     const userHasTeam = await users.findOne({
-      username: req.session.username,
+      _id: req.session.userId,
       verified: true,
     });
     if (userHasTeam.teamId == teamNameExists.id) {
@@ -93,7 +94,7 @@ exports.joinTeam = async function (req, res) {
 
   if (teamCodeExists) {
     const userToCheck = await users.findOne({
-      username: req.session.username,
+      _id: req.session.userId,
       verified: true,
     });
 
@@ -124,7 +125,7 @@ exports.joinTeam = async function (req, res) {
           .then(async function (team) {
             await users
               .findOneAndUpdate(
-                { username: req.session.username, verified: true },
+                { _id: req.session.userId, verified: true },
                 { teamId: team.id },
                 { returnOriginal: false }
               )
@@ -168,167 +169,24 @@ exports.getTeams = async function (req, res) {
 
       let allTeams = [];
       try {
-        allTeams = await teams
-          .aggregate([
-            {
-              $match: {
-                name: new RegExp(search, "i"),
-                $or: [
-                  {
-                    users: {
-                      $elemMatch: { username: req.session.username },
-                    },
-                  },
-                  {
-                    users: {
-                      $not: {
-                        $elemMatch: { shadowBanned: true },
-                      },
-                    },
-                  },
-                ],
-              },
-            },
-            {
-              $addFields: {
-                oldUsers: "$users",
-              },
-            },
-            {
-              $unwind: {
-                path: "$users",
-                preserveNullAndEmptyArrays: true,
-              },
-            },
-            {
-              $unwind: {
-                path: "$users.solved",
-                preserveNullAndEmptyArrays: true,
-              },
-            },
-            {
-              $group: {
-                _id: "$_id",
-                users: { $first: "$oldUsers" },
-                oldUsers: { $first: "$oldUsers" },
-                solved: { $push: "$users.solved" },
-                name: { $first: "$name" },
-                teamCaptain: { $first: "$teamCaptain" },
-              },
-            },
-            {
-              $unwind: {
-                path: "$users",
-                preserveNullAndEmptyArrays: true,
-              },
-            },
-            {
-              $unwind: {
-                path: "$users.hintsBought",
-                preserveNullAndEmptyArrays: true,
-              },
-            },
-            {
-              $group: {
-                _id: "$_id",
-                users: { $first: "$oldUsers" },
-                oldUsers: { $first: "$oldUsers" },
-                solved: { $first: "$solved" },
-                hintsCost: { $sum: "$users.hintsBought.cost" },
-                name: { $first: "$name" },
-                teamCaptain: { $first: "$teamCaptain" },
-              },
-            },
-            {
-              $unwind: {
-                path: "$users",
-                preserveNullAndEmptyArrays: true,
-              },
-            },
-            {
-              $group: {
-                _id: "$_id",
-                userIds: { $push: { $toString: "$users._id" } },
-                users: { $first: "$oldUsers" },
-                oldUsers: { $first: "$oldUsers" },
-                solved: { $first: "$solved" },
-                hintsCost: { $first: "$hintsCost" },
-                name: { $first: "$name" },
-                teamCaptain: { $first: "$teamCaptain" },
-              },
-            },
-            {
-              $unwind: {
-                path: "$solved",
-                preserveNullAndEmptyArrays: true,
-              },
-            },
-            {
-              $lookup: {
-                from: "challenges",
-                let: {
-                  chalId: "$solved._id",
-                  timestamp: "$solved.timestamp",
-                  userIds: "$userIds",
+        allTeams = await dbController
+          .resolveTeamsMin({
+            name: new RegExp(search, "i"),
+            $or: [
+              {
+                users: {
+                  $elemMatch: { _id: req.session.userId },
                 },
-                pipeline: [
-                  {
-                    $match: {
-                      $expr: { $eq: ["$$chalId", "$_id"] },
-                    },
-                  },
-                  {
-                    $project: {
-                      _id: 0,
-                      solve: {
-                        _id: "$_id",
-                        points: {
-                          $cond: {
-                            if: { $in: ["$firstBlood", "$$userIds"] },
-                            then: { $add: ["$points", "$firstBloodPoints"] },
-                            else: "$points",
-                          },
-                        },
-                        timestamp: "$$timestamp",
-                      },
-                    },
-                  },
-                  {
-                    $replaceRoot: { newRoot: "$solve" },
-                  },
-                ],
-                as: "newSolved",
               },
-            },
-            {
-              $unwind: {
-                path: "$newSolved",
-                preserveNullAndEmptyArrays: true,
-              },
-            },
-            {
-              $group: {
-                _id: "$_id",
-                users: { $first: "$oldUsers" },
-                totalScore: { $sum: "$newSolved.points" },
-                totalSolved: {
-                  $sum: {
-                    $cond: { if: "$newSolved.points", then: 1, else: 0 },
+              {
+                users: {
+                  $not: {
+                    $elemMatch: { shadowBanned: true },
                   },
                 },
-                solved: { $push: "$newSolved" },
-                maxTimestamp: { $max: "$newSolved.timestamp" },
-                name: { $first: "$name" },
-                teamCaptain: { $first: "$teamCaptain" },
-                hintsCost: { $first: "$hintsCost" },
               },
-            },
-            {
-              $addFields: {
-                totalScore: { $subtract: ["$totalScore", "$hintsCost"] },
-              },
-            },
-          ])
+            ],
+          })
           .sort({ totalScore: -1, maxTimestamp: -1, _id: 1 })
           .skip((page - 1) * 100)
           .limit(100);
@@ -344,74 +202,11 @@ exports.getTeams = async function (req, res) {
 exports.getUserTeam = async function (req, res) {
   if (ObjectId.isValid(req.body.teamId)) {
     try {
-      let team = await teams.aggregate([
-        {
-          $match: { _id: ObjectId(req.body.teamId) },
-        },
-        {
-          $unwind: {
-            path: "$users",
-            preserveNullAndEmptyArrays: true,
-          },
-        },
-        {
-          $unwind: {
-            path: "$users.solved",
-            preserveNullAndEmptyArrays: true,
-          },
-        },
-        {
-          $lookup: {
-            from: "challenges",
-            let: {
-              chalId: "$users.solved._id",
-              timestamp: "$users.solved.timestamp",
-              userId: { $toString: "$users._id" },
-            },
-            pipeline: [
-              {
-                $match: {
-                  $expr: { $eq: ["$$chalId", "$_id"] },
-                },
-              },
-              {
-                $project: {
-                  _id: 0,
-                  solve: {
-                    _id: "$_id",
-                    points: {
-                      $cond: {
-                        if: { $eq: ["$firstBlood", "$$userId"] },
-                        then: { $add: ["$points", "$firstBloodPoints"] },
-                        else: "$points",
-                      },
-                    },
-                    firstBlood: "$firstBlood",
-                    name: "$name",
-                    category: "$category",
-                    timestamp: "$$timestamp",
-                  },
-                },
-              },
-              {
-                $replaceRoot: { newRoot: "$solve" },
-              },
-            ],
-            as: "users.solved",
-          },
-        },
-        {
-          $group: {
-            _id: "$_id",
-            users: { $push: "$users" },
-            name: { $first: "$name" },
-            teamCaptain: { $first: "$teamCaptain" },
-          },
-        },
-      ]);
+      const team = await dbController.resolveTeamsFull({
+        _id: ObjectId(req.body.teamId),
+      });
 
       if (team[0]) {
-        team[0].inviteCode = "Nice try XD";
         res.send(team[0]);
       } else {
         res.send({ state: "error" });
@@ -425,7 +220,7 @@ exports.getUserTeam = async function (req, res) {
 
 exports.leaveTeam = async function (req, res) {
   const userToCheck = await users.findOne({
-    username: req.session.username,
+    _id: req.session.userId,
     verified: true,
   });
 
@@ -447,7 +242,7 @@ exports.leaveTeam = async function (req, res) {
       .then(async function (team) {
         await users
           .findOneAndUpdate(
-            { username: req.session.username, verified: true },
+            { _id: req.session.userId, verified: true },
             { teamId: "none" },
             { returnOriginal: false }
           )
@@ -472,75 +267,11 @@ exports.leaveTeam = async function (req, res) {
 };
 
 exports.getTeam = async function (req, res) {
-  let team = await teams.aggregate([
-    {
-      $match: { name: decodeURIComponent(req.body.teamName.trim()) },
-    },
-    {
-      $unwind: {
-        path: "$users",
-        preserveNullAndEmptyArrays: true,
-      },
-    },
-    {
-      $unwind: {
-        path: "$users.solved",
-        preserveNullAndEmptyArrays: true,
-      },
-    },
-    {
-      $lookup: {
-        from: "challenges",
-        let: {
-          chalId: "$users.solved._id",
-          timestamp: "$users.solved.timestamp",
-          userId: { $toString: "$users._id" },
-        },
-        pipeline: [
-          {
-            $match: {
-              $expr: { $eq: ["$$chalId", "$_id"] },
-            },
-          },
-          {
-            $project: {
-              _id: 0,
-              solve: {
-                _id: "$_id",
-                points: {
-                  $cond: {
-                    if: { $eq: ["$firstBlood", "$$userId"] },
-                    then: { $add: ["$points", "$firstBloodPoints"] },
-                    else: "$points",
-                  },
-                },
-                firstBlood: "$firstBlood",
-                name: "$name",
-                category: "$category",
-                timestamp: "$$timestamp",
-              },
-            },
-          },
-          {
-            $replaceRoot: { newRoot: "$solve" },
-          },
-        ],
-        as: "users.solved",
-      },
-    },
-    {
-      $group: {
-        _id: "$_id",
-        users: { $push: "$users" },
-        name: { $first: "$name" },
-        teamCaptain: { $first: "$teamCaptain" },
-      },
-    },
-  ]);
+  let team = await dbController.resolveTeamsFull({
+    name: decodeURIComponent(req.body.teamName.trim()),
+  });
 
   if (team[0]) {
-    team[0].inviteCode = "Nice try XD";
-
     res.send(team[0]);
   } else {
     res.send({ state: "error", message: "Team not found" });
@@ -559,7 +290,7 @@ exports.kickUser = async function (req, res) {
   }
 
   if (userTeamExists) {
-    if (userTeamExists.teamCaptain === req.session.username) {
+    if (userTeamExists.teamCaptain === req.session.userId) {
       let newTeamUsers = userTeamExists.users.filter(
         (user) => user.username != req.body.userToKick
       );

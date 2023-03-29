@@ -8,6 +8,7 @@ const encryptionController = require("./encryptionController.js");
 const logController = require("./logController.js");
 const ObjectId = require("mongoose").Types.ObjectId;
 const nodemailer = require("nodemailer");
+const dbController = require("./dbController");
 
 exports.login = async function (req, res) {
   const username = req.body.username.trim();
@@ -20,7 +21,7 @@ exports.login = async function (req, res) {
       if (await encryptionController.compare(password, user.password)) {
         const newKey = v4();
 
-        req.session.username = username;
+        req.session.userId = user._id.toString();
         req.session.key = newKey;
         user.password = undefined;
         await users.updateOne(
@@ -52,7 +53,7 @@ exports.login = async function (req, res) {
 };
 
 exports.logout = async function (req, res) {
-  req.session.username = undefined;
+  req.session.userId = undefined;
   req.session.key = undefined;
   res.sendStatus(200);
 };
@@ -82,7 +83,10 @@ const sendEmail = async (email, subject, text) => {
 
 exports.register = async function (req, res) {
   try {
-    if(req.body.username_old.trim() != req.body.username.trim() || req.body.password_old.trim() != req.body.password.trim()) {
+    if (
+      req.body.username_old.trim() != req.body.username.trim() ||
+      req.body.password_old.trim() != req.body.password.trim()
+    ) {
       throw new Error("Please dont use any 'sus' character's");
     }
 
@@ -90,7 +94,7 @@ exports.register = async function (req, res) {
     const email = req.body.email.trim();
     const password = await encryptionController.encrypt(
       req.body.password.trim()
-    ); 
+    );
 
     // const startTime = await ctfConfig.findOne({ name: "startTime" });
 
@@ -100,19 +104,23 @@ exports.register = async function (req, res) {
     // }
 
     // Username to short
-    if (username.length < 4) throw new Error("Username is to short! 4 characters minimum!");
+    if (username.length < 4)
+      throw new Error("Username is to short! 4 characters minimum!");
 
     // Username to long
-    if (username.length > 32) throw new Error("Username is to long! 32 characters maximum!");
+    if (username.length > 32)
+      throw new Error("Username is to long! 32 characters maximum!");
 
     // Check password length
-    if (req.body.password.trim().length < 8) throw new Error("Password is to short 8 characters minimum!!");
+    if (req.body.password.trim().length < 8)
+      throw new Error("Password is to short 8 characters minimum!!");
 
     if (
       !email.match(
         /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
       )
-    ) throw new Error("Invalid email!");
+    )
+      throw new Error("Invalid email!");
 
     // Check if username exists
     const userExists = await users.findOne({ username: username });
@@ -210,8 +218,7 @@ exports.updateUsername = async function (req, res) {
     }
 
     await users
-      .findOneAndUpdate(
-        { username: req.session.username, key: req.session.key },
+      .findByIdAndUpdate(req.session.userId,
         { username: username },
         { returnOriginal: false }
       )
@@ -228,15 +235,14 @@ exports.updateUsername = async function (req, res) {
               }
             });
 
-            if (captain == req.session.username) {
+            if (captain == req.session.userId) {
               await teams
                 .findByIdAndUpdate(
                   user.teamId,
-                  { users: newUsers, teamCaptain: username },
+                  { users: newUsers, teamCaptain: req.session.userId },
                   { returnOriginal: false }
                 )
                 .then(async function (team) {
-                  req.session.username = username;
                   user.password = undefined;
                   res.send({
                     state: "success",
@@ -253,7 +259,6 @@ exports.updateUsername = async function (req, res) {
                   { returnOriginal: false }
                 )
                 .then(async function (team) {
-                  req.session.username = username;
                   user.password = undefined;
                   res.send({
                     state: "success",
@@ -265,7 +270,6 @@ exports.updateUsername = async function (req, res) {
             }
           }
         } else {
-          req.session.username = username;
           res.send({
             state: "success",
             message: "Username updated!",
@@ -301,94 +305,12 @@ exports.getUsers = async function (req, res) {
 
       let allUsers = [];
       try {
-        allUsers = await users
-          .aggregate([
-            {
-              $match: {
-                username: new RegExp(search, "i"),
-                verified: true,
-                $or: [{ username: req.session.username }, { shadowBanned: false }],
-              },
-            },
-            {
-              $unwind: {
-                path: "$solved",
-                preserveNullAndEmptyArrays: true,
-              },
-            },
-            {
-              $lookup: {
-                from: "challenges",
-                let: {
-                  challId: "$solved._id",
-                  timestamp: "$solved.timestamp",
-                  userId: { $toString: "$_id" },
-                },
-                pipeline: [
-                  {
-                    $match: {
-                      $expr: { $eq: ["$$challId", "$_id"] },
-                    },
-                  },
-                  {
-                    $project: {
-                      _id: 0,
-                      solve: {
-                        _id: "$_id",
-                        timestamp: "$$timestamp",
-                        points: {
-                          $cond: {
-                            if: { $eq: ["$firstBlood", "$$userId"] },
-                            then: { $add: ["$points", "$firstBloodPoints"] },
-                            else: "$points",
-                          },
-                        },
-                      },
-                    },
-                  },
-                  {
-                    $replaceRoot: { newRoot: "$solve" },
-                  },
-                ],
-                as: "solved",
-              },
-            },
-            {
-              $unwind: {
-                path: "$solved",
-                preserveNullAndEmptyArrays: true,
-              },
-            },
-            {
-              $group: {
-                _id: "$_id",
-                username: { $first: "$username" },
-                hintsBought: { $first: "$hintsBought" },
-                score: { $sum: "$solved.points" },
-                solved: { $push: "$solved" },
-              },
-            },
-            {
-              $unwind: {
-                path: "$hintsBought",
-                preserveNullAndEmptyArrays: true,
-              },
-            },
-            {
-              $group: {
-                _id: "$_id",
-                username: { $first: "$username" },
-                hintsCost: { $sum: "$hintsBought.cost" },
-                score: { $first: "$score" },
-                solved: { $first: "$solved" },
-              },
-            },
-            {
-              $addFields: {
-                score: { $subtract: ["$score", "$hintsCost"] },
-              },
-            },
-          ])
+        allUsers = await dbController
+          .resolveUsers({
+            username: new RegExp(search, "i"),
+            verified: true,
+            $or: [{ _id: req.session.userId }, { shadowBanned: false }],
+          })
           .sort({ score: -1, _id: 1 })
           .skip((page - 1) * 100)
           .limit(100);
@@ -418,10 +340,18 @@ exports.getUser = async function (req, res) {
 
     // Fetch Challenges from solves
     for (let i = 0; i < user.solved.length; i++) {
-      let challenge = await challenges.findById(user.solved[i]._id, { _id: 1, name: 1, category: 1, points: 1, firstBlood: 1, firstBloodPoints: 1 });
+      let challenge = await challenges.findById(user.solved[i]._id, {
+        _id: 1,
+        name: 1,
+        category: 1,
+        points: 1,
+        firstBlood: 1,
+        firstBloodPoints: 1,
+      });
       if (challenge) {
         user.solved[i].challenge = challenge;
-        if(user._id.equals(challenge.firstBlood)) user.score += challenge.firstBloodPoints;
+        if (user._id.equals(challenge.firstBlood))
+          user.score += challenge.firstBloodPoints;
         user.score += challenge.points;
       } else {
         user.solved.splice(i, 1);
@@ -431,9 +361,22 @@ exports.getUser = async function (req, res) {
 
     // Fetch challenges from hintsBought
     for (let i = 0; i < user.hintsBought.length; i++) {
-      let challenge = await challenges.findById(user.hintsBought[i].challId, { _id: 1, name: 1 });
+      let challenge = await challenges.findById(user.hintsBought[i].challId, {
+        _id: 1,
+        name: 1,
+        hints: 1,
+      });
       if (challenge) {
         user.hintsBought[i].challName = challenge.name;
+
+        let hint = undefined;
+        if (
+          (hint = challenge.hints.find(
+            (x) => x.id == user.hintsBought[i].hintId
+          ))
+        ) {
+          user.hintsBought[i].cost = hint.cost;
+        }
       } else {
         user.hintsBought.splice(i, 1);
         i--;
@@ -473,154 +416,11 @@ exports.getTheme = async function (req, res) {
 };
 
 exports.getScoreboard = async function (req, res) {
-  let allTeams = await teams
-    .aggregate([
-      {
-        $match: { users: { $not: { $elemMatch: { shadowBanned: true } } } },
-      },
-      {
-        $addFields: {
-          oldUsers: "$users",
-        },
-      },
-      {
-        $unwind: {
-          path: "$users",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $unwind: {
-          path: "$users.solved",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $group: {
-          _id: "$_id",
-          users: { $first: "$oldUsers" },
-          oldUsers: { $first: "$oldUsers" },
-          solved: { $push: "$users.solved" },
-          name: { $first: "$name" },
-          teamCaptain: { $first: "$teamCaptain" },
-        },
-      },
-      {
-        $unwind: {
-          path: "$users",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $unwind: {
-          path: "$users.hintsBought",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $group: {
-          _id: "$_id",
-          users: { $first: "$oldUsers" },
-          oldUsers: { $first: "$oldUsers" },
-          solved: { $first: "$solved" },
-          hintsCost: { $sum: "$users.hintsBought.cost" },
-          name: { $first: "$name" },
-          teamCaptain: { $first: "$teamCaptain" },
-        },
-      },
-      {
-        $unwind: {
-          path: "$users",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $group: {
-          _id: "$_id",
-          userIds: { $push: { $toString: "$users._id" } },
-          users: { $first: "$oldUsers" },
-          oldUsers: { $first: "$oldUsers" },
-          solved: { $first: "$solved" },
-          hintsCost: { $first: "$hintsCost" },
-          name: { $first: "$name" },
-          teamCaptain: { $first: "$teamCaptain" },
-        },
-      },
-      {
-        $unwind: {
-          path: "$solved",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $lookup: {
-          from: "challenges",
-          let: {
-            chalId: "$solved._id",
-            timestamp: "$solved.timestamp",
-            userIds: "$userIds",
-          },
-          pipeline: [
-            {
-              $match: {
-                $expr: { $eq: ["$$chalId", "$_id"] },
-              },
-            },
-            {
-              $project: {
-                _id: 0,
-                solve: {
-                  _id: "$_id",
-                  points: {
-                    $cond: {
-                      if: { $in: ["$firstBlood", "$$userIds"] },
-                      then: { $add: ["$points", "$firstBloodPoints"] },
-                      else: "$points",
-                    },
-                  },
-                  timestamp: "$$timestamp",
-                },
-              },
-            },
-            {
-              $replaceRoot: { newRoot: "$solve" },
-            },
-          ],
-          as: "newSolved",
-        },
-      },
-      {
-        $unwind: {
-          path: "$newSolved",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $group: {
-          _id: "$_id",
-          users: { $first: "$oldUsers" },
-          totalScore: { $sum: "$newSolved.points" },
-          totalSolved: {
-            $sum: {
-              $cond: { if: "$newSolved.points", then: 1, else: 0 },
-            },
-          },
-          solved: { $push: "$newSolved" },
-          maxTimestamp: { $max: "$newSolved.timestamp" },
-          name: { $first: "$name" },
-          teamCaptain: { $first: "$teamCaptain" },
-          hintsCost: { $first: "$hintsCost" },
-        },
-      },
-      {
-        $addFields: {
-          totalScore: { $subtract: ["$totalScore", "$hintsCost"] },
-        },
-      },
-    ])
+  let allTeams = await dbController
+    .resolveTeamsMin({
+      users: { $not: { $elemMatch: { shadowBanned: true } } },
+    })
     .sort({ totalScore: -1, maxTimestamp: -1, _id: 1 });
-
-  // TO FIX_
 
   let finalData = {
     standings: [],

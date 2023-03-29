@@ -49,21 +49,21 @@ exports.saveChallenge = async function (req, res) {
     const challengeExists = await challenges.findById(req.body.id);
 
     const validationObject = {
-      points: { type: 'positiveNumber' },
-      level: { type: 'positiveNumber' },
-      firstBloodPoints: { type: 'positiveNumber' },
+      points: { type: "positiveNumber" },
+      level: { type: "positiveNumber" },
+      firstBloodPoints: { type: "positiveNumber" },
       hints: {
-        type: 'array',
+        type: "array",
         itemValidation: {
-          cost: { type: 'positiveNumber', required: true },
+          cost: { type: "positiveNumber", required: true },
           content: { required: true },
-          id: { required: true }
-        }
+          id: { required: true },
+        },
       },
       name: { required: true },
       info: { required: true },
       flag: { required: true },
-      requirement: { type: 'objectId' }
+      requirement: { type: "objectId" },
     };
 
     validateRequestBody(req.body, validationObject);
@@ -71,22 +71,22 @@ exports.saveChallenge = async function (req, res) {
     if (!challengeExists) throw Error("Challenge does not exist");
 
     await challenges.findByIdAndUpdate(req.body.id, {
-      hidden: req.body.hidden == "true" ? true : false,
+      hidden: req.body.hidden,
       name: req.body.name.trim(),
-      points: parseInt(req.body.points),
-      firstBloodPoints: parseInt(req.body.firstBloodPoints),
-      initialPoints: parseInt(req.body.points),
-      minimumPoints: parseInt(req.body.minimumPoints),
-      level: parseInt(req.body.level),
+      points: JSON.parse(req.body.points),
+      firstBloodPoints: JSON.parse(req.body.firstBloodPoints),
+      initialPoints: JSON.parse(req.body.points),
+      minimumPoints: JSON.parse(req.body.minimumPoints),
+      level: JSON.parse(req.body.level),
       info: req.body.info,
-      hints: req.body.hints,
+      hints: JSON.parse(req.body.hints),
       flag: req.body.flag.trim(),
-      file: req.body.file.length > 0 ? req.body.file : "",
-      codeSnippet: req.body.codeSnippet.length > 0 ? req.body.codeSnippet : "",
+      file: req.body.file,
+      codeSnippet: req.body.codeSnippet,
       githubUrl: req.body.githubUrl.trim(),
-      isInstance: req.body.isInstance == "true",
+      isInstance: JSON.parse(req.body.isInstance),
       codeLanguage: req.body.codeLanguage,
-      randomFlag: req.body.randomFlag == "true" ? true : false,
+      randomFlag: JSON.parse(req.body.randomFlag),
       requirement: req.body.requirement,
     });
     res.send({ state: "success", message: "Challenge Updated!" });
@@ -262,66 +262,7 @@ exports.getUsers = async function (req, res) {
       let allUsers = [];
       try {
         allUsers = await users
-          .aggregate([
-            {
-              $match: { username: new RegExp(search, "i") },
-            },
-            {
-              $unwind: {
-                path: "$solved",
-                preserveNullAndEmptyArrays: true,
-              },
-            },
-            {
-              $lookup: {
-                from: "challenges",
-                let: { chalId: "$solved._id", timestamp: "$solved.timestamp" },
-                pipeline: [
-                  {
-                    $match: {
-                      $expr: { $eq: ["$$chalId", "$_id"] },
-                    },
-                  },
-                  {
-                    $project: {
-                      _id: 0,
-                      solve: {
-                        _id: "$_id",
-                        challenge: {
-                          points: "$points",
-                          name: "$name",
-                          _id: "$_id",
-                        },
-                        timestamp: "$$timestamp",
-                        points: "$points",
-                      },
-                    },
-                  },
-                  {
-                    $replaceRoot: { newRoot: "$solve" },
-                  },
-                ],
-                as: "solved",
-              },
-            },
-            {
-              $unwind: {
-                path: "$solved",
-                preserveNullAndEmptyArrays: true,
-              },
-            },
-            {
-              $group: {
-                _id: "$_id",
-                username: { $first: "$username" },
-                score: { $sum: "$solved.points" },
-                solved: { $push: "$solved" },
-                verified: { $first: "$verified" },
-                isAdmin: { $first: "$isAdmin" },
-                shadowBanned: { $first: "$shadowBanned" },
-              },
-            },
-          ])
+          .find({ username: new RegExp(search, "i") })
           .sort({ score: -1, _id: 1 })
           .skip((page - 1) * 100)
           .limit(100);
@@ -458,6 +399,36 @@ exports.unShadowBan = async function (req, res) {
     }
   } else {
     res.send({ state: "error", message: "User not found!" });
+  }
+};
+
+exports.getTeams = async function (req, res) {
+  let page = req.body.page;
+  let search = req.body.search;
+
+  if (page <= 0) {
+    res.send({ state: "error", message: "Page cannot be less than 1!" });
+  } else {
+    let teamCount = await teams.count();
+    if ((page - 1) * 100 > teamCount) {
+      res.send({ state: "error", message: "No more pages!" });
+    } else {
+      if (isNaN(page)) {
+        page = 1;
+      }
+
+      let allTeams = [];
+      try {
+        allTeams = await teams
+          .find({ name: new RegExp(search, "i") })
+          .skip((page - 1) * 100)
+          .limit(100);
+
+        res.send(allTeams);
+      } catch (err) {
+        res.send({ state: "error", message: err.message });
+      }
+    }
   }
 };
 

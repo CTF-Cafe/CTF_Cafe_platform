@@ -17,7 +17,7 @@ function Teams(props) {
   const getTeams = (index) => {
     axios
       .post(
-        process.env.REACT_APP_BACKEND_URI + "/api/getTeams",
+        process.env.REACT_APP_BACKEND_URI + "/api/admin/getTeams",
         {
           page: index,
           search: searchQuery,
@@ -143,8 +143,6 @@ function Teams(props) {
             </th>
             <th scope="col">Team Name</th>
             <th scope="col">Team Users</th>
-            <th scope="col">Team Score</th>
-            <th scope="col">Team Solves</th>
             {editMode && <th scope="col">Delete Team</th>}
           </tr>
         </thead>
@@ -167,8 +165,6 @@ function Teams(props) {
                     return <p key={user.username}>{user.username}</p>;
                   })}
                 </td>
-                <td>{team.totalScore}</td>
-                <td>{team.totalSolved}</td>
                 {editMode && (
                   <td>
                     <button

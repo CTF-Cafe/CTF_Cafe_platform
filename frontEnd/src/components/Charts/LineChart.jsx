@@ -33,9 +33,18 @@ const LineChart = (props) => {
           points: user.score,
           name: user.username,
         });
-        user.solved.forEach((solve) => {
-          currentPoints += solve.points;
-          d = new Date(solve.timestamp);
+        
+        user.items = [
+          ...user.solved,
+          ...user.hintsBought.map((x) => {
+            return { points: -x.cost, timestamp: x.timestamp };
+          }),
+        ];
+
+        user.items.sort((a, b) => a.timestamp - b.timestamp);
+        user.items.forEach((item) => {
+          currentPoints += item.points;
+          d = new Date(item.timestamp);
           dformat =
             [d.getMonth() + 1, d.getDate(), d.getFullYear()].join("/") +
             " " +
@@ -75,12 +84,18 @@ const LineChart = (props) => {
           points: team.totalScore,
           name: team.name,
         });
-        team.solved.sort(
-          (a, b) => a.timestamp - b.timestamp
-        );
-        team.solved.forEach((solve) => {
-          currentPoints += solve.points;
-          d = new Date(solve.timestamp);
+
+        team.items = [
+          ...team.solved,
+          ...team.hintsBought.map((x) => {
+            return { points: -x.cost, timestamp: x.timestamp };
+          }),
+        ];
+
+        team.items.sort((a, b) => a.timestamp - b.timestamp);
+        team.items.forEach((item) => {
+          currentPoints += item.points;
+          d = new Date(item.timestamp);
           dformat =
             [d.getMonth() + 1, d.getDate(), d.getFullYear()].join("/") +
             " " +

@@ -10,6 +10,10 @@ router.post('/getUsers', (req, res) => {
     adminController.getUsers(req, res);
 });
 
+router.post('/getTeams', (req, res) => {
+    adminController.getTeams(req, res);
+});
+
 router.post('/deleteUser', (req, res) => {
     adminController.deleteUser(req, res);
 });
