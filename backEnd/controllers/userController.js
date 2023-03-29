@@ -387,9 +387,7 @@ exports.getUser = async function (req, res) {
       user.score -= user.hintsBought[i].cost;
     }
 
-    for (let i = 0; i < user.adminPoints.length; i++) {
-      user.score += user.adminPoints[i];
-    }
+    user.score += user.adminPoints;
 
     res.send(user);
   } else {

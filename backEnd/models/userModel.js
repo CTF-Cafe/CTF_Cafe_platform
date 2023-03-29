@@ -55,8 +55,8 @@ var userSchema = new Schema({
         default: false
     },
     adminPoints: {
-        type: Array,
-        default: []
+        type: Number,
+        default: 0
     }
 });
 
