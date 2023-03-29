@@ -92,7 +92,12 @@ function UserTeam(props) {
         user.score -= hint.cost;
         response.data.score -= hint.cost;
       });
+
+      response.data.score += user.adminPoints;
+      user.score += user.adminPoints;
     });
+
+    response.data.users.sort((a, b) => b.score - a.score);
 
     setChallengeStatsCategory(finalDataCategory);
 
