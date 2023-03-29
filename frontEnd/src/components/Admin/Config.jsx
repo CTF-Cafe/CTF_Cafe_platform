@@ -9,7 +9,8 @@ const configsToShow = [
   "sponsors",
   "categories",
   "dynamicScoring",
-  "scoreboardHidden"
+  "scoreboardHidden",
+  "dockerLimit",
 ];
 
 function ArrayEdit(props) {
@@ -116,6 +117,8 @@ function Config(props) {
             : config.name === "categories"
             ? document.getElementById("config-data" + config._id).attributes
                 .value.nodeValue
+            : config.name === "dockerLimit"
+            ? parseInt(document.getElementById("config-data" + config._id).value) || 0
             : ["dynamicScoring", "scoreboardHidden"].includes(config.name)
             ? document.getElementById("config-data" + config._id).value
             : document.getElementById("config-data" + config._id).textContent,
@@ -186,7 +189,9 @@ function Config(props) {
                     </td>
                   ) : config.name === "categories" ? (
                     <ArrayEdit config={config} />
-                  ) : ["dynamicScoring", "scoreboardHidden"].includes(config.name) ? (
+                  ) : ["dynamicScoring", "scoreboardHidden"].includes(
+                      config.name
+                    ) ? (
                     <td>
                       <select
                         defaultValue={JSON.stringify(config.value)}
@@ -196,9 +201,19 @@ function Config(props) {
                         <option value="false">False</option>
                       </select>
                     </td>
+                  ) : config.name === "dockerLimit" ? (
+                    <td>
+                      <input
+                        id={"config-data" + config._id}
+                        type="number"
+                        defaultValue={config.value}
+                      />
+                    </td>
                   ) : (
                     <td contentEditable="true" id={"config-data" + config._id}>
-                      <pre style={{ color: "white" }}>{JSON.stringify(config.value, null, 2)}</pre>
+                      <pre style={{ color: "white" }}>
+                        {JSON.stringify(config.value, null, 2)}
+                      </pre>
                     </td>
                   )}
                 </tr>

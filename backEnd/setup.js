@@ -117,5 +117,14 @@ exports.setupDB = async function() {
         });
     }
 
+    const dockerLimitConfig = await ctfConfig.findOne({ name: 'dockerLimit' });
+
+    if(!dockerLimitConfig) {
+        await ctfConfig.create({
+            name: 'dockerLimit',
+            value: 1,
+        });
+    }
+
     console.log("Database Setup successfully");
 }
