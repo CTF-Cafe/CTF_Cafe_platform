@@ -48,7 +48,7 @@ var sess = {
 // Trust Proxy to be able to read X-Forwaded-For (user ips)
 if (process.env.NODE_ENV === "production") {
   app.set("trust proxy", 1); // trust first proxy
-  sess.cookie.secure = true; // serve secure cookies
+  // sess.cookie.secure = true; // serve secure cookies
   sess.proxy = true;
 }
 
