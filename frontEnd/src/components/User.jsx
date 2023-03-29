@@ -193,7 +193,7 @@ function User(props) {
                             {index}
                           </th>
                           <td>{hint.challName}</td>
-                          <td>(-{hint.cost})</td>
+                          <td>-{hint.cost}</td>
                           <td>{hint.timestamp}</td>
                         </tr>
                       );

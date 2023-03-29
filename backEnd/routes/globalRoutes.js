@@ -52,7 +52,7 @@ router.get("/getConfigs", (req, res) => {
 });
 
 router.get("/checkSession", (req, res) => {
-  users.findOne({ username: req.session.username }).then(async function (user) {
+  users.findById(req.session.userId).then(async function (user) {
     if (!user) {
       res.send({ state: "sessionError" });
     } else if (!(user.key == req.session.key)) {

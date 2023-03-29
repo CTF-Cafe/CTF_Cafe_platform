@@ -186,7 +186,7 @@ function Config(props) {
                   ) : config.name === "categories" ? (
                     <ArrayEdit config={config} />
                   ) : config.name === "dynamicScoring" ? (
-                    <div>
+                    <td>
                       <select
                         defaultValue={JSON.stringify(config.value)}
                         id={"config-data" + config._id}
@@ -194,7 +194,7 @@ function Config(props) {
                         <option value="true">True</option>
                         <option value="false">False</option>
                       </select>
-                    </div>
+                    </td>
                   ) : (
                     <td contentEditable="true" id={"config-data" + config._id}>
                       <pre style={{ color: "white" }}>{JSON.stringify(config.value, null, 2)}</pre>

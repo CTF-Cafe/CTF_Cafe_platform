@@ -105,7 +105,7 @@ function customSanitize(req, res, next) {
 app.use(customSanitize);
 
 function checkAuth(req, res, next) {
-  users.findOne({ username: req.session.username }).then(function (user) {
+  users.findById(req.session.userId).then(function (user) {
     if (!user) {
       res.send({ state: "sessionError" });
     } else if (!(user.key == req.session.key)) {
@@ -117,7 +117,7 @@ function checkAuth(req, res, next) {
 }
 
 function checkAdminAuth(req, res, next) {
-  users.findOne({ username: req.session.username }).then(function (user) {
+  users.findById(req.session.userId).then(function (user) {
     if (!user) {
       res.send({ state: "sessionError" });
     } else if (!(user.key == req.session.key)) {

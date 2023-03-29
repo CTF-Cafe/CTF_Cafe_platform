@@ -64,10 +64,10 @@ router.get("/getNotifications", async (req, res) => {
   if (notifications && notifications.value && notifications.value.length > 0) {
     const editedNotifications = notifications.value.map((notification) => {
       if (notification && notification.message && notification.seenBy) {
-        if (!notification.seenBy.includes(req.session.username)) {
+        if (!notification.seenBy.includes(req.session.userId)) {
           return {
             ...notification,
-            seenBy: [...notification.seenBy, req.session.username],
+            seenBy: [...notification.seenBy, req.session.userId],
           };
         } else {
           return notification;
@@ -88,7 +88,7 @@ router.get("/getNotifications", async (req, res) => {
     }
 
     const notificationsNeeded = editedNotifications.filter(
-      (notification) => !notification.seenBy.includes(req.session.username)
+      (notification) => !notification.seenBy.includes(req.session.userId)
     );
     res.send({ state: "success", notifications: notificationsNeeded });
   } else {

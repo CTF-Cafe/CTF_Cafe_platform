@@ -22,7 +22,7 @@ function Hackerboard(props) {
   const [teamCount, setTeamCount] = useState(0);
 
   useEffect(() => {
-    selectionMain == "Teams" ? getTeams(page) : getUsers(page);
+    selectionMain === "Teams" ? getTeams(page) : getUsers(page);
   }, [searchQuery]);
 
   const getData = (index) => {
@@ -65,10 +65,10 @@ function Hackerboard(props) {
         { withCredentials: true }
       )
       .then((response) => {
-        if (response.data.state == "error") {
+        if (response.data.state === "error") {
           globalData.alert.error(response.data.message);
         } else {
-          if (selectionScore == "down") {
+          if (selectionScore === "down") {
             setUsers(response.data.reverse());
           } else {
             setUsers(response.data);
@@ -93,11 +93,11 @@ function Hackerboard(props) {
         { withCredentials: true }
       )
       .then((response) => {
-        if (response.data.state == "error") {
+        if (response.data.state === "error") {
           globalData.alert.error(response.data.message);
           setLoading(false);
         } else {
-          if (selectionScore == "down") {
+          if (selectionScore === "down") {
             setTeams(response.data.reverse());
           } else {
             setTeams(response.data);
@@ -128,10 +128,10 @@ function Hackerboard(props) {
         getUsers(1);
         getTeams(1);
 
-        setSelectionMain(selectionMain == "Users" ? "Teams" : "Users");
+        setSelectionMain(selectionMain === "Users" ? "Teams" : "Users");
         break;
       case "score":
-        setSelectionScore(selectionScore == "down" ? "up" : "down");
+        setSelectionScore(selectionScore === "down" ? "up" : "down");
         sortData();
         break;
       default:
@@ -308,9 +308,9 @@ function Hackerboard(props) {
                   onClick={() => {
                     changeSelection("main");
                   }}
-                  title={selectionMain == "Users" ? "View Teams" : "View Users"}
+                  title={selectionMain === "Users" ? "View Teams" : "View Users"}
                 >
-                  {selectionMain == "Users" ? (
+                  {selectionMain === "Users" ? (
                     <span className="fa-solid fa-users" />
                   ) : (
                     <span className="fa-solid fa-user" />
@@ -368,7 +368,7 @@ function Hackerboard(props) {
                       >
                         <span
                           className={
-                            selectionScore == "down"
+                            selectionScore === "down"
                               ? "fa-solid fa-arrow-down"
                               : "fa-solid fa-arrow-up"
                           }
@@ -378,7 +378,7 @@ function Hackerboard(props) {
                   </tr>
                 </thead>
                 <tbody>
-                  {selectionMain == "Users"
+                  {selectionMain === "Users"
                     ? users.map(function (user, index) {
                         return (
                           <tr
@@ -387,11 +387,11 @@ function Hackerboard(props) {
                           >
                             <th scope="row">
                               {(
-                                selectionScore == "up"
-                                  ? index + (page - 1) * 100 == 0
+                                selectionScore === "up"
+                                  ? index + (page - 1) * 100 === 0
                                   : index * -1 +
                                       (page - 1) * 100 +
-                                      users.length ==
+                                      users.length ===
                                     1
                               ) ? (
                                 globalData.theme.top1_icon ? (
@@ -403,11 +403,11 @@ function Hackerboard(props) {
                                   1
                                 )
                               ) : (
-                                  selectionScore == "up"
-                                    ? index + (page - 1) * 100 == 1
+                                  selectionScore === "up"
+                                    ? index + (page - 1) * 100 === 1
                                     : index * -1 +
                                         (page - 1) * 100 +
-                                        users.length ==
+                                        users.length ===
                                       2
                                 ) ? (
                                 globalData.theme.top2_icon ? (
@@ -419,11 +419,11 @@ function Hackerboard(props) {
                                   2
                                 )
                               ) : (
-                                  selectionScore == "up"
-                                    ? index + (page - 1) * 100 == 2
+                                  selectionScore === "up"
+                                    ? index + (page - 1) * 100 === 2
                                     : index * -1 +
                                         (page - 1) * 100 +
-                                        users.length ==
+                                        users.length ===
                                       3
                                 ) ? (
                                 globalData.theme.top3_icon ? (
@@ -434,7 +434,7 @@ function Hackerboard(props) {
                                 ) : (
                                   3
                                 )
-                              ) : selectionScore == "up" ? (
+                              ) : selectionScore === "up" ? (
                                 index + 1 + (page - 1) * 100
                               ) : (
                                 index * -1 + (page - 1) * 100 + users.length
@@ -460,11 +460,11 @@ function Hackerboard(props) {
                           >
                             <th scope="row">
                               {(
-                                selectionScore == "up"
-                                  ? index + (page - 1) * 100 == 0
+                                selectionScore === "up"
+                                  ? index + (page - 1) * 100 === 0
                                   : index * -1 +
                                       (page - 1) * 100 +
-                                      teams.length ==
+                                      teams.length ===
                                     1
                               ) ? (
                                 globalData.theme.top1_icon ? (
@@ -480,7 +480,7 @@ function Hackerboard(props) {
                                     ? index + (page - 1) * 100 == 1
                                     : index * -1 +
                                         (page - 1) * 100 +
-                                        teams.length ==
+                                        teams.length ===
                                       2
                                 ) ? (
                                 globalData.theme.top2_icon ? (
@@ -492,11 +492,11 @@ function Hackerboard(props) {
                                   2
                                 )
                               ) : (
-                                  selectionScore == "up"
-                                    ? index + (page - 1) * 100 == 2
+                                  selectionScore === "up"
+                                    ? index + (page - 1) * 100 === 2
                                     : index * -1 +
                                         (page - 1) * 100 +
-                                        teams.length ==
+                                        teams.length ===
                                       3
                                 ) ? (
                                 globalData.theme.top3_icon ? (
@@ -507,7 +507,7 @@ function Hackerboard(props) {
                                 ) : (
                                   3
                                 )
-                              ) : selectionScore == "up" ? (
+                              ) : selectionScore === "up" ? (
                                 index + (page - 1) * 100 + 1
                               ) : (
                                 index * -1 + (page - 1) * 100 + teams.length

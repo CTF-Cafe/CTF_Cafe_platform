@@ -33,18 +33,6 @@ function Users(props) {
         } else if (response.data.state == "error") {
           globalData.alert.error(response.data.message);
         } else {
-          response.data.sort((a, b) => {
-            if (a.score < b.score) {
-              return 1;
-            }
-
-            if (a.score > b.score) {
-              return -1;
-            }
-
-            return 0;
-          });
-
           setUsers(response.data);
           setPage(index);
         }
@@ -274,8 +262,6 @@ function Users(props) {
               #
             </th>
             <th scope="col">Username</th>
-            <th scope="col">User Score</th>
-            <th scope="col">User Solves</th>
             <th scope="col">Verified</th>
             <th scope="col">Admin</th>
             <th scope="col">SBanned</th>
@@ -296,8 +282,6 @@ function Users(props) {
                     </a>
                   </Link>
                 </td>
-                <td>{user.score}</td>
-                <td>{user.solved.length}</td>
                 <td>{user.verified.toString()}</td>
                 <td>
                   {user.isAdmin.toString()}{" "}

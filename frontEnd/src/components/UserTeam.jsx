@@ -16,25 +16,12 @@ function UserTeam(props) {
 
   // Parse and Organize team data
   const updateUserTeam = (response) => {
-    const clubArray = (arr) => {
-      return arr.reduce((acc, val, _) => {
-        const index = acc.findIndex((el) => el.username === val.username);
-        if (index !== -1) {
-          acc[index].solved.push(val.solved[0]);
-          acc[index].score += val.score;
-        } else {
-          acc.push(val);
-        }
-        return acc;
-      }, []);
-    };
-
-    response.data.users = clubArray(response.data.users);
-
     let finalDataCategory = [];
     let finalDataDifficulty = [];
 
     response.data.solved = [];
+    response.data.hintsBought = [];
+    response.data.score = 0;
     response.data.users.forEach((user) => {
       user.solved.forEach((solve) => {
         response.data.solved.push({
@@ -42,10 +29,18 @@ function UserTeam(props) {
           userId: user._id,
           username: user.username,
         });
+
+        // Add FirstBlood Points if match
+        if (solve.firstBlood === user._id) {
+          user.score += solve.firstBloodPoints;
+          response.data.score += solve.firstBloodPoints;
+        }
+
         user.score += solve.points;
+        response.data.score += solve.points;
 
         var category = finalDataCategory.find((obj) => {
-          return obj.name == solve.category;
+          return obj.name === solve.category;
         });
 
         if (category) {
@@ -59,12 +54,12 @@ function UserTeam(props) {
 
         var difficulty = finalDataDifficulty.find((obj) => {
           return (
-            obj.name ==
-            (solve.level == 3
+            obj.name ===
+            (solve.level === 3
               ? "Ninja"
-              : solve.level == 2
+              : solve.level === 2
               ? "Hard"
-              : solve.level == 1
+              : solve.level === 1
               ? "Medium"
               : "Easy")
           );
@@ -77,11 +72,11 @@ function UserTeam(props) {
         } else {
           finalDataDifficulty.push({
             name:
-              solve.level == 3
+              solve.level === 3
                 ? "Ninja"
-                : solve.level == 2
+                : solve.level === 2
                 ? "Hard"
-                : solve.level == 1
+                : solve.level === 1
                 ? "Medium"
                 : "Easy",
             value: 1,
@@ -89,7 +84,13 @@ function UserTeam(props) {
         }
       });
       user.hintsBought.forEach((hint) => {
+        response.data.hintsBought.push({
+          ...hint,
+          userId: user._id,
+          username: user.username,
+        });
         user.score -= hint.cost;
+        response.data.score -= hint.cost;
       });
     });
 
@@ -112,7 +113,7 @@ function UserTeam(props) {
         { withCredentials: true }
       )
       .then((response) => {
-        if (response.data.state != "error") {
+        if (response.data.state !== "error") {
           updateUserTeam(response);
         }
       })
@@ -358,6 +359,9 @@ function UserTeam(props) {
                 >
                   Leave Team
                 </button>
+                <div style={{ textAlign: "center" }}>
+                  <p>Score : {userTeam.score}</p>
+                </div>
               </div>
               <table className="table table-hover table-striped">
                 <thead className="thead-dark hackerFont">
@@ -378,9 +382,8 @@ function UserTeam(props) {
                           {index}
                         </th>
                         <td>
-                          {userTeam.teamCaptain ==
-                            globalData.userData.username &&
-                          globalData.userData.username != user.username ? (
+                          {userTeam.teamCaptain === globalData.userData._id &&
+                          globalData.userData.username !== user.username ? (
                             <button
                               className="btn btn-outline-danger btn-shadow"
                               data-toggle="modal"
@@ -409,68 +412,104 @@ function UserTeam(props) {
                   })}
                 </tbody>
               </table>
-              {userTeam.solved.length > 0 && (
-                <>
-                  <div className="row" style={{ textAlign: "center" }}>
-                    <div className="col-md-6 mb-3">
-                      <div>
-                        <h3>Solves by Category</h3>
-                        <PieChart data={challengeStatsCategory} />
-                      </div>
-                    </div>
-                    <div className="col-md-6 mb-3">
-                      <div>
-                        <h3>Solves by Difficulty</h3>
-                        <PieChart data={challengeStatsDifficulty} />
-                      </div>
-                    </div>
+              <div className="row" style={{ textAlign: "center" }}>
+                <div className="col-md-6 mb-3">
+                  <div>
+                    <h3>Solves by Category</h3>
+                    <PieChart data={challengeStatsCategory} />
                   </div>
-                  <div className="row">
-                    <table className="table table-hover table-striped">
-                      <thead className="thead-dark hackerFont">
-                        <tr>
-                          <th scope="col" style={{ textAlign: "center" }}>
-                            #
+                </div>
+                <div className="col-md-6 mb-3">
+                  <div>
+                    <h3>Solves by Difficulty</h3>
+                    <PieChart data={challengeStatsDifficulty} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Team Solves */}
+              <div className="row">
+                <p>Team Solves</p>
+                <table className="table table-hover table-striped">
+                  <thead className="thead-dark hackerFont">
+                    <tr>
+                      <th scope="col" style={{ textAlign: "center" }}>
+                        #
+                      </th>
+                      <th scope="col">Challenge Name</th>
+                      <th scope="col">Challenge Points</th>
+                      <th scope="col">Challenge Category</th>
+                      <th scope="col">Time Solved</th>
+                      <th scope="col">Flagger</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {userTeam.solved.map((solve, index) => {
+                      return (
+                        <tr key={solve._id}>
+                          <th scope="row" style={{ textAlign: "center" }}>
+                            {index}
                           </th>
-                          <th scope="col">Challenge Name</th>
-                          <th scope="col">Challenge Points</th>
-                          <th scope="col">Challenge Category</th>
-                          <th scope="col">Time Solved</th>
-                          <th scope="col">Flagger</th>
+                          <td>
+                            {solve.firstBlood === solve.userId ? (
+                              <span
+                                className="fa-solid fa-droplet"
+                                style={{
+                                  fontSize: "22px",
+                                  color: "red",
+                                  marginRight: "5px",
+                                }}
+                              ></span>
+                            ) : null}
+                            {solve.name}
+                          </td>
+                          <td>
+                            {solve.points}{" "}
+                            {solve.firstBlood === solve.userId &&
+                              `(+${solve.firstBloodPoints})`}
+                          </td>
+                          <td>{solve.category}</td>
+                          <td>{solve.timestamp}</td>
+                          <td>{solve.username}</td>
                         </tr>
-                      </thead>
-                      <tbody>
-                        {userTeam.solved.map((solve, index) => {
-                          return (
-                            <tr key={solve._id}>
-                              <th scope="row" style={{ textAlign: "center" }}>
-                                {index}
-                              </th>
-                              <td>
-                                {solve.firstBlood == solve.userId ? (
-                                  <span
-                                    className="fa-solid fa-droplet"
-                                    style={{
-                                      fontSize: "22px",
-                                      color: "red",
-                                      marginRight: "5px",
-                                    }}
-                                  ></span>
-                                ) : null}
-                                {solve.name}
-                              </td>
-                              <td>{solve.points}</td>
-                              <td>{solve.category}</td>
-                              <td>{solve.timestamp}</td>
-                              <td>{solve.username}</td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                </>
-              )}
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Team Hints Bought */}
+              <div className="row">
+                <p>Team Hints Bought</p>
+                <table className="table table-hover table-striped">
+                  <thead className="thead-dark hackerFont">
+                    <tr>
+                      <th scope="col" style={{ textAlign: "center" }}>
+                        #
+                      </th>
+                      <th scope="col">Challenge Name</th>
+                      <th scope="col">Hint Cost</th>
+                      <th scope="col">Time Bought</th>
+                      <th scope="col">Buyer</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {userTeam.hintsBought.map((hint, index) => {
+                      return (
+                        <tr key={hint.hintId}>
+                          <th scope="row" style={{ textAlign: "center" }}>
+                            {index}
+                          </th>
+                          <td>{hint.challName}</td>
+                          <td>-{hint.cost}</td>
+                          <td>{hint.timestamp}</td>
+                          <td>{hint.username}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>

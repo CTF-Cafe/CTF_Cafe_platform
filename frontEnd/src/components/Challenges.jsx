@@ -75,12 +75,12 @@ function Challenges(props) {
         }
       )
       .then((response) => {
-        if (response.data.state == "sessionError") {
+        if (response.data.state === "sessionError") {
           globalData.alert.error("Session expired!");
           globalData.setUserData({});
           globalData.setLoggedIn(false);
           globalData.navigate("/", { replace: true });
-        } else if (response.data.state == "error") {
+        } else if (response.data.state === "error") {
           globalData.alert.error(response.data.message);
         } else {
           globalData.alert.success("Hint Bought!");
@@ -99,12 +99,12 @@ function Challenges(props) {
         withCredentials: true,
       })
       .then((response) => {
-        if (response.data.state == "sessionError") {
+        if (response.data.state === "sessionError") {
           globalData.alert.error("Session expired!");
           globalData.setUserData({});
           globalData.setLoggedIn(false);
           globalData.navigate("/", { replace: true });
-        } else if (response.data.state == "error") {
+        } else if (response.data.state === "error") {
           var startDate = new Date();
           var endDate = new Date(parseInt(response.data.startTime));
           var secondsTillStart = parseInt(
@@ -127,11 +127,11 @@ function Challenges(props) {
           });
 
           response.data.categories.sort((a, b) => {
-            if (a == "misc") {
+            if (a === "misc") {
               return 1;
             }
 
-            if (b == "misc") {
+            if (b === "misc") {
               return -1;
             }
 
@@ -185,12 +185,12 @@ function Challenges(props) {
         }
       )
       .then((response) => {
-        if (response.data.state == "sessionError") {
+        if (response.data.state === "sessionError") {
           globalData.alert.error("Session expired!");
           globalData.setUserData({});
           globalData.setLoggedIn(false);
           globalData.navigate("/", { replace: true });
-        } else if (response.data.state == "error") {
+        } else if (response.data.state === "error") {
           globalData.alert.error(response.data.message);
           delete challenge.progress;
           setChallenges([...challenges]);
@@ -219,12 +219,12 @@ function Challenges(props) {
         }
       )
       .then((response) => {
-        if (response.data.state == "sessionError") {
+        if (response.data.state === "sessionError") {
           globalData.alert.error("Session expired!");
           globalData.setUserData({});
           globalData.setLoggedIn(false);
           globalData.navigate("/", { replace: true });
-        } else if (response.data.state == "error") {
+        } else if (response.data.state === "error") {
           globalData.alert.error(response.data.message);
           delete challenge.progress;
           setChallenges([...challenges]);
@@ -251,12 +251,12 @@ function Challenges(props) {
         { withCredentials: true }
       )
       .then((response) => {
-        if (response.data.state == "success") {
+        if (response.data.state === "success") {
           globalData.setUserData(response.data.user);
           globalData.alert.success("Correct Flag!");
           getChallenges();
         } else {
-          if (response.data.state == "sessionError") {
+          if (response.data.state === "sessionError") {
             globalData.alert.error("Session expired!");
             globalData.setUserData({});
             globalData.setLoggedIn(false);
@@ -334,22 +334,22 @@ function Challenges(props) {
                   <h4>{capitalize(category)}</h4>
                 </div>
                 {challenges.map((challenge, index) => {
-                  if (challenge.category == category) {
+                  if (challenge.category === category) {
                     return (
                       <div className="col-md-6 mb-3" key={index}>
                         <div
                           className={
-                            challenge.category.toLowerCase() == "crypto"
+                            challenge.category.toLowerCase() === "crypto"
                               ? "card category_crypt"
-                              : challenge.category.toLowerCase() == "web"
+                              : challenge.category.toLowerCase() === "web"
                               ? "card category_web"
-                              : challenge.category.toLowerCase() == "osint"
+                              : challenge.category.toLowerCase() === "osint"
                               ? "card category_osint"
-                              : challenge.category.toLowerCase() == "reverse"
+                              : challenge.category.toLowerCase() === "reverse"
                               ? "card category_reverse"
-                              : challenge.category.toLowerCase() == "pwn"
+                              : challenge.category.toLowerCase() === "pwn"
                               ? "card category_pwning"
-                              : challenge.category.toLowerCase() == "forensics"
+                              : challenge.category.toLowerCase() === "forensics"
                               ? "card category_forensics"
                               : "card category_misc"
                           }
@@ -357,7 +357,7 @@ function Challenges(props) {
                           <div
                             className={
                               globalData.userData.solved.filter((obj) => {
-                                return obj._id == challenge._id;
+                                return obj._id === challenge._id;
                               }).length > 0
                                 ? "card-header solved"
                                 : globalData.userData.team
@@ -365,7 +365,7 @@ function Challenges(props) {
                                     (user) => {
                                       return (
                                         user.solved.filter((obj) => {
-                                          return obj._id == challenge._id;
+                                          return obj._id === challenge._id;
                                         }).length > 0
                                       );
                                     }
@@ -384,7 +384,7 @@ function Challenges(props) {
                             }}
                           >
                             <div>
-                              {challenge.firstBlood ==
+                              {challenge.firstBlood ===
                               globalData.userData._id ? (
                                 <div
                                   style={{
@@ -408,7 +408,7 @@ function Challenges(props) {
                               }}
                             >
                               {globalData.userData.solved.filter((obj) => {
-                                return obj._id == challenge._id;
+                                return obj._id === challenge._id;
                               }).length > 0 ? (
                                 <>
                                   <span
@@ -421,26 +421,33 @@ function Challenges(props) {
                               ) : null}
                               <span
                                 className={
-                                  challenge.level == 0
+                                  challenge.level === 0
                                     ? "badge color_white color_easy align-self-end"
-                                    : challenge.level == 1
+                                    : challenge.level === 1
                                     ? "badge color_white color_medium align-self-end"
-                                    : challenge.level == 2
+                                    : challenge.level === 2
                                     ? "badge color_white color_hard align-self-end"
                                     : "badge color_white color_ninja align-self-end"
                                 }
                                 style={{ marginRight: "5px" }}
                               >
-                                {challenge.level == 0
+                                {challenge.level === 0
                                   ? "Easy"
-                                  : challenge.level == 1
+                                  : challenge.level === 1
                                   ? "Medium"
-                                  : challenge.level == 2
+                                  : challenge.level === 2
                                   ? "Hard"
                                   : "Ninja"}
                               </span>
-                              <span className="badge align-self-end">
+                              <span className="badge align-self-end" style={{ marginRight: "5px" }}>
                                 {challenge.points} points
+                              </span>
+                              <span className="badge align-self-end">
+                                (+{challenge.firstBloodPoints}){" "}
+                                <span
+                                  className="fa-solid fa-droplet"
+                                  style={{ fontSize: "11px", color: "red" }}
+                                ></span>
                               </span>
                             </div>
                           </div>
@@ -458,20 +465,20 @@ function Challenges(props) {
                                   &nbsp;
                                   <span
                                     className={
-                                      challenge.level == 0
+                                      challenge.level === 0
                                         ? "color_white color_easy"
-                                        : challenge.level == 1
+                                        : challenge.level === 1
                                         ? "color_white color_medium"
-                                        : challenge.level == 2
+                                        : challenge.level === 2
                                         ? "color_white color_hard"
                                         : "color_white color_ninja"
                                     }
                                   >
-                                    {challenge.level == 0
+                                    {challenge.level === 0
                                       ? "Easy"
-                                      : challenge.level == 1
+                                      : challenge.level === 1
                                       ? "Medium"
-                                      : challenge.level == 2
+                                      : challenge.level === 2
                                       ? "Hard"
                                       : "Ninja"}
                                   </span>
@@ -568,7 +575,7 @@ function Challenges(props) {
                               ) : null}
 
                               {challenge.hints.map((hint, i) =>
-                                hint.cost == 0 ? (
+                                hint.cost === 0 ? (
                                   hint.content.trim().length > 0 && (
                                     <a
                                       onClick={() => {
@@ -696,7 +703,7 @@ function Challenges(props) {
                 className="modal-footer"
                 style={{ justifyContent: "center" }}
               >
-                {currentHint.length == 0 ? (
+                {currentHint.length === 0 ? (
                   <button
                     type="button"
                     className="btn btn-success"

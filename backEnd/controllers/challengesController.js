@@ -30,7 +30,7 @@ exports.getChallenges = async function (req, res) {
     });
   } else {
     users
-      .findOne({ username: req.session.username })
+      .findById(req.session.userId)
       .then(async (user) => {
         const deployed = await getDocker(user.teamId);
         let returnedChallenges = [];
@@ -144,7 +144,7 @@ exports.getChallenges = async function (req, res) {
 
 exports.deployDocker = async function (req, res) {
   try {
-    const user = await users.findOne({ username: req.session.username });
+    const user = await users.findById(req.session.userId);
     if (!user) throw new Error("User not found");
     if (!ObjectId.isValid(user.teamId)) throw new Error("Not in a team!");
 
@@ -208,7 +208,7 @@ exports.deployDocker = async function (req, res) {
 
 exports.shutdownDocker = async function (req, res) {
   try {
-    const user = await users.findOne({ username: req.session.username });
+    const user = await users.findById(req.session.userId);
     if (!user) throw new Error("User not found");
     if (!ObjectId.isValid(user.teamId)) throw new Error("Not in a team!");
 
@@ -291,10 +291,10 @@ exports.submitFlag = async function (req, res) {
     if (!req.body.flag) throw new Error("No flag provided!");
 
     // Check if user is currently submitting flag
-    if (currentlySubmittingUsers.includes(req.session.username))
+    if (currentlySubmittingUsers.includes(req.session.userId))
       throw new Error("Submiting to fast!");
 
-    currentlySubmittingUsers.push(req.session.username);
+    currentlySubmittingUsers.push(req.session.userId);
 
     const endTime = await ctfConfig.findOne({ name: "endTime" });
     const startTime = await ctfConfig.findOne({ name: "startTime" });
@@ -304,7 +304,7 @@ exports.submitFlag = async function (req, res) {
     else if (parseInt(startTime.value) - Math.floor(new Date().getTime()) >= 0)
       throw new Error("CTF has not started!");
 
-    const username = req.session.username;
+    const username = req.session.userId;
     const flag = req.body.flag.trim();
     const user = await users.findOne({ username: username, verified: true });
 
@@ -493,7 +493,7 @@ exports.submitFlag = async function (req, res) {
     }
   } finally {
     currentlySubmittingUsers = currentlySubmittingUsers.filter(
-      (item) => item !== req.session.username
+      (item) => item !== req.session.userId
     );
 
     if (teamId) {
@@ -514,8 +514,7 @@ exports.buyHint = async function (req, res) {
     else if (parseInt(startTime.value) - Math.floor(new Date().getTime()) >= 0)
       throw new Error("CTF has not started!");
 
-    const username = req.session.username;
-    const user = await users.findOne({ username: username, verified: true });
+    const user = await users.findOne({ _id: req.session.userId, verified: true });
 
     // Check if user exists
     if (!user) throw new Error("Not logged in!");
@@ -577,7 +576,7 @@ exports.buyHint = async function (req, res) {
 
     let timestamp = new Date().getTime();
     await users.updateOne(
-      { username: username, verified: true },
+      { _id: req.session.userId, verified: true },
       {
         $push: {
           hintsBought: {
@@ -591,14 +590,14 @@ exports.buyHint = async function (req, res) {
     );
 
     const updatedUser = await users.findOne({
-      username: username,
+      _id: req.session.userId,
       verified: true,
     });
 
     await teams.updateOne(
       {
         _id: team._id,
-        users: { $elemMatch: { username: updatedUser.username } },
+        users: { $elemMatch: { _id: updatedUser._id } },
       },
       {
         $set: {

@@ -4,7 +4,7 @@ const users = require('./models/userModel.js');
 const encryptionController = require('./controllers/encryptionController.js');
 
 function generatePassword(length) {
-    const characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+";
+    const characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@";
     let password = "";
     for (let i = 0; i < length; i++) {
       const randomIndex = Math.floor(Math.random() * characters.length);
@@ -73,10 +73,10 @@ exports.setupDB = async function() {
         await theme.create({
             color_1: "#ff3d3d",
             color_2: "#ff7070",
-            bg_img: "http://localhost:3001/api/assets/bg.jpg",
-            top1_icon: "http://localhost:3001/api/assets/top1.png",
-            top2_icon: "http://localhost:3001/api/assets/top2.png",
-            top3_icon: "http://localhost:3001/api/assets/top3.png",
+            bg_img: "",
+            top1_icon: "",
+            top2_icon: "",
+            top3_icon: "",
         });
     }
 

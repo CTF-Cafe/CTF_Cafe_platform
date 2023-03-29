@@ -1,7 +1,6 @@
-import { Outlet, Routes, Route, Link, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import axios from "axios";
-import { useContext, useEffect, useState } from "react";
-import AppContext from "./Data/AppContext";
+import { useEffect, useState } from "react";
 import Navbar from "./Global/Navbar";
 import PieChart from "./Charts/PieChart";
 
@@ -18,26 +17,13 @@ function Team(props) {
         teamName: teamName,
       })
       .then((response) => {
-        if (response.data.state != "error") {
-          const clubArray = (arr) => {
-            return arr.reduce((acc, val, ind) => {
-              const index = acc.findIndex((el) => el.username === val.username);
-              if (index !== -1) {
-                acc[index].solved.push(val.solved[0]);
-                acc[index].score += val.score;
-              } else {
-                acc.push(val);
-              }
-              return acc;
-            }, []);
-          };
-
-          response.data.users = clubArray(response.data.users);
-
+        if (response.data.state !== "error") {
           let finalDataCategory = [];
           let finalDataDifficulty = [];
 
           response.data.solved = [];
+          response.data.hintsBought = [];
+          response.data.score = 0;
           response.data.users.forEach((user) => {
             user.solved.forEach((solve) => {
               response.data.solved.push({
@@ -45,10 +31,18 @@ function Team(props) {
                 userId: user._id,
                 username: user.username,
               });
+
+              // Add FirstBlood Points if match
+              if(solve.firstBlood === user._id) {
+                user.score += solve.firstBloodPoints;
+                response.data.score += solve.firstBloodPoints;
+              }
+
               user.score += solve.points;
+              response.data.score += solve.points;
 
               var category = finalDataCategory.find((obj) => {
-                return obj.name == solve.category;
+                return obj.name === solve.category;
               });
 
               if (category) {
@@ -64,12 +58,12 @@ function Team(props) {
 
               var difficulty = finalDataDifficulty.find((obj) => {
                 return (
-                  obj.name ==
-                  (solve.level == 3
+                  obj.name ===
+                  (solve.level === 3
                     ? "Ninja"
-                    : solve.level == 2
+                    : solve.level === 2
                     ? "Hard"
-                    : solve.level == 1
+                    : solve.level === 1
                     ? "Medium"
                     : "Easy")
                 );
@@ -82,11 +76,11 @@ function Team(props) {
               } else {
                 finalDataDifficulty.push({
                   name:
-                    solve.level == 3
+                    solve.level === 3
                       ? "Ninja"
-                      : solve.level == 2
+                      : solve.level === 2
                       ? "Hard"
-                      : solve.level == 1
+                      : solve.level === 1
                       ? "Medium"
                       : "Easy",
                   value: 1,
@@ -94,7 +88,13 @@ function Team(props) {
               }
             });
             user.hintsBought.forEach((hint) => {
+              response.data.hintsBought.push({
+                ...hint,
+                userId: user._id,
+                username: user.username,
+              });
               user.score -= hint.cost;
+              response.data.score -= hint.cost;
             });
           });
 
@@ -141,6 +141,9 @@ function Team(props) {
                 >
                   {team.name.toUpperCase()}
                 </h1>
+                <div style={{ textAlign: "center" }}>
+                  <p>Score : {team.score}</p>
+                </div>
               </div>
               <table className="table table-hover table-striped">
                 <thead className="thead-dark hackerFont">
@@ -190,7 +193,9 @@ function Team(props) {
                       </div>
                     </div>
                   </div>
+                  {/* Team Solves */}
                   <div className="row">
+                    <p>Team Solves</p>
                     <table className="table table-hover table-striped">
                       <thead className="thead-dark hackerFont">
                         <tr>
@@ -212,7 +217,7 @@ function Team(props) {
                                 {index}
                               </th>
                               <td>
-                                {solve.firstBlood == solve.userId ? (
+                                {solve.firstBlood === solve.userId ? (
                                   <span
                                     className="fa-solid fa-droplet"
                                     style={{
@@ -224,10 +229,46 @@ function Team(props) {
                                 ) : null}
                                 {solve.name}
                               </td>
-                              <td>{solve.points}</td>
+                              <td>
+                                {solve.points}{" "}
+                                {solve.firstBlood === solve.userId &&
+                                  `(+${solve.firstBloodPoints})`}
+                              </td>
                               <td>{solve.category}</td>
                               <td>{solve.timestamp}</td>
                               <td>{solve.username}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                  {/* Team Hints Bought */}
+                  <div className="row">
+                    <p>Team Hints Bought</p>
+                    <table className="table table-hover table-striped">
+                      <thead className="thead-dark hackerFont">
+                        <tr>
+                          <th scope="col" style={{ textAlign: "center" }}>
+                            #
+                          </th>
+                          <th scope="col">Challenge Name</th>
+                          <th scope="col">Hint Cost</th>
+                          <th scope="col">Time Bought</th>
+                          <th scope="col">Buyer</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {team.hintsBought.map((hint, index) => {
+                          return (
+                            <tr key={hint.hintId}>
+                              <th scope="row" style={{ textAlign: "center" }}>
+                                {index}
+                              </th>
+                              <td>{hint.challName}</td>
+                              <td>-{hint.cost}</td>
+                              <td>{hint.timestamp}</td>
+                              <td>{hint.username}</td>
                             </tr>
                           );
                         })}
