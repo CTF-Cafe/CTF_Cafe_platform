@@ -15,10 +15,31 @@ services:
     ports: 
       - '3001:3001'
     environment:
-      - NODE_ENV=development
-      - FRONTEND_URI=http://localhost:3000
-      - MONGODB_CONNSTRING=mongodb://raxo:jdHAKZ!172Lks@mongo:27017/ctfDB?authSource=admin
-      - SESSION_SECRET=djbh28Y879U292dklkdjjd
+      # DB 
+      - SESSION_SECRET=<secure randomly generated session key for validating session cookies>
+      - MONGODB_CONNSTRING=<mongodb connect URI, e.g. "mongodb://localhost:27017" - you may need to surround it in quotes if you experience glitches or formatting issues>
+
+      # Routing
+      - FRONTEND_URI=<frontend url if local usually http://localhost:3000>
+
+      # Mail Verification
+      - MAIL_VERIFICATION=<true/false>
+      - BACKEND_URI=<backend url same as frontend unless testing locally, will then be port 3001>
+      - HOST=<mail server>
+      - MAIL_PORT=<mail server port>
+      - MAIL=<mail address to send emails>
+      - PASS=<mail password to send emails>
+
+      # Docker API
+      - DEPLOYER_API=<URL of the challenge deployer>
+      - DEPLOYER_SECRET=<deployer secret token>
+
+      # Config 
+      - NODE_ENV=<development/production>
+      - PORT=3001
+
+      # First Blood Webhook
+      - WEBHOOK=<discord webhook url>
     volumes:
       - ./backEnd/assets:/server/assets
     depends_on:
@@ -30,6 +51,9 @@ services:
     ports: 
       - '3000:3000'
     environment:
-      - REACT_APP_SERVER_URI=http://localhost:3001
-      - REACT_APP_CTF_NAME=TEST_CTF
+      - REACT_APP_BACKEND_URI=http://localhost:3001
+      - REACT_APP_CTF_NAME=<ctf_name_formatted_like_this>
       - GENERATE_SOURCEMAP=false
+      - REACT_APP_DISCORD_URI=<optional>
+      - REACT_APP_GITHUB_URI=<optional>
+      - REACT_APP_TWIITER_URI=<optional>

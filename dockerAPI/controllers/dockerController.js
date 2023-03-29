@@ -18,11 +18,11 @@ cron.schedule("*/5 * * * *", () => {
         // stop docker
         await compose.stop({
           cwd: docker.path,
-          composeOptions: [["--verbose"], ["-p", docker.dockerId]],
+          composeOptions: [["-p", docker.dockerId]],
         });
         await compose.rm({
           cwd: docker.path,
-          composeOptions: [["--verbose"], ["-p", docker.dockerId]],
+          composeOptions: [["-p", docker.dockerId]],
         });
       }
     });
@@ -123,7 +123,6 @@ exports.deployDocker = async function (req, res) {
       await compose.upAll({
         cwd: dockerPath,
         composeOptions: [
-          ["--verbose"],
           ["-p", challengeId + "_" + ownerId],
           ["--env-file", ownerId + ".env"],
         ],
@@ -135,13 +134,13 @@ exports.deployDocker = async function (req, res) {
       // launch docker
       await compose.upAll({
         cwd: dockerPath,
-        composeOptions: [["--verbose"], ["-p", challengeId + "_" + ownerId]],
+        composeOptions: [["-p", challengeId + "_" + ownerId]],
       });
     }
 
     var containers = await compose.ps({
       cwd: dockerPath,
-      composeOptions: [["--verbose"], ["-p", challengeId + "_" + ownerId]],
+      composeOptions: [["-p", challengeId + "_" + ownerId]],
     });
 
     let i = 0;
@@ -149,10 +148,12 @@ exports.deployDocker = async function (req, res) {
       while (
         containers.data.services[i].ports.length == 0 ||
         !containers.data.services[i].ports[0].hasOwnProperty("mapped")
-      )
+      ) {
+        console.log(containers.data.services[i].ports)
         i += 1;
+      }
 
-      var port = containers.data.services[i].ports[0].mapped.port;
+      const port = containers.data.services[i].ports[0].mapped.port;
       await dockers.create({
         dockerId: challengeId + "_" + ownerId,
         challengeId: challengeId,
@@ -172,12 +173,12 @@ exports.deployDocker = async function (req, res) {
 
       await compose.stop({
         cwd: dockerPath,
-        composeOptions: [["--verbose"], ["-p", challengeId + "_" + ownerId]],
+        composeOptions: [["-p", challengeId + "_" + ownerId]],
       });
 
       await compose.rm({
         cwd: dockerPath,
-        composeOptions: [["--verbose"], ["-p", challengeId + "_" + ownerId]],
+        composeOptions: [["-p", challengeId + "_" + ownerId]],
       });
 
       progress.delete(challengeId + "_" + ownerId);
@@ -221,11 +222,11 @@ exports.shutdownDocker = async function (req, res) {
     // stop docker
     await compose.stop({
       cwd: docker.path,
-      composeOptions: [["--verbose"], ["-p", challengeId + "_" + ownerId]],
+      composeOptions: [["-p", challengeId + "_" + ownerId]],
     });
     await compose.rm({
       cwd: docker.path,
-      composeOptions: [["--verbose"], ["-p", challengeId + "_" + ownerId]],
+      composeOptions: [["-p", challengeId + "_" + ownerId]],
     });
 
     await dockers.deleteOne({

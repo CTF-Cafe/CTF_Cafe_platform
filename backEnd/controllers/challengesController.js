@@ -167,14 +167,15 @@ exports.deployDocker = async function (req, res) {
     // Check Team Docker Limit
     const dockerLimit = await ctfConfig.findOne({ name: "dockerLimit" });
     const deployed = await getDocker(user.teamId);
-    if(deployed.length >= dockerLimit)
-      throw new Error("Docker limit reached!")
+    if (deployed.length >= dockerLimit.value)
+      throw new Error("Docker limit reached!");
 
-    const resFetch = (
+    const resFetch = await (await (
       await fetch(`${process.env.DEPLOYER_API}/api/deployDocker`, {
         method: "POST",
         headers: {
           "X-API-KEY": process.env.DEPLOYER_SECRET,
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           githubUrl: challenge.githubUrl,
@@ -183,7 +184,7 @@ exports.deployDocker = async function (req, res) {
           randomFlag: challenge.randomFlag,
         }),
       })
-    ).json();
+    ).json());
 
     if (resFetch.state == "error") throw new Error(resFetch.message);
 
@@ -209,7 +210,7 @@ exports.deployDocker = async function (req, res) {
       );
     }
 
-    delete resFetch.flag
+    delete resFetch.flag;
     res.send({ state: "success", message: resFetch });
   } catch (error) {
     res.send({ state: "error", message: error.message });
@@ -234,18 +235,19 @@ exports.shutdownDocker = async function (req, res) {
     if (!challenge.githubUrl)
       throw new Error("Challenge doesn't have a github url!");
 
-    const resFetch = (
+    const resFetch = await ((
       await fetch(`${process.env.DEPLOYER_API}/api/shutdownDocker`, {
         method: "POST",
         headers: {
           "X-API-KEY": process.env.DEPLOYER_SECRET,
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           ownerId: user.teamId,
           challengeId: challenge.id,
         }),
       })
-    ).json();
+    ).json());
 
     if (resFetch.state == "error") throw new Error(resFetch.message);
 
@@ -270,17 +272,18 @@ exports.shutdownDocker = async function (req, res) {
 
 async function getDocker(teamId) {
   try {
-    const deployed = (
+    const deployed = await ((
       await fetch(`${process.env.DEPLOYER_API}/api/getDockers`, {
         method: "POST",
         headers: {
           "X-API-KEY": process.env.DEPLOYER_SECRET,
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           ownerId: teamId,
         }),
       })
-    ).json();
+    ).json());
 
     return deployed.dockers.map((c) => {
       delete c.githubUrl;
@@ -524,7 +527,10 @@ exports.buyHint = async function (req, res) {
     else if (parseInt(startTime.value) - Math.floor(new Date().getTime()) >= 0)
       throw new Error("CTF has not started!");
 
-    const user = await users.findOne({ _id: req.session.userId, verified: true });
+    const user = await users.findOne({
+      _id: req.session.userId,
+      verified: true,
+    });
 
     // Check if user exists
     if (!user) throw new Error("Not logged in!");
