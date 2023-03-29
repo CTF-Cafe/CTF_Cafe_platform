@@ -564,16 +564,17 @@ exports.getDockers = async function (req, res) {
     if (isNaN(page)) page = 1;
 
     let dockers = (
-      await fetch(`${process.env.DEPLOYER_API}/api/getAllDockers`, {
+      await (await fetch(`${process.env.DEPLOYER_API}/api/getAllDockers`, {
         method: "POST",
         headers: {
           "X-API-KEY": process.env.DEPLOYER_SECRET,
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           page: page,
         }),
       })
-    ).json().dockers;
+    ).json()).dockers;
 
     dockers = await Promise.all(
       dockers.map(async (x) => {
@@ -601,26 +602,28 @@ exports.restartDocker = async function (req, res) {
   try {
     const dockerToRestart = req.body.docker;
 
-    let resFetch = (
+    let resFetch = await ((
       await fetch(`${process.env.DEPLOYER_API}/api/shutdownDocker`, {
         method: "POST",
         headers: {
           "X-API-KEY": process.env.DEPLOYER_SECRET,
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           ownerId: dockerToRestart.ownerId,
           challengeId: dockerToRestart.challengeId,
         }),
       })
-    ).json();
+    ).json());
 
     if (resFetch.state == "error") throw new Error(resFetch.message);
 
     resFetch = (
-      await fetch(`${process.env.DEPLOYER_API}/api/deployDocker`, {
+      await (await fetch(`${process.env.DEPLOYER_API}/api/deployDocker`, {
         method: "POST",
         headers: {
           "X-API-KEY": process.env.DEPLOYER_SECRET,
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           githubUrl: dockerToRestart.githubUrl,
@@ -629,7 +632,7 @@ exports.restartDocker = async function (req, res) {
           randomFlag: dockerToRestart.randomFlag != "false" ? true : false,
         }),
       })
-    ).json();
+    ).json());
 
     if (resFetch.state == "error") throw new Error(resFetch.message);
 
@@ -674,17 +677,18 @@ exports.shutdownDocker = async function (req, res) {
     const dockerToStop = req.body.docker;
 
     const resFetch = (
-      await fetch(`${process.env.DEPLOYER_API}/api/shutdownDocker`, {
+      await (await fetch(`${process.env.DEPLOYER_API}/api/shutdownDocker`, {
         method: "POST",
         headers: {
           "X-API-KEY": process.env.DEPLOYER_SECRET,
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           ownerId: dockerToStop.ownerId,
           challengeId: dockerToStop.challengeId,
         }),
       })
-    ).json();
+    ).json());
 
     if (resFetch.state == "error") throw new Error(resFetch.message);
 

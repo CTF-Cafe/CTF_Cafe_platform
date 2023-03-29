@@ -384,6 +384,12 @@ function Challenges(props) {
                             }}
                           >
                             <div>
+                              {challenge.isInstance && (
+                                <span
+                                  className="fa-brands fa-docker"
+                                  style={{ fontSize: "22px", marginRight: "10px" }}
+                                ></span>
+                              )}
                               {challenge.firstBlood ===
                               globalData.userData._id ? (
                                 <div
@@ -439,7 +445,10 @@ function Challenges(props) {
                                   ? "Hard"
                                   : "Ninja"}
                               </span>
-                              <span className="badge align-self-end" style={{ marginRight: "5px" }}>
+                              <span
+                                className="badge align-self-end"
+                                style={{ marginRight: "5px" }}
+                              >
                                 {challenge.points} points
                               </span>
                               <span className="badge align-self-end">
@@ -497,7 +506,7 @@ function Challenges(props) {
                                   })}
                               </p>
 
-                              {challenge.isInstance ? (
+                              {challenge.isInstance && (
                                 <button
                                   className="btn btn-outline-danger btn-shadow"
                                   onClick={(e) => {
@@ -534,7 +543,7 @@ function Challenges(props) {
                                     </>
                                   )}
                                 </button>
-                              ) : null}
+                              )}
 
                               {challenge.file ? (
                                 challenge.file.length > 0 ? (
