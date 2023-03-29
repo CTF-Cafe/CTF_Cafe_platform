@@ -9,6 +9,7 @@ const configsToShow = [
   "sponsors",
   "categories",
   "dynamicScoring",
+  "scoreboardHidden"
 ];
 
 function ArrayEdit(props) {
@@ -115,7 +116,7 @@ function Config(props) {
             : config.name === "categories"
             ? document.getElementById("config-data" + config._id).attributes
                 .value.nodeValue
-            : config.name === "dynamicScoring"
+            : ["dynamicScoring", "scoreboardHidden"].includes(config.name)
             ? document.getElementById("config-data" + config._id).value
             : document.getElementById("config-data" + config._id).textContent,
         });
@@ -185,7 +186,7 @@ function Config(props) {
                     </td>
                   ) : config.name === "categories" ? (
                     <ArrayEdit config={config} />
-                  ) : config.name === "dynamicScoring" ? (
+                  ) : ["dynamicScoring", "scoreboardHidden"].includes(config.name) ? (
                     <td>
                       <select
                         defaultValue={JSON.stringify(config.value)}

@@ -1,6 +1,6 @@
-import { Outlet, Routes, Route, Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import axios from "axios";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "./Global/Navbar";
 import PieChart from "./Charts/PieChart";
 
@@ -15,9 +15,11 @@ function User(props) {
     axios
       .post(process.env.REACT_APP_BACKEND_URI + "/api/getUser", {
         username: username,
+      }, {
+        withCredentials: true
       })
       .then((response) => {
-        if (response.data.state != "error") {
+        if (response.data.state !== "error") {
           setUser(response.data);
 
           if (response.data.solved.length > 0) {
@@ -26,7 +28,7 @@ function User(props) {
 
             response.data.solved.forEach((solve) => {
               var category = finalDataCategory.find((obj) => {
-                return obj.name == solve.challenge.category;
+                return obj.name === solve.challenge.category;
               });
 
               if (category) {

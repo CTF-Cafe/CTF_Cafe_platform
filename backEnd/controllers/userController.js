@@ -218,7 +218,8 @@ exports.updateUsername = async function (req, res) {
     }
 
     await users
-      .findByIdAndUpdate(req.session.userId,
+      .findByIdAndUpdate(
+        req.session.userId,
         { username: username },
         { returnOriginal: false }
       )
@@ -295,6 +296,18 @@ exports.getUsers = async function (req, res) {
   if (page <= 0) {
     res.send({ state: "error", message: "Page cannot be less than 1!" });
   } else {
+    const userToCheck = await users.findById(req.session.userId);
+    if (!userToCheck || !userToCheck.isAdmin) {
+      // DONT SEND USERS IF SCOREBOARD HIDDEN AND NOT ADMIN
+      const scoreboardHidden = await ctfConfig.findOne({
+        name: "scoreboardHidden",
+      });
+      if (scoreboardHidden.value) {
+        res.send({ state: "error", message: "Scoreboard is Hidden!" });
+        return;
+      }
+    }
+
     let userCount = await users.count();
     if ((page - 1) * 100 > userCount) {
       res.send({ state: "error", message: "No more pages!" });
@@ -333,6 +346,20 @@ exports.getUser = async function (req, res) {
   });
 
   if (user) {
+    if (!user._id.equals(req.session.userId)) {
+      const userToCheck = await users.findById(req.session.userId);
+      if (!userToCheck || !userToCheck.isAdmin) {
+        // DONT SEND USER IF SCOREBOARD HIDDEN AND ITS NOT THE USER HIMSELF OR ADMIN
+        const scoreboardHidden = await ctfConfig.findOne({
+          name: "scoreboardHidden",
+        });
+        if (scoreboardHidden.value) {
+          res.send({ state: "error", message: "Scoreboard is Hidden!" });
+          return;
+        }
+      }
+    }
+
     user.password = "Nice try XD";
     user.key = "Nice try XD";
     user.isAdmin = false;
@@ -418,6 +445,15 @@ exports.getTheme = async function (req, res) {
 };
 
 exports.getScoreboard = async function (req, res) {
+  const scoreboardHidden = await ctfConfig.findOne({
+    name: "scoreboardHidden",
+  });
+
+  if (scoreboardHidden.value) {
+    res.send({ state: "error", message: "Scoreboard is Hidden!" });
+    return;
+  }
+
   let allTeams = await dbController
     .resolveTeamsMin({
       users: { $not: { $elemMatch: { shadowBanned: true } } },
