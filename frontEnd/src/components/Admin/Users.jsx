@@ -25,12 +25,12 @@ function Users(props) {
         { withCredentials: true }
       )
       .then((response) => {
-        if (response.data.state == "sessionError") {
+        if (response.data.state === "sessionError") {
           globalData.alert.error("Session expired!");
           globalData.setUserData({});
           globalData.setLoggedIn(false);
           globalData.navigate("/", { replace: true });
-        } else if (response.data.state == "error") {
+        } else if (response.data.state === "error") {
           globalData.alert.error(response.data.message);
         } else {
           setUsers(response.data);
@@ -56,13 +56,13 @@ function Users(props) {
         { withCredentials: true }
       )
       .then((response) => {
-        if (response.data.state == "sessionError") {
+        if (response.data.state === "sessionError") {
           globalData.alert.error("Session expired!");
           globalData.setUserData({});
           globalData.setLoggedIn(false);
           globalData.navigate("/", { replace: true });
         } else {
-          if (response.data.state == "success") {
+          if (response.data.state === "success") {
             globalData.alert.success("Deleted user!");
             getUsers(page);
           } else {
@@ -86,13 +86,13 @@ function Users(props) {
         { withCredentials: true }
       )
       .then((response) => {
-        if (response.data.state == "sessionError") {
+        if (response.data.state === "sessionError") {
           globalData.alert.error("Session expired!");
           globalData.setUserData({});
           globalData.setLoggedIn(false);
           globalData.navigate("/", { replace: true });
         } else {
-          if (response.data.state == "success") {
+          if (response.data.state === "success") {
             globalData.alert.success("User is now admin!");
             getUsers(page);
           } else {
@@ -116,13 +116,13 @@ function Users(props) {
         { withCredentials: true }
       )
       .then((response) => {
-        if (response.data.state == "sessionError") {
+        if (response.data.state === "sessionError") {
           globalData.alert.error("Session expired!");
           globalData.setUserData({});
           globalData.setLoggedIn(false);
           globalData.navigate("/", { replace: true });
         } else {
-          if (response.data.state == "success") {
+          if (response.data.state === "success") {
             globalData.alert.success("Admin removed!");
             getUsers(page);
           } else {
@@ -146,13 +146,13 @@ function Users(props) {
         { withCredentials: true }
       )
       .then((response) => {
-        if (response.data.state == "sessionError") {
+        if (response.data.state === "sessionError") {
           globalData.alert.error("Session expired!");
           globalData.setUserData({});
           globalData.setLoggedIn(false);
           globalData.navigate("/", { replace: true });
         } else {
-          if (response.data.state == "success") {
+          if (response.data.state === "success") {
             globalData.alert.success("User shadow banned!");
             getUsers(page);
           } else {
@@ -176,13 +176,13 @@ function Users(props) {
         { withCredentials: true }
       )
       .then((response) => {
-        if (response.data.state == "sessionError") {
+        if (response.data.state === "sessionError") {
           globalData.alert.error("Session expired!");
           globalData.setUserData({});
           globalData.setLoggedIn(false);
           globalData.navigate("/", { replace: true });
         } else {
-          if (response.data.state == "success") {
+          if (response.data.state === "success") {
             globalData.alert.success("User unShadow banned!");
             getUsers(page);
           } else {
@@ -286,7 +286,7 @@ function Users(props) {
                 <td>
                   {user.isAdmin.toString()}{" "}
                   {editMode &&
-                    (user.isAdmin.toString() == "false" ? (
+                    (user.isAdmin.toString() === "false" ? (
                       <button
                         className="btn btn-outline-danger btn-shadow"
                         data-toggle="modal"
@@ -323,7 +323,7 @@ function Users(props) {
                 <td>
                   {user.shadowBanned.toString()}
                   {editMode &&
-                    (user.shadowBanned.toString() == "false" ? (
+                    (user.shadowBanned.toString() === "false" ? (
                       <button
                         className="btn btn-outline-danger btn-shadow"
                         data-toggle="modal"

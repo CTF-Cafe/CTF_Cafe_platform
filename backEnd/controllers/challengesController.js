@@ -304,9 +304,9 @@ exports.submitFlag = async function (req, res) {
     else if (parseInt(startTime.value) - Math.floor(new Date().getTime()) >= 0)
       throw new Error("CTF has not started!");
 
-    const username = req.session.userId;
+    const userId = req.session.userId;
     const flag = req.body.flag.trim();
-    const user = await users.findOne({ username: username, verified: true });
+    const user = await users.findOne({ _id: userId, verified: true });
 
     // Check if user exists
     if (!user) throw new Error("Not logged in!");
@@ -417,19 +417,19 @@ exports.submitFlag = async function (req, res) {
     }
 
     await users.updateOne(
-      { username: username, verified: true },
+      { _id: userId, verified: true },
       { $push: { solved: { _id: challenge._id, timestamp: timestamp } } }
     );
 
     const updatedUser = await users.findOne({
-      username: username,
+      _id: userId,
       verified: true,
     });
 
     await teams.updateOne(
       {
         _id: team._id,
-        users: { $elemMatch: { username: updatedUser.username } },
+        users: { $elemMatch: { _id: updatedUser._id } },
       },
       {
         $set: {

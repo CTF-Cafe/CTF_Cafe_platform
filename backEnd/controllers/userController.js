@@ -387,6 +387,10 @@ exports.getUser = async function (req, res) {
       user.score -= user.hintsBought[i].cost;
     }
 
+    for (let i = 0; i < user.adminPoints.length; i++) {
+      user.score += user.adminPoints[i];
+    }
+
     res.send(user);
   } else {
     res.send({ state: "error", message: "User not found" });

@@ -53,6 +53,10 @@ var userSchema = new Schema({
     shadowBanned: {
         type: Boolean,
         default: false
+    },
+    adminPoints: {
+        type: Array,
+        default: []
     }
 });
 
