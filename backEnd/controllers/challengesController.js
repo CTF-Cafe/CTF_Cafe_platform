@@ -151,6 +151,10 @@ exports.deployDocker = async function (req, res) {
     const team = await teams.findById(user.teamId);
     if (!team) throw new Error("Not in a team!");
 
+    const startTime = await ctfConfig.findOne({ name: "startTime" });
+    if (parseInt(startTime.value) - Math.floor(new Date().getTime()) >= 0)
+      throw new Error("CTF has not started!");
+
     const challenge = await challenges.findOne({
       _id: ObjectId(req.body.challengeId),
     });
@@ -159,6 +163,12 @@ exports.deployDocker = async function (req, res) {
     if (!challenge.isInstance) throw new Error("Challenge is not an instance!");
     if (!challenge.githubUrl)
       throw new Error("Challenge doesn't have a github url!");
+
+    // Check Team Docker Limit
+    const dockerLimit = await ctfConfig.findOne({ name: "dockerLimit" });
+    const deployed = await getDocker(user.teamId);
+    if(deployed.length >= dockerLimit)
+      throw new Error("Docker limit reached!")
 
     const resFetch = (
       await fetch(`${process.env.DEPLOYER_API}/api/deployDocker`, {
