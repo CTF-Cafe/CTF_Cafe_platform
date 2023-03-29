@@ -245,30 +245,6 @@ exports.resolveTeamsMin = function (match) {
       },
     },
     {
-      $unwind: {
-        path: "$users.adminPoints",
-        preserveNullAndEmptyArrays: true,
-      },
-    },
-    {
-      $group: {
-        _id: "$_id",
-        users: { $first: "$oldUsers" },
-        oldUsers: { $first: "$oldUsers" },
-        solved: { $first: "$solved" },
-        hintsBought: { $first: "$hintsBought" },
-        name: { $first: "$name" },
-        teamCaptain: { $first: "$teamCaptain" },
-        adminPoints: { $sum: "$users.adminPoints" },
-      },
-    },
-    {
-      $unwind: {
-        path: "$users",
-        preserveNullAndEmptyArrays: true,
-      },
-    },
-    {
       $group: {
         _id: "$_id",
         userIds: { $push: { $toString: "$users._id" } },
@@ -276,7 +252,7 @@ exports.resolveTeamsMin = function (match) {
         oldUsers: { $first: "$oldUsers" },
         solved: { $first: "$solved" },
         hintsBought: { $first: "$hintsBought" },
-        adminPoints: { $first: "$adminPoints" },
+        adminPoints: { $sum: "$users.adminPoints" },
         name: { $first: "$name" },
         teamCaptain: { $first: "$teamCaptain" },
       },
@@ -573,24 +549,6 @@ exports.resolveUsers = function (match) {
         solved: { $first: "$solved" },
         hintsBought: { $push: "$hintsBought" },
         adminPoints: { $first: "$adminPoints" },
-        maxTimestamp: { $first: "$maxTimestamp" },
-      },
-    },
-    {
-      $unwind: {
-        path: "$adminPoints",
-        preserveNullAndEmptyArrays: true,
-      },
-    },
-    {
-      $group: {
-        _id: "$_id",
-        username: { $first: "$username" },
-        hintsCost: { $first: "$hintsCost" },
-        score: { $first: "$score" },
-        solved: { $first: "$solved" },
-        hintsBought: { $first: "$hintsBought" },
-        adminPoints: { $sum: "$adminPoints" },
         maxTimestamp: { $first: "$maxTimestamp" },
       },
     },
