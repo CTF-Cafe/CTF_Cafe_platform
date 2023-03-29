@@ -111,6 +111,9 @@ function checkAuth(req, res, next) {
     } else if (!(user.key == req.session.key)) {
       res.send({ state: "sessionError" });
     } else {
+      if(user.isAdmin) {
+        req.isAdmin = true;
+      }
       next();
     }
   });

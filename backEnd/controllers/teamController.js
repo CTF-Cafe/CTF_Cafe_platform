@@ -3,6 +3,7 @@ const users = require("../models/userModel");
 const { v4 } = require("uuid");
 const ObjectId = require("mongoose").Types.ObjectId;
 const dbController = require("./dbController");
+const ctfConfig = require("../models/ctfConfigModel");
 
 exports.register = async function (req, res) {
   const teamName = req.body.teamName.trim();
@@ -37,7 +38,7 @@ exports.register = async function (req, res) {
                 solved: userToCheck.solved,
                 hintsBought: userToCheck.hintsBought,
                 shadowBanned: userToCheck.shadowBanned,
-                adminPoints: userToCheck.adminPoints
+                adminPoints: userToCheck.adminPoints,
               },
             ],
           })
@@ -118,7 +119,7 @@ exports.joinTeam = async function (req, res) {
                   solved: userToCheck.solved,
                   hintsBought: userToCheck.hintsBought,
                   shadowBanned: userToCheck.shadowBanned,
-                  adminPoints: userToCheck.adminPoints
+                  adminPoints: userToCheck.adminPoints,
                 },
               },
             },
@@ -161,6 +162,18 @@ exports.getTeams = async function (req, res) {
   if (page <= 0) {
     res.send({ state: "error", message: "Page cannot be less than 1!" });
   } else {
+    const userToCheck = await users.findById(req.session.userId);
+    if (!userToCheck || !userToCheck.isAdmin) {
+      // DONT SEND TEAMS IF SCOREBOARD HIDDEN AND NOT ADMIN
+      const scoreboardHidden = await ctfConfig.findOne({
+        name: "scoreboardHidden",
+      });
+      if (scoreboardHidden.value) {
+        res.send({ state: "error", message: "Scoreboard is Hidden!" });
+        return;
+      }
+    }
+
     let teamCount = await teams.count();
     if ((page - 1) * 100 > teamCount) {
       res.send({ state: "error", message: "No more pages!" });
@@ -274,6 +287,21 @@ exports.getTeam = async function (req, res) {
   });
 
   if (team[0]) {
+
+    if (!team[0].users.find(x => x._id.equals(req.session.userId))) {
+      const userToCheck = await users.findById(req.session.userId);
+      if (!userToCheck || !userToCheck.isAdmin) {
+        // DONT SEND TEAM IF SCOREBOARD HIDDEN AND USER NOT IN TEAM OR ADMIN
+        const scoreboardHidden = await ctfConfig.findOne({
+          name: "scoreboardHidden",
+        });
+        if (scoreboardHidden.value) {
+          res.send({ state: "error", message: "Scoreboard is Hidden!" });
+          return;
+        }
+      }
+    }
+
     res.send(team[0]);
   } else {
     res.send({ state: "error", message: "Team not found" });

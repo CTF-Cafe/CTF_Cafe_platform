@@ -108,5 +108,14 @@ exports.setupDB = async function() {
         });
     }
 
+    const scoreboardHiddenConfig = await ctfConfig.findOne({ name: 'scoreboardHidden' });
+
+    if(!scoreboardHiddenConfig) {
+        await ctfConfig.create({
+            name: 'scoreboardHidden',
+            value: false,
+        });
+    }
+
     console.log("Database Setup successfully");
 }
