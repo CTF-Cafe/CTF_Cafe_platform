@@ -81,6 +81,9 @@ app.use(function (req, res, next) {
 
 app.use(
   fileUpload({
+    limits: {
+      fileSize: 100000000, //100mb
+    },
     createParentPath: true,
   })
 );
@@ -111,7 +114,7 @@ function checkAuth(req, res, next) {
     } else if (!(user.key == req.session.key)) {
       res.send({ state: "sessionError" });
     } else {
-      if(user.isAdmin) {
+      if (user.isAdmin) {
         req.isAdmin = true;
       }
       next();
