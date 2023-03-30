@@ -1,3 +1,5 @@
+const ObjectId = require("mongoose").Types.ObjectId;
+
 exports.validateRequestBody = function(body, validationObject) {
     for (const [key, validation] of Object.entries(validationObject)) {
       const value = body[key];

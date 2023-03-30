@@ -82,6 +82,7 @@ function ChallengeCard(props) {
           <div
             id={"problem_id_" + challenge._id}
             className="collapse card-body"
+            style={{ height: "0px" }}
           >
             <blockquote className="card-blockquote">
               <h6 className="solvers">
