@@ -35,7 +35,8 @@ function ChallengeCard(props) {
           style={{
             borderTop:
               "4px solid " +
-              props.categoryColors.find((x) => x.name === challenge.category).color,
+              props.categoryColors.find((x) => x.name === challenge.category)
+                .color,
           }}
           id={"challenge" + challenge._id}
         >
@@ -45,8 +46,8 @@ function ChallengeCard(props) {
             data-toggle="collapse"
             aria-expanded="false"
             aria-controls={"problem_id_" + challenge._id}
-            draggable="true"
-            onDragStart={props.drag} // DO NOT REMOVE!
+            // draggable="true" // PREVENTS GOOD INPUT CAPTURE
+            // onDragStart={props.drag} 
             id={"challenge-header" + challenge._id}
             style={{ display: "flex", justifyContent: "space-between" }}
           >
@@ -54,28 +55,23 @@ function ChallengeCard(props) {
               {challenge.isInstance ? (
                 <span
                   className="fa-brands fa-docker"
-                  style={{ fontSize: "18px" }}
+                  style={{ fontSize: "26px", marginRight: "5px" }}
                 ></span>
               ) : null}
-              <span
-                contentEditable="true"
-                style={{ outline: "none" }}
+              <input
                 id={"name" + challenge._id}
                 onClick={(e) => e.stopPropagation()}
-              >
-                {challenge.name}{" "}
-              </span>
+                defaultValue={challenge.name}
+              />
             </div>
             <span className="badge align-self-end">
-              <span
-                contentEditable="true"
-                style={{ outline: "none" }}
+              <input
                 onClick={(e) => e.stopPropagation()}
                 id={"points" + challenge._id}
-              >
-                {challenge.points}
-              </span>{" "}
-              points
+                defaultValue={challenge.points}
+                style={{ width: "50px" }}
+              />
+              {" "}points
             </span>
           </div>
           <div
