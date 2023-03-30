@@ -8,6 +8,8 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: dbuser
       MONGO_INITDB_ROOT_PASSWORD: changeme
+    volumes: 
+      - ~/mongo/data:/data/db
 
   backend:
     build: ./backEnd/
