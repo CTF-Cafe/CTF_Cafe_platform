@@ -338,21 +338,12 @@ function Challenges(props) {
                     return (
                       <div className="col-md-6 mb-3" key={index}>
                         <div
-                          className={
-                            challenge.category.toLowerCase() === "crypto"
-                              ? "card category_crypt"
-                              : challenge.category.toLowerCase() === "web"
-                              ? "card category_web"
-                              : challenge.category.toLowerCase() === "osint"
-                              ? "card category_osint"
-                              : challenge.category.toLowerCase() === "reverse"
-                              ? "card category_reverse"
-                              : challenge.category.toLowerCase() === "pwn"
-                              ? "card category_pwning"
-                              : challenge.category.toLowerCase() === "forensics"
-                              ? "card category_forensics"
-                              : "card category_misc"
-                          }
+                          className="card"
+                          style={{
+                            borderTop:
+                              "4px solid " +
+                              globalData.categoryColors.find((x) => x.name === challenge.category).color,
+                          }}
                         >
                           <div
                             className={

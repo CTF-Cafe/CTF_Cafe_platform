@@ -34,7 +34,7 @@ function App() {
   const [dynamicScoring, setDynamicScoring] = useState(JSON.parse(localStorage.getItem('dynamicScoring')) || false);
   const [socialLinks, setSocialLinks] = useState(JSON.parse(localStorage.getItem('socialLinks')) || [])
   const [categories, setCategories] = useState(JSON.parse(localStorage.getItem('categories')) || []);
-  const [loading, setLoading] = useState(true);
+  const [categoryColors, setCategoryColors] = useState(JSON.parse(localStorage.getItem('categoryColors')) || []);
   const [sponsors, setSponsors] = useState(JSON.parse(localStorage.getItem('sponsors')) || []);
   const [endTime, setEndTime] = useState(JSON.parse(localStorage.getItem('endTime')) || 0);
   const [startTime, setStartTime] = useState(JSON.parse(localStorage.getItem('startTime')) || 0);
@@ -42,6 +42,7 @@ function App() {
   const [notifications, setNotifications] = useState(
     JSON.parse(localStorage.getItem("notifications")) || []
   );
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   const globalData = {
@@ -53,6 +54,7 @@ function App() {
     dynamicScoring: dynamicScoring,
     socialLinks: socialLinks,
     categories: categories,
+    categoryColors: categoryColors,
     sponsors: sponsors,
     startTime: startTime,
     endTime: endTime,
@@ -95,6 +97,10 @@ function App() {
               case "categories":
                 localStorage.setItem('categories', JSON.stringify(config.value));
                 setCategories(config.value);
+                break;
+              case "categoryColors":
+                localStorage.setItem('categoryColors', JSON.stringify(config.value));
+                setCategoryColors(config.value);
                 break;
               case "startTime":
                 localStorage.setItem('startTime', JSON.stringify(config.value));

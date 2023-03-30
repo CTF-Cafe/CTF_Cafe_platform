@@ -171,34 +171,6 @@ body {
   padding-right: 20px;
 }
 
-.category_web {
-  border-top: 4px solid #ef121b94;
-}
-
-.category_osint {
-  border-top: 4px solid #b017a494;
-}
-
-.category_reverse {
-  border-top: 4px solid #17b06b94;
-}
-
-.category_pwning {
-  border-top: 4px solid #00d5ff94;
-}
-
-.category_forensics {
-  border-top: 4px solid #0f329894;
-}
-
-.category_misc {
-  border-top: 4px solid #ffff00c4;
-}
-
-.category_crypt {
-  border-top: 4px solid #9966ff94;
-}
-
 .category_machine {
   border-top: 4px solid #ffa600a7;
 }
