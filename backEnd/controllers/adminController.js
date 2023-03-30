@@ -8,6 +8,7 @@ const path = require("path");
 const fs = require("fs");
 const ObjectId = require("mongoose").Types.ObjectId;
 const { validateRequestBody } = require("./inputController");
+const encryptionController = require("./encryptionController");
 
 exports.getStats = async function (req, res) {
   let allChallenges = await challenges.find({}).sort({ points: 1 });
@@ -317,7 +318,9 @@ exports.addAdmin = async function (req, res) {
 
   if (user) {
     if (!user.isAdmin) {
-      await users.findByIdAndUpdate(req.body.user._id, { isAdmin: true });
+      await users.findByIdAndUpdate(req.body.user._id, {
+        $set: { isAdmin: true },
+      });
       res.send({ state: "success" });
     } else {
       res.send({ state: "error", message: "User is already an Admin!" });
@@ -332,7 +335,9 @@ exports.removeAdmin = async function (req, res) {
 
   if (user) {
     if (user.isAdmin) {
-      await users.findByIdAndUpdate(req.body.user._id, { isAdmin: false });
+      await users.findByIdAndUpdate(req.body.user._id, {
+        $set: { isAdmin: false },
+      });
       res.send({ state: "success" });
     } else {
       res.send({ state: "error", message: "User is not an Admin!" });
@@ -347,7 +352,9 @@ exports.shadowBan = async function (req, res) {
 
   if (user) {
     if (!user.shadowBanned) {
-      await users.findByIdAndUpdate(req.body.user._id, { shadowBanned: true });
+      await users.findByIdAndUpdate(req.body.user._id, {
+        $set: { shadowBanned: true },
+      });
 
       if (ObjectId.isValid(user.teamId)) {
         await teams.findOneAndUpdate(
@@ -377,7 +384,9 @@ exports.unShadowBan = async function (req, res) {
 
   if (user) {
     if (user.shadowBanned) {
-      await users.findByIdAndUpdate(req.body.user._id, { shadowBanned: false });
+      await users.findByIdAndUpdate(req.body.user._id, {
+        $set: { shadowBanned: false },
+      });
 
       if (ObjectId.isValid(user.teamId)) {
         await teams.findOneAndUpdate(
@@ -407,7 +416,7 @@ exports.setUserAdminPoints = async function (req, res) {
   const user = await users.findById(req.body.user._id);
 
   if (user) {
-    if(isNaN(parseInt(req.body.adminPoints))) {
+    if (isNaN(parseInt(req.body.adminPoints))) {
       res.send({ state: "error", message: "Admin points must be a number!" });
       return;
     }
@@ -429,6 +438,32 @@ exports.setUserAdminPoints = async function (req, res) {
         }
       );
     }
+
+    res.send({ state: "success" });
+  } else {
+    res.send({ state: "error", message: "User not found!" });
+  }
+};
+
+exports.changeUserPassword = async function (req, res) {
+  const user = await users.findById(req.body.user._id);
+
+  if (user) {
+    if (req.body.password_old.trim() != req.body.password.trim()) {
+      throw new Error("Please dont use any 'sus' character's");
+    }
+
+    // Check password length
+    if (req.body.password.trim().length < 8)
+      throw new Error("Password is to short 8 characters minimum!!");
+
+    const password = await encryptionController.encrypt(
+      req.body.password.trim()
+    );
+
+    await users.findByIdAndUpdate(req.body.user._id, {
+      $set: { password: password },
+    });
 
     res.send({ state: "success" });
   } else {
@@ -564,17 +599,19 @@ exports.getDockers = async function (req, res) {
     if (isNaN(page)) page = 1;
 
     let dockers = (
-      await (await fetch(`${process.env.DEPLOYER_API}/api/getAllDockers`, {
-        method: "POST",
-        headers: {
-          "X-API-KEY": process.env.DEPLOYER_SECRET,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          page: page,
-        }),
-      })
-    ).json()).dockers;
+      await (
+        await fetch(`${process.env.DEPLOYER_API}/api/getAllDockers`, {
+          method: "POST",
+          headers: {
+            "X-API-KEY": process.env.DEPLOYER_SECRET,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            page: page,
+          }),
+        })
+      ).json()
+    ).dockers;
 
     dockers = await Promise.all(
       dockers.map(async (x) => {
@@ -602,28 +639,28 @@ exports.restartDocker = async function (req, res) {
   try {
     const dockerToRestart = req.body.docker;
 
-    let resFetch = await ((
+    let resFetch = await (
       await fetch(`${process.env.DEPLOYER_API}/api/shutdownDocker`, {
         method: "POST",
         headers: {
           "X-API-KEY": process.env.DEPLOYER_SECRET,
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           ownerId: dockerToRestart.ownerId,
           challengeId: dockerToRestart.challengeId,
         }),
       })
-    ).json());
+    ).json();
 
     if (resFetch.state == "error") throw new Error(resFetch.message);
 
-    resFetch = (
-      await (await fetch(`${process.env.DEPLOYER_API}/api/deployDocker`, {
+    resFetch = await (
+      await fetch(`${process.env.DEPLOYER_API}/api/deployDocker`, {
         method: "POST",
         headers: {
           "X-API-KEY": process.env.DEPLOYER_SECRET,
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           githubUrl: dockerToRestart.githubUrl,
@@ -632,7 +669,7 @@ exports.restartDocker = async function (req, res) {
           randomFlag: dockerToRestart.randomFlag != "false" ? true : false,
         }),
       })
-    ).json());
+    ).json();
 
     if (resFetch.state == "error") throw new Error(resFetch.message);
 
@@ -676,19 +713,19 @@ exports.shutdownDocker = async function (req, res) {
   try {
     const dockerToStop = req.body.docker;
 
-    const resFetch = (
-      await (await fetch(`${process.env.DEPLOYER_API}/api/shutdownDocker`, {
+    const resFetch = await (
+      await fetch(`${process.env.DEPLOYER_API}/api/shutdownDocker`, {
         method: "POST",
         headers: {
           "X-API-KEY": process.env.DEPLOYER_SECRET,
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           ownerId: dockerToStop.ownerId,
           challengeId: dockerToStop.challengeId,
         }),
       })
-    ).json());
+    ).json();
 
     if (resFetch.state == "error") throw new Error(resFetch.message);
 
