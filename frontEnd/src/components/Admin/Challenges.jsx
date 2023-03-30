@@ -158,12 +158,12 @@ function Challenges(props) {
     const hidden = document.getElementById("hidden" + oldChallenge._id).value;
     formData.append("hidden", hidden);
 
-    const name = document.getElementById("name" + oldChallenge._id).textContent;
+    const name = document.getElementById("name" + oldChallenge._id).value;
     formData.append("name", name);
 
     const points = document.getElementById(
       "points" + oldChallenge._id
-    ).textContent;
+    ).value;
     formData.append("points", points);
 
     const firstBloodPoints = document.getElementById(

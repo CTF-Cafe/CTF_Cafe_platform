@@ -62,6 +62,8 @@ function ChallengeCard(props) {
                 id={"name" + challenge._id}
                 onClick={(e) => e.stopPropagation()}
                 defaultValue={challenge.name}
+                placeholder="Name"
+                type="text"
               />
             </div>
             <span className="badge align-self-end">
@@ -69,7 +71,10 @@ function ChallengeCard(props) {
                 onClick={(e) => e.stopPropagation()}
                 id={"points" + challenge._id}
                 defaultValue={challenge.points}
+                placeholder="0"
                 style={{ width: "50px" }}
+                type="number"
+                step="25"
               />
               {" "}points
             </span>
