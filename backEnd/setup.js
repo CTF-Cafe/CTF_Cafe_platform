@@ -126,5 +126,14 @@ exports.setupDB = async function() {
         });
     }
 
+    const socialLinksConfig = await ctfConfig.findOne({ name: 'socialLinks' });
+
+    if(!socialLinksConfig) {
+        await ctfConfig.create({
+            name: 'socialLinks',
+            value: [{ link: "github.com", icon: "github" }],
+        });
+    }
+
     console.log("Database Setup successfully");
 }

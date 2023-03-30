@@ -54,6 +54,3 @@ services:
       - REACT_APP_BACKEND_URI=http://localhost:3001
       - REACT_APP_CTF_NAME=TEST_CTF
       - GENERATE_SOURCEMAP=false
-      - REACT_APP_DISCORD_URI=<optional>
-      - REACT_APP_GITHUB_URI=<optional>
-      - REACT_APP_TWIITER_URI=<optional>

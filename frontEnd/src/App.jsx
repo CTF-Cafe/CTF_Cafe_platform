@@ -29,14 +29,15 @@ import AppContext from "./components/Data/AppContext";
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [userData, setUserData] = useState(false);
-  const [theme, setTheme] = useState({});
-  const [rules, setRules] = useState([]);
-  const [dynamicScoring, setDynamicScoring] = useState(false);
-  const [categories, setCategories] = useState([]);
+  const [theme, setTheme] = useState(JSON.parse(localStorage.getItem('theme')) || []);
+  const [rules, setRules] = useState(JSON.parse(localStorage.getItem('rules')) || []);
+  const [dynamicScoring, setDynamicScoring] = useState(JSON.parse(localStorage.getItem('dynamicScoring')) || false);
+  const [socialLinks, setSocialLinks] = useState(JSON.parse(localStorage.getItem('socialLinks')) || [])
+  const [categories, setCategories] = useState(JSON.parse(localStorage.getItem('categories')) || []);
   const [loading, setLoading] = useState(true);
-  const [sponsors, setSponsors] = useState([]);
-  const [endTime, setEndTime] = useState(0);
-  const [startTime, setStartTime] = useState(0);
+  const [sponsors, setSponsors] = useState(JSON.parse(localStorage.getItem('sponsors')) || []);
+  const [endTime, setEndTime] = useState(JSON.parse(localStorage.getItem('endTime')) || 0);
+  const [startTime, setStartTime] = useState(JSON.parse(localStorage.getItem('startTime')) || 0);
   const alert = useAlert();
   const [notifications, setNotifications] = useState(
     JSON.parse(localStorage.getItem("notifications")) || []
@@ -50,6 +51,7 @@ function App() {
     rules: rules,
     notifications: notifications,
     dynamicScoring: dynamicScoring,
+    socialLinks: socialLinks,
     categories: categories,
     sponsors: sponsors,
     startTime: startTime,
@@ -75,21 +77,31 @@ function App() {
           response.data.forEach((config) => {
             switch (config.name) {
               case "rules":
+                localStorage.setItem('rules', JSON.stringify(config.value));
                 setRules(config.value);
                 break;
               case "sponsors":
+                localStorage.setItem('sponsors', JSON.stringify(config.value));
                 setSponsors(config.value);
                 break;
               case "dynamicScoring":
+                localStorage.setItem('dynamicScoring', JSON.stringify(config.value));
                 setDynamicScoring(config.value);
                 break;
+              case "socialLinks":
+                localStorage.setItem('socialLinks', JSON.stringify(config.value));
+                setSocialLinks(config.value);
+                break;
               case "categories":
+                localStorage.setItem('categories', JSON.stringify(config.value));
                 setCategories(config.value);
                 break;
               case "startTime":
+                localStorage.setItem('startTime', JSON.stringify(config.value));
                 setStartTime(parseInt(config.value));
                 break;
               case "endTime":
+                localStorage.setItem('endTime', JSON.stringify(config.value));
                 setEndTime(parseInt(config.value));
                 break;
               default:
