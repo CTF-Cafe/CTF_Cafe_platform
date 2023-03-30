@@ -215,21 +215,23 @@ exports.getTeams = async function (req, res) {
 };
 
 exports.getUserTeam = async function (req, res) {
-  if (ObjectId.isValid(req.body.teamId)) {
-    try {
-      const team = await dbController.resolveTeamsFull({
-        _id: ObjectId(req.body.teamId),
-      });
+  try {
+    const team = await dbController.resolveTeamsFull({
+      _id: ObjectId(req.body.teamId),
+    });
 
-      if (team[0]) {
-        res.send(team[0]);
-      } else {
-        res.send({ state: "error" });
+    if (team[0]) {
+      if (!team[0].users.find((x) => x._id.equals(req.session.userId))) {
+        res.send({ state: "error", message: "You are not in this team!" });
       }
-    } catch (err) {
-      console.log(err);
-      res.send({ state: "error" });
+
+      res.send(team[0]);
+    } else {
+      res.send({ state: "error", message: "You are not in any team!" });
     }
+  } catch (err) {
+    console.log(err);
+    res.send({ state: "error" });
   }
 };
 
@@ -287,8 +289,7 @@ exports.getTeam = async function (req, res) {
   });
 
   if (team[0]) {
-
-    if (!team[0].users.find(x => x._id.equals(req.session.userId))) {
+    if (!team[0].users.find((x) => x._id.equals(req.session.userId))) {
       const userToCheck = await users.findById(req.session.userId);
       if (!userToCheck || !userToCheck.isAdmin) {
         // DONT SEND TEAM IF SCOREBOARD HIDDEN AND USER NOT IN TEAM OR ADMIN

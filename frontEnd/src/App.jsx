@@ -174,7 +174,7 @@ function App() {
           withCredentials: true,
         })
         .then((res) => {
-          if (res.data.state == "success") {
+          if (res.data.state === "success") {
             alert.success("Logged In!");
 
             if (res.data.team) {

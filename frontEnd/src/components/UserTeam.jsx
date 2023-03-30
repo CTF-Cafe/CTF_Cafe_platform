@@ -143,14 +143,15 @@ function UserTeam(props) {
         { withCredentials: true }
       )
       .then((response) => {
-        if (response.data.state == "sessionError") {
+        if (response.data.state === "sessionError") {
           globalData.alert.error("Session expired!");
           globalData.setUserData({});
           globalData.setLoggedIn(false);
           globalData.navigate("/", { replace: true });
-        } else if (response.data.state == "success") {
+        } else if (response.data.state === "success") {
           globalData.alert.success("Team registered!");
-          updateUserTeam(response);
+          globalData.userData.teamId = response.data.team._id;
+          getTeam();
         } else {
           globalData.alert.error(response.data.message);
         }
@@ -172,14 +173,15 @@ function UserTeam(props) {
         { withCredentials: true }
       )
       .then((response) => {
-        if (response.data.state == "sessionError") {
+        if (response.data.state === "sessionError") {
           globalData.alert.error("Session expired!");
           globalData.setUserData({});
           globalData.setLoggedIn(false);
           globalData.navigate("/", { replace: true });
-        } else if (response.data.state == "success") {
+        } else if (response.data.state === "success") {
           globalData.alert.success("Team joined!");
-          updateUserTeam(response);
+          globalData.userData.teamId = response.data.team._id;
+          getTeam();
         } else {
           globalData.alert.error(response.data.message);
         }
