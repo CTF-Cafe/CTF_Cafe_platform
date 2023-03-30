@@ -406,8 +406,8 @@ function Challenges(props) {
           <div
             className="row hackerFont"
             key={category}
-            onDrop={drop}
-            onDragOver={allowDrop}
+            // onDrop={drop}
+            // onDragOver={allowDrop}
           >
             <div
               className="col-md-12"
