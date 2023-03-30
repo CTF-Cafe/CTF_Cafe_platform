@@ -131,7 +131,7 @@ exports.setupDB = async function() {
     if(!socialLinksConfig) {
         await ctfConfig.create({
             name: 'socialLinks',
-            value: [{ link: "github.com", icon: "github" }],
+            value: [{ link: "https://github.com", icon: "github" }],
         });
     }
 
