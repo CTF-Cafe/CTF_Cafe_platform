@@ -3,6 +3,17 @@ import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import AppContext from "../Data/AppContext";
 
+function generatePassword(length) {
+  const characters =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@";
+  let password = "";
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    password += characters[randomIndex];
+  }
+  return password;
+}
+
 function Users(props) {
   const globalData = useContext(AppContext);
   const [users, setUsers] = useState([]);
@@ -229,6 +240,38 @@ function Users(props) {
       });
   };
 
+  const changeUserPassword = (e, user) => {
+    axios
+      .post(
+        process.env.REACT_APP_BACKEND_URI + "/api/admin/changeUserPassword",
+        {
+          user: user,
+          password: document.getElementById(user._id + "new_password")
+            .textContent,
+        },
+        { withCredentials: true }
+      )
+      .then((response) => {
+        if (response.data.state === "sessionError") {
+          globalData.alert.error("Session expired!");
+          globalData.setUserData({});
+          globalData.setLoggedIn(false);
+          globalData.navigate("/", { replace: true });
+        } else {
+          if (response.data.state === "success") {
+            globalData.alert.success("User Password Changed!");
+            getUsers(page);
+          } else {
+            globalData.alert.error(response.data.message);
+            getUsers(page);
+          }
+        }
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+  };
+
   const previousPage = () => {
     getUsers(page - 1);
   };
@@ -299,6 +342,7 @@ function Users(props) {
             <th scope="col">Admin</th>
             <th scope="col">SBanned</th>
             <th scope="col">Admin Points</th>
+            {editMode && <th scope="col">Change Password</th>}
             {editMode && <th scope="col">Delete User</th>}
           </tr>
         </thead>
@@ -416,8 +460,32 @@ function Users(props) {
                         <span className="fa-solid fa-floppy-disk"></span>
                       </button>
                     </>
-                  ): user.adminPoints}
+                  ) : (
+                    user.adminPoints
+                  )}
                 </td>
+                {editMode && (
+                  <td>
+                    <span id={user._id + "new_password"} contentEditable={true}>
+                      REDACTED
+                    </span>
+                    <button
+                      className="btn btn-outline-danger btn-shadow"
+                      data-toggle="modal"
+                      data-target="#confirmModal"
+                      onClick={(e) => {
+                        props.setAction({
+                          function: changeUserPassword,
+                          e: e,
+                          data: user,
+                        });
+                      }}
+                      title="Save User Password"
+                    >
+                      <span className="fa-solid fa-floppy-disk"></span>
+                    </button>
+                  </td>
+                )}
                 {editMode && (
                   <td>
                     <button

@@ -12,7 +12,6 @@ function generatePassword(length) {
     }
     return password;
 }
-  
 
 exports.setupDB = async function() {
     const startTimeConfig = await ctfConfig.findOne({ name: 'startTime' });
