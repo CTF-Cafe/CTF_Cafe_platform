@@ -85,41 +85,16 @@ function Index(props) {
                 </Link>
               )}
               <br />
-              {process.env.REACT_APP_DISCORD_URI && (
+              {globalData.socialLinks.map((social) => 
                 <a
-                  href={process.env.REACT_APP_DISCORD_URI}
+                  href={social.link}
                   className="btn btn-outline-danger btn-shadow mr-2 ml-0 ml-sm-1"
                   target="_blank"
+                  rel="noreferrer"
                   style={{ padding: "8px" }}
                 >
                   <span
-                    className="fa-brands fa-discord"
-                    style={{ fontSize: "32px" }}
-                  ></span>
-                </a>
-              )}
-              {process.env.REACT_APP_TWITTER_URI && (
-                <a
-                  href={process.env.REACT_APP_TWITTER_URI}
-                  className="btn btn-outline-danger btn-shadow mr-2 ml-0 ml-sm-1"
-                  target="_blank"
-                  style={{ padding: "8px" }}
-                >
-                  <span
-                    className="fa-brands fa-twitter"
-                    style={{ fontSize: "32px" }}
-                  ></span>
-                </a>
-              )}
-              {process.env.REACT_APP_GITHUB_URI && (
-                <a
-                  href={process.env.REACT_APP_GITHUB_URI}
-                  className="btn btn-outline-danger btn-shadow mr-2 ml-0 ml-sm-1"
-                  target="_blank"
-                  style={{ padding: "8px" }}
-                >
-                  <span
-                    className="fa-brands fa-github"
+                    className={"fa-brands fa-" + social.icon}
                     style={{ fontSize: "32px" }}
                   ></span>
                 </a>
@@ -138,6 +113,7 @@ function Index(props) {
                   {globalData.sponsors.map((sponsor) => {
                     return (
                       <img
+                        alt="sponsor"
                         key={sponsor.image}
                         src={sponsor.image}
                         style={{

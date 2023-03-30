@@ -7,6 +7,7 @@ const configsToShow = [
   "endTime",
   "rules",
   "sponsors",
+  "socialLinks",
   "categories",
   "dynamicScoring",
   "scoreboardHidden",
