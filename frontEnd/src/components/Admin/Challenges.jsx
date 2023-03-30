@@ -9,77 +9,77 @@ function Challenges(props) {
   const [categories, setCategories] = useState(globalData.categories);
   const [assets, setAssets] = useState([]);
 
-  const importChallenges = () => {
-    const file = document.getElementById("jsonImport").files[0];
+  // const importChallenges = () => {
+  //   const file = document.getElementById("jsonImport").files[0];
 
-    const reader = new FileReader();
-    reader.addEventListener("load", async (event) => {
-      const json = JSON.parse(window.atob(event.target.result.split(",")[1]));
+  //   const reader = new FileReader();
+  //   reader.addEventListener("load", async (event) => {
+  //     const json = JSON.parse(window.atob(event.target.result.split(",")[1]));
 
-      let categoriesArray = [...categories];
+  //     let categoriesArray = [...categories];
 
-      json.results.forEach(async (challenge) => {
-        if (!categoriesArray.includes(challenge.category)) {
-          categoriesArray.push(challenge.category);
-        }
+  //     json.results.forEach(async (challenge) => {
+  //       if (!categoriesArray.includes(challenge.category)) {
+  //         categoriesArray.push(challenge.category);
+  //       }
 
-        await axios
-          .post(
-            process.env.REACT_APP_BACKEND_URI + "/api/admin/createChallenge",
-            {
-              category: challenge.category,
-            },
-            { withCredentials: true }
-          )
-          .then((response) => {
-            if (response.data.state == "sessionError") {
-              globalData.alert.error("Session expired!");
-              globalData.setUserData({});
-              globalData.setLoggedIn(false);
-              globalData.navigate("/", { replace: true });
-            } else {
-              if (response.data.state == "success") {
-                globalData.alert.success("Challenge created!");
-              } else {
-                globalData.alert.error(response.data.message);
-              }
-            }
-          })
-          .catch((error) => console.log(error.message));
-      });
+  //       await axios
+  //         .post(
+  //           process.env.REACT_APP_BACKEND_URI + "/api/admin/createChallenge",
+  //           {
+  //             category: challenge.category,
+  //           },
+  //           { withCredentials: true }
+  //         )
+  //         .then((response) => {
+  //           if (response.data.state == "sessionError") {
+  //             globalData.alert.error("Session expired!");
+  //             globalData.setUserData({});
+  //             globalData.setLoggedIn(false);
+  //             globalData.navigate("/", { replace: true });
+  //           } else {
+  //             if (response.data.state == "success") {
+  //               globalData.alert.success("Challenge created!");
+  //             } else {
+  //               globalData.alert.error(response.data.message);
+  //             }
+  //           }
+  //         })
+  //         .catch((error) => console.log(error.message));
+  //     });
 
-      await axios
-        .post(
-          process.env.REACT_APP_BACKEND_URI + "/api/admin/saveConfigs",
-          {
-            newConfigs: [
-              { name: "categories", value: JSON.stringify(categoriesArray) },
-            ],
-          },
-          { withCredentials: true }
-        )
-        .then((response) => {
-          if (response.data.state == "sessionError") {
-            globalData.alert.error("Session expired!");
-            globalData.setUserData({});
-            globalData.setLoggedIn(false);
-            globalData.navigate("/", { replace: true });
-          } else {
-            if (response.data.state == "success") {
-              globalData.alert.success("Updated config!");
-            } else {
-              globalData.alert.error(response.data.message);
-            }
-          }
-        })
-        .catch((err) => {
-          console.log(err.message);
-        });
+  //     await axios
+  //       .post(
+  //         process.env.REACT_APP_BACKEND_URI + "/api/admin/saveConfigs",
+  //         {
+  //           newConfigs: [
+  //             { name: "categories", value: JSON.stringify(categoriesArray) },
+  //           ],
+  //         },
+  //         { withCredentials: true }
+  //       )
+  //       .then((response) => {
+  //         if (response.data.state == "sessionError") {
+  //           globalData.alert.error("Session expired!");
+  //           globalData.setUserData({});
+  //           globalData.setLoggedIn(false);
+  //           globalData.navigate("/", { replace: true });
+  //         } else {
+  //           if (response.data.state == "success") {
+  //             globalData.alert.success("Updated config!");
+  //           } else {
+  //             globalData.alert.error(response.data.message);
+  //           }
+  //         }
+  //       })
+  //       .catch((err) => {
+  //         console.log(err.message);
+  //       });
 
-      getChallenges();
-    });
-    reader.readAsDataURL(file);
-  };
+  //     getChallenges();
+  //   });
+  //   reader.readAsDataURL(file);
+  // };
 
   const getChallenges = () => {
     axios
@@ -185,7 +185,9 @@ function Challenges(props) {
     let hints = [];
     let i = 0;
     while (document.getElementById(i + "hintId" + oldChallenge._id)) {
-      const id = document.getElementById(i + "hintId" + oldChallenge._id).textContent;
+      const id = document.getElementById(
+        i + "hintId" + oldChallenge._id
+      ).textContent;
       const content = document.getElementById(
         i + "hintContent" + oldChallenge._id
       ).textContent;
@@ -239,7 +241,10 @@ function Challenges(props) {
       .post(
         process.env.REACT_APP_BACKEND_URI + "/api/admin/saveChallenge",
         formData,
-        { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true },
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+          withCredentials: true,
+        }
       )
       .then((response) => {
         if (response.data.state == "sessionError") {
@@ -436,6 +441,7 @@ function Challenges(props) {
                     challenges={challenges}
                     setAction={setAction}
                     dynamicScoring={globalData.dynamicScoring}
+                    categoryColors={globalData.categoryColors}
                   />
                 );
               }
@@ -444,37 +450,21 @@ function Challenges(props) {
         );
       })}
       <div className="row hackerFont justify-content-center mt-5">
-        <div className="col-md-12">
+        {/* <div className="col-md-12">
           <button onClick={importChallenges} className="btn btn-outline-danger">
             Import JSON
           </button>
           <br />
           <input type="file" id="jsonImport" />
-        </div>
+        </div> */}
         <div className="col-md-12">
           <br />
           Challenge Types:
-          <span className="p-1" style={{ backgroundColor: "#ef121b94" }}>
-            Web
-          </span>
-          <span className="p-1" style={{ backgroundColor: "#b017a494" }}>
-            Osint
-          </span>
-          <span className="p-1" style={{ backgroundColor: "#17b06b94" }}>
-            Reverse
-          </span>
-          <span className="p-1" style={{ backgroundColor: "#36a2eb94" }}>
-            Pwning
-          </span>
-          <span className="p-1" style={{ backgroundColor: "#0f329894" }}>
-            Forensics
-          </span>
-          <span className="p-1" style={{ backgroundColor: "#9966FF94" }}>
-            Cryptography
-          </span>
-          <span className="p-1" style={{ backgroundColor: "#ffce5694" }}>
-            Misc
-          </span>
+          {globalData.categoryColors.map((category) => (
+            <span className="p-1" style={{ backgroundColor: category.color }}>
+              {category.name}
+            </span>
+          ))}
         </div>
       </div>
     </div>

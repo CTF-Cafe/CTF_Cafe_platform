@@ -31,21 +31,12 @@ function ChallengeCard(props) {
         style={{ maxWidth: "100%" }}
       >
         <div
-          className={
-            challenge.category.toLowerCase() === "crypto"
-              ? "card category_crypt"
-              : challenge.category.toLowerCase() === "web"
-              ? "card category_web"
-              : challenge.category.toLowerCase() === "osint"
-              ? "card category_osint"
-              : challenge.category.toLowerCase() === "reverse"
-              ? "card category_reverse"
-              : challenge.category.toLowerCase() === "pwn"
-              ? "card category_pwning"
-              : challenge.category.toLowerCase() === "forensics"
-              ? "card category_forensics"
-              : "card category_misc"
-          }
+          className="card"
+          style={{
+            borderTop:
+              "4px solid " +
+              props.categoryColors.find((x) => x.name === challenge.category).color,
+          }}
           id={"challenge" + challenge._id}
         >
           <div
@@ -506,13 +497,15 @@ function ChallengeCard(props) {
                     id={"requirement" + challenge._id}
                   >
                     <option value="">None</option>
-                    {props.challenges.filter(x => x._id !== challenge._id).map((challenge) => {
-                      return (
-                        <option value={challenge._id} key={challenge.name}>
-                          {challenge.name}
-                        </option>
-                      );
-                    })}
+                    {props.challenges
+                      .filter((x) => x._id !== challenge._id)
+                      .map((challenge) => {
+                        return (
+                          <option value={challenge._id} key={challenge.name}>
+                            {challenge.name}
+                          </option>
+                        );
+                      })}
                   </select>
                 </div>
 

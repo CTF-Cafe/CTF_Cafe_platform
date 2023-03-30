@@ -9,6 +9,7 @@ const configsToShow = [
   "sponsors",
   "socialLinks",
   "categories",
+  "categoryColors",
   "dynamicScoring",
   "scoreboardHidden",
   "dockerLimit",
