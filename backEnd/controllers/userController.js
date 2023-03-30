@@ -35,7 +35,7 @@ exports.login = async function (req, res) {
           message: "Logged In",
         });
 
-        res.send({ state: "success", message: "Logged In", user: user });
+        res.send({ state: "success", message: "Logged In" });
       } else {
         logController.createLog(req, user, {
           state: "error",
@@ -163,7 +163,10 @@ exports.register = async function (req, res) {
             message: "Registered! Now verify email!",
           });
         } else {
-          res.send({ state: "success", message: "Registered" });
+          req.session.userId = user._id.toString();
+          req.session.key = newKey.toString();
+
+          res.send({ state: "success", message: "Registered", verified: true });
         }
       })
       .catch(function (err) {
