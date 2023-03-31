@@ -83,7 +83,6 @@ const sendEmail = async (email, subject, text) => {
 
 exports.register = async function (req, res) {
   try {
-    // VERIFY DATA PHASE START
     if (
       req.body.username_old.trim() != req.body.username.trim() ||
       req.body.password_old.trim() != req.body.password.trim()
@@ -141,14 +140,10 @@ exports.register = async function (req, res) {
     //     throw new Error('Change the default admins password first!');
     // }
 
-    // VERIFY DATA PHASE END
-
-    // MANIPULATE DATA PHASE START
-
     // Create new User
     const newKey = v4();
 
-    const user = await users
+    await users
       .create({
         username: username,
         password: password,
@@ -177,21 +172,6 @@ exports.register = async function (req, res) {
       .catch(function (err) {
         throw new Error("User creation failed!");
       });
-
-    // MANIPULATE DATA PHASE END
-
-    // RESPONSE PHASE START
-    if (process.env.MAIL_VERIFICATION == "true") {
-      const message = `Verify your email : ${process.env.BACKEND_URI}/api/verify/${user._id}/${user.token}`;
-      await sendEmail(user.email, "Verify Email CTF", message);
-
-      res.send({
-        state: "success",
-        message: "Registered! Now verify email!",
-      });
-    } else {
-      res.send({ state: "success", message: "Registered" });
-    }
 
   } catch (err) {
     if (err) {
