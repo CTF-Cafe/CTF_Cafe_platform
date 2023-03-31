@@ -7,6 +7,12 @@ const teams = require("../models/teamModel.js");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 
+if (process.env.NODE_ENV === "plugins") {
+  router.post("/pluginTest", (req, res) => {
+    apiController.user.pluginTest(req, res)
+  });
+}
+
 router.post("/login", (req, res) => {
   userController.login(req, res);
 });
