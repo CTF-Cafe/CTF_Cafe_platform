@@ -105,6 +105,8 @@ function customSanitize(req, res, next) {
   next();
 }
 
+app.use(customSanitize);
+
 function checkAuth(req, res, next) {
   users.findById(req.session.userId).then(function (user) {
     if (!user) {
@@ -134,8 +136,8 @@ function checkAdminAuth(req, res, next) {
   });
 }
 
-app.use("/api", customSanitize, globalRouter);
-app.use("/api/user", checkAuth, customSanitize, userRouter);
+app.use("/api", globalRouter);
+app.use("/api/user", checkAuth, userRouter);
 app.use("/api/admin", checkAdminAuth, adminRouter);
 
 app.use("/api/assets", express.static("./assets"));
