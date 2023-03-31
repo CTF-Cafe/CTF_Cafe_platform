@@ -16,16 +16,7 @@ router.get("/logout", (req, res) => {
 });
 
 router.post("/register", (req, res) => {
-  try {
-    [req, res] = userController.register.verify(req, res); // VERIFY DATA PHASE
-    [req, res] = userController.register.manipulate(req, res); // MANIPULATE DATA PHASE
-    [req, res] = userController.register.respond(req, res); // RESPOND PHASE
-    res.send(res.message);
-  } catch (err) {
-    if (err) {
-      res.send({ state: "error", message: err.message });
-    }
-  }
+  userController.register(req, res);
 });
 
 router.get("/verify/:id/:token", async (req, res) => {
