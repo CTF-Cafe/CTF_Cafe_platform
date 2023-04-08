@@ -1,6 +1,6 @@
 exports.init = async function (api) {
   // set endpoint entry
-  api._user.pluginTest.setEntrypoint(entrypoint);
+  api.user.pluginTest.setEntrypoint(entrypoint);
 }
 
 async function entrypoint(req, res) {
