@@ -18,8 +18,8 @@ async function registerPlugins(dirPath) {
 
     // Register Routes on API
     if (stats.isDirectory()) {
-      const init = require(`${dirPath}/${item}/init.js`);
-      init(api);
+      const plugin = require(`${dirPath}/${item}/init.js`);
+      plugin.init(api);
     }
   }
 }
@@ -29,4 +29,4 @@ async function init() {
   await registerPlugins(dirPath);
 }
 
-init();
+module.exports = init;

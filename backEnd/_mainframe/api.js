@@ -16,6 +16,7 @@ method : HTTP Method used for the router (i.e GET or POST)
 function addRoute(name, verify, manipulate, respond, method) {
   if (this[name]) throw new Error(`Route ${name} already exists!`);
   this[name] = {
+    path: this.path + name,
     entry(req, res) {
       [req, res] = this.verify(req, res);
       [req, res] = this.manipulate(req, res);
@@ -37,7 +38,12 @@ function addSection(name) {
   this[name] = {
     // ADD a Route to Section
     addRoute: addRoute,
+
+    // ADD a Section to Section
     addSection: addSection,
+
+    // Section path
+    path: this.path + name + "/"
   };
 }
 
@@ -47,6 +53,9 @@ const api = {
 
   // ADD a Section to Root
   addSection: addSection,
+
+  // root path
+  path: "/"
 };
 
 /* NOTES
