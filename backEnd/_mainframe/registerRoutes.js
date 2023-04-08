@@ -35,25 +35,17 @@ async function recursiveRegisterRoutes(dirPath, scope) {
       );
 
       // Register to router
-      if (route.method == "POST") {
-        router.post(scope[item.slice(0, -3)].path, async (req, res) => {
+      router[route.method.toLowerCase()](
+        scope[item.slice(0, -3)].path,
+        async (req, res) => {
           try {
             await scope[item.slice(0, -3)].entry(req, res);
           } catch (e) {
             res.message = { state: "error", msg: e.message };
           }
           res.send(res.message);
-        });
-      } else if (route.method == "GET") {
-        router.get(scope[item.slice(0, -3)].path, async (req, res) => {
-          try {
-            await scope[item.slice(0, -3)].entry(req, res);
-          } catch (e) {
-            res.message = { state: "error", msg: e.message };
-          }
-          res.send(res.message);
-        });
-      }
+        }
+      );
     } else if (stats.isDirectory()) {
       // Register Routes inside section
       scope.addSection(item);
@@ -63,7 +55,7 @@ async function recursiveRegisterRoutes(dirPath, scope) {
 }
 
 async function init(app) {
-  const dirPath = path.join(__dirname, "../_sections");
+  const dirPath = path.join(__dirname, "../_routes");
   await recursiveRegisterRoutes(dirPath, api, app);
   return router;
 }

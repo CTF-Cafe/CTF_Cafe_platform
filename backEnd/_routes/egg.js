@@ -1,6 +1,6 @@
 /*
-ROUTE : /user/pluginTest
-FUNCTION : TEST PLUGINS
+ROUTE : GET /egg
+FUNCTION : TEST ROOT ROUTES
 AUTHOR : Raxo
 */
 
