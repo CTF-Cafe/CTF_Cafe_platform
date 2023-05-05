@@ -11,6 +11,7 @@ function Register(props) {
     const password = document.getElementById("password").value;
     const confirm_password = document.getElementById("confirm_password").value;
     const email = document.getElementById("email").value;
+    const userCategory = document.getElementById("userCategory").value;
 
     if (password !== confirm_password) {
       globalData.alert.error("Passwords don't match!");
@@ -22,6 +23,7 @@ function Register(props) {
             username: username,
             password: password,
             email: email,
+            userCategory: userCategory,
           },
           { withCredentials: true }
         )
@@ -139,6 +141,16 @@ function Register(props) {
                       Make sure nobody's behind you
                     </small>
                   </div>
+                  {globalData.userCategories.length > 0 && (
+                    <div className="form-group">
+                      <label>Category : </label>
+                      <select id="userCategory" className="form-control">
+                        {globalData.userCategories.map((c) => (
+                          <option key={c} value={c}>{c.toUpperCase()}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

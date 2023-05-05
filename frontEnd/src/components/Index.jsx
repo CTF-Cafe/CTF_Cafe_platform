@@ -92,6 +92,7 @@ function Index(props) {
                   target="_blank"
                   rel="noreferrer"
                   style={{ padding: "8px" }}
+                  key={social.link}
                 >
                   <span
                     className={"fa-brands fa-" + social.icon}

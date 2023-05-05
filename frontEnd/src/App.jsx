@@ -29,18 +29,39 @@ import AppContext from "./components/Data/AppContext";
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [userData, setUserData] = useState(false);
-  const [theme, setTheme] = useState(JSON.parse(localStorage.getItem('theme')) || []);
-  const [rules, setRules] = useState(JSON.parse(localStorage.getItem('rules')) || []);
-  const [dynamicScoring, setDynamicScoring] = useState(JSON.parse(localStorage.getItem('dynamicScoring')) || false);
-  const [socialLinks, setSocialLinks] = useState(JSON.parse(localStorage.getItem('socialLinks')) || [])
-  const [categories, setCategories] = useState(JSON.parse(localStorage.getItem('categories')) || []);
-  const [categoryColors, setCategoryColors] = useState(JSON.parse(localStorage.getItem('categoryColors')) || []);
-  const [sponsors, setSponsors] = useState(JSON.parse(localStorage.getItem('sponsors')) || []);
-  const [endTime, setEndTime] = useState(JSON.parse(localStorage.getItem('endTime')) || 0);
-  const [startTime, setStartTime] = useState(JSON.parse(localStorage.getItem('startTime')) || 0);
+  const [theme, setTheme] = useState(
+    JSON.parse(localStorage.getItem("theme")) || []
+  );
+  const [rules, setRules] = useState(
+    JSON.parse(localStorage.getItem("rules")) || []
+  );
+  const [dynamicScoring, setDynamicScoring] = useState(
+    JSON.parse(localStorage.getItem("dynamicScoring")) || false
+  );
+  const [socialLinks, setSocialLinks] = useState(
+    JSON.parse(localStorage.getItem("socialLinks")) || []
+  );
+  const [categories, setCategories] = useState(
+    JSON.parse(localStorage.getItem("categories")) || []
+  );
+  const [categoryColors, setCategoryColors] = useState(
+    JSON.parse(localStorage.getItem("categoryColors")) || []
+  );
+  const [sponsors, setSponsors] = useState(
+    JSON.parse(localStorage.getItem("sponsors")) || []
+  );
+  const [endTime, setEndTime] = useState(
+    JSON.parse(localStorage.getItem("endTime")) || 0
+  );
+  const [startTime, setStartTime] = useState(
+    JSON.parse(localStorage.getItem("startTime")) || 0
+  );
   const alert = useAlert();
   const [notifications, setNotifications] = useState(
     JSON.parse(localStorage.getItem("notifications")) || []
+  );
+  const [userCategories, setUserCategories] = useState(
+    JSON.parse(localStorage.getItem("userCategories")) || []
   );
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -58,6 +79,7 @@ function App() {
     sponsors: sponsors,
     startTime: startTime,
     endTime: endTime,
+    userCategories: userCategories,
     setNotifications,
     setTheme,
     setLoggedIn,
@@ -79,36 +101,52 @@ function App() {
           response.data.forEach((config) => {
             switch (config.name) {
               case "rules":
-                localStorage.setItem('rules', JSON.stringify(config.value));
+                localStorage.setItem("rules", JSON.stringify(config.value));
                 setRules(config.value);
                 break;
               case "sponsors":
-                localStorage.setItem('sponsors', JSON.stringify(config.value));
+                localStorage.setItem("sponsors", JSON.stringify(config.value));
                 setSponsors(config.value);
                 break;
               case "dynamicScoring":
-                localStorage.setItem('dynamicScoring', JSON.stringify(config.value));
+                localStorage.setItem(
+                  "dynamicScoring",
+                  JSON.stringify(config.value)
+                );
                 setDynamicScoring(config.value);
                 break;
               case "socialLinks":
-                localStorage.setItem('socialLinks', JSON.stringify(config.value));
+                localStorage.setItem(
+                  "socialLinks",
+                  JSON.stringify(config.value)
+                );
                 setSocialLinks(config.value);
                 break;
               case "categories":
-                localStorage.setItem('categories', JSON.stringify(config.value));
+                localStorage.setItem(
+                  "categories",
+                  JSON.stringify(config.value)
+                );
                 setCategories(config.value);
                 break;
               case "categoryColors":
-                localStorage.setItem('categoryColors', JSON.stringify(config.value));
+                localStorage.setItem(
+                  "categoryColors",
+                  JSON.stringify(config.value)
+                );
                 setCategoryColors(config.value);
                 break;
               case "startTime":
-                localStorage.setItem('startTime', JSON.stringify(config.value));
+                localStorage.setItem("startTime", JSON.stringify(config.value));
                 setStartTime(parseInt(config.value));
                 break;
               case "endTime":
-                localStorage.setItem('endTime', JSON.stringify(config.value));
+                localStorage.setItem("endTime", JSON.stringify(config.value));
                 setEndTime(parseInt(config.value));
+                break;
+              case "userCategories":
+                localStorage.setItem("userCategories", JSON.stringify(config.value));
+                setUserCategories(config.value);
                 break;
               default:
                 break;

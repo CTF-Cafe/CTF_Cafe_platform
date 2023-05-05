@@ -31,9 +31,9 @@ function Navbar() {
                   <h3 className="bold" style={{ margin: 0 }}>
                     {process.env.REACT_APP_CTF_NAME.split("_").map((text, i) =>
                       i % 2 ? (
-                        <span className="color_white">{text}</span>
+                        <span className="color_white" key={text}>{text}</span>
                       ) : (
-                        <span className="color_danger">{text}</span>
+                        <span className="color_danger" key={text}>{text}</span>
                       )
                     )}
                   </h3>
@@ -120,6 +120,7 @@ function Navbar() {
                       {globalData.notifications.map((notification) => {
                         return (
                           <div
+                            key={notification.message}
                             className="card-header text-light"
                             style={{
                               display: "flex",

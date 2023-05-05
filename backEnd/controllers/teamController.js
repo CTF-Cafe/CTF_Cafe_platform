@@ -4,6 +4,7 @@ const { v4 } = require("uuid");
 const ObjectId = require("mongoose").Types.ObjectId;
 const dbController = require("./dbController");
 const ctfConfig = require("../models/ctfConfigModel");
+const { isValidObjectId } = require("mongoose");
 
 exports.register = async function (req, res) {
   const teamName = req.body.teamName.trim();
@@ -30,6 +31,7 @@ exports.register = async function (req, res) {
             name: teamName,
             inviteCode: v4(),
             teamCaptain: userToCheck._id,
+            category: userToCheck.category,
             users: [
               {
                 _id: userToCheck._id,
@@ -107,43 +109,45 @@ exports.joinTeam = async function (req, res) {
 
     if (!userTeamExists) {
       if (teamCodeExists.users.length < 4) {
-        await teams
-          .findOneAndUpdate(
-            { inviteCode: teamCode },
-            {
-              $push: {
-                users: {
-                  _id: userToCheck._id,
-                  username: userToCheck.username,
-                  score: userToCheck.score,
-                  solved: userToCheck.solved,
-                  hintsBought: userToCheck.hintsBought,
-                  shadowBanned: userToCheck.shadowBanned,
-                  adminPoints: userToCheck.adminPoints,
+        if (teamCodeExists.category === userToCheck.category) {
+          await teams
+            .findOneAndUpdate(
+              { inviteCode: teamCode },
+              {
+                $push: {
+                  users: {
+                    _id: userToCheck._id,
+                    username: userToCheck.username,
+                    score: userToCheck.score,
+                    solved: userToCheck.solved,
+                    hintsBought: userToCheck.hintsBought,
+                    shadowBanned: userToCheck.shadowBanned,
+                    adminPoints: userToCheck.adminPoints,
+                  },
                 },
               },
-            },
-            { returnOriginal: false }
-          )
-          .then(async function (team) {
-            await users
-              .findOneAndUpdate(
-                { _id: req.session.userId, verified: true },
-                { teamId: team.id },
-                { returnOriginal: false }
-              )
-              .then(async function (user) {
-                res.send({
-                  state: "success",
-                  message: "Joined team!",
-                  user: user,
-                  team: team,
+              { returnOriginal: false }
+            )
+            .then(async function (team) {
+              await users
+                .findOneAndUpdate(
+                  { _id: req.session.userId, verified: true },
+                  { teamId: team.id },
+                  { returnOriginal: false }
+                )
+                .then(async function (user) {
+                  res.send({
+                    state: "success",
+                    message: "Joined team!",
+                    user: user,
+                    team: team,
+                  });
                 });
-              });
-          })
-          .catch((error) => {
-            res.send({ state: "error", message: error.messsage });
-          });
+            })
+            .catch((error) => {
+              res.send({ state: "error", message: error.messsage });
+            });
+        }
       } else {
         res.send({ state: "error", message: "Team is full!" });
       }
@@ -158,6 +162,7 @@ exports.joinTeam = async function (req, res) {
 exports.getTeams = async function (req, res) {
   let page = req.body.page;
   let search = req.body.search;
+  let userCategory = req.body.category;
 
   if (page <= 0) {
     res.send({ state: "error", message: "Page cannot be less than 1!" });
@@ -174,6 +179,11 @@ exports.getTeams = async function (req, res) {
       }
     }
 
+    const userCategories = (await ctfConfig.findOne({ name: "userCategories" })).value;
+
+    if(userCategory && !userCategories.find(x => x === userCategory))
+      throw new Error("User Category does not exist!");
+
     let teamCount = await teams.count();
     if ((page - 1) * 100 > teamCount) {
       res.send({ state: "error", message: "No more pages!" });
@@ -186,6 +196,7 @@ exports.getTeams = async function (req, res) {
       try {
         allTeams = await dbController
           .resolveTeamsMin({
+            category: userCategory ? userCategory : { $exists: true },
             name: new RegExp(search, "i"),
             $or: [
               {
@@ -216,8 +227,12 @@ exports.getTeams = async function (req, res) {
 
 exports.getUserTeam = async function (req, res) {
   try {
+    if (!req.body.teamId || !isValidObjectId(req.body.teamId)) {
+      res.send({ state: "error", message: "teamId is a required parameter!" });
+    }
+
     const team = await dbController.resolveTeamsFull({
-      _id: ObjectId(req.body.teamId),
+      _id: new ObjectId(req.body.teamId),
     });
 
     if (team[0]) {

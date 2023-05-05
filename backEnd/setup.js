@@ -176,5 +176,14 @@ exports.setupDB = async function () {
     });
   }
 
+  const userCategoriesConfig = await ctfConfig.findOne({ name: "userCategories" });
+
+  if (!userCategoriesConfig) {
+    await ctfConfig.create({
+      name: "userCategories",
+      value: ["Student", "Other"],
+    });
+  }
+
   console.log("Database Setup successfully");
 };

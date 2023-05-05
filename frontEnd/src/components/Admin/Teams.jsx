@@ -143,6 +143,7 @@ function Teams(props) {
             </th>
             <th scope="col">Team Name</th>
             <th scope="col">Team Users</th>
+            <th scope="col">Team Category</th>
             {editMode && <th scope="col">Delete Team</th>}
           </tr>
         </thead>
@@ -164,6 +165,9 @@ function Teams(props) {
                   {team.users.map((user) => {
                     return <p key={user.username}>{user.username}</p>;
                   })}
+                </td>
+                <td>
+                  {team.category}
                 </td>
                 {editMode && (
                   <td>
