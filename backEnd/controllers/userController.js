@@ -95,6 +95,7 @@ exports.register = async function (req, res) {
     const password = await encryptionController.encrypt(
       req.body.password.trim()
     );
+    const userCategory = req.body.userCategory.trim();
 
     // const startTime = await ctfConfig.findOne({ name: "startTime" });
 
@@ -102,6 +103,11 @@ exports.register = async function (req, res) {
     // if (parseInt(startTime.value) - (Math.floor((new Date()).getTime() / 1000)) <= 0) {
     //     throw new Error('Registrations are closed!');
     // }
+
+    const userCategories = (await ctfConfig.findOne({ name: "userCategories" })).value;
+
+    if(!userCategories.find(x => x === userCategory))
+      throw new Error("User Category does not exist!");
 
     // Username to short
     if (username.length < 4)
@@ -148,6 +154,7 @@ exports.register = async function (req, res) {
         username: username,
         password: password,
         email: email,
+        category: userCategory,
         key: newKey.toString(),
         isAdmin: false,
         verified: process.env.MAIL_VERIFICATION == "true" ? false : true,
@@ -298,6 +305,7 @@ exports.updateUsername = async function (req, res) {
 exports.getUsers = async function (req, res) {
   let page = req.body.page;
   let search = req.body.search;
+  let userCategory = req.body.category;
 
   if (page <= 0) {
     res.send({ state: "error", message: "Page cannot be less than 1!" });
@@ -314,6 +322,11 @@ exports.getUsers = async function (req, res) {
       }
     }
 
+    const userCategories = (await ctfConfig.findOne({ name: "userCategories" })).value;
+
+    if(userCategory && !userCategories.find(x => x === userCategory))
+      throw new Error("User Category does not exist!");
+
     let userCount = await users.count();
     if ((page - 1) * 100 > userCount) {
       res.send({ state: "error", message: "No more pages!" });
@@ -326,6 +339,7 @@ exports.getUsers = async function (req, res) {
       try {
         allUsers = await dbController
           .resolveUsers({
+            category: userCategory ? userCategory : { $exists: true },
             username: new RegExp(search, "i"),
             verified: true,
             $or: [{ _id: req.session.userId }, { shadowBanned: false }],

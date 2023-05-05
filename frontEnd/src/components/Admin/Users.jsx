@@ -338,6 +338,7 @@ function Users(props) {
               #
             </th>
             <th scope="col">Username</th>
+            <th scope="col">Category</th>
             <th scope="col">Verified</th>
             <th scope="col">Admin</th>
             <th scope="col">SBanned</th>
@@ -360,6 +361,7 @@ function Users(props) {
                     </a>
                   </Link>
                 </td>
+                <td>{user.category}</td>
                 <td>{user.verified.toString()}</td>
                 <td>
                   {user.isAdmin.toString()}{" "}

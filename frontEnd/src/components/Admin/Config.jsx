@@ -13,6 +13,7 @@ const configsToShow = [
   "dynamicScoring",
   "scoreboardHidden",
   "dockerLimit",
+  "userCategories"
 ];
 
 function ArrayEdit(props) {

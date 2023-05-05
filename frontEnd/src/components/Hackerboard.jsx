@@ -20,6 +20,7 @@ function Hackerboard(props) {
   const [searchQuery, setSearchQuery] = useState("");
   const [endTime, setEndTime] = useState(2651526762);
   const [teamCount, setTeamCount] = useState(0);
+  const [category, setCategory] = useState(null);
 
   useEffect(() => {
     selectionMain === "Teams" ? getTeams(page) : getUsers(page);
@@ -61,6 +62,7 @@ function Hackerboard(props) {
         {
           page: index,
           search: searchQuery,
+          category: category
         },
         { withCredentials: true }
       )
@@ -89,6 +91,7 @@ function Hackerboard(props) {
         {
           page: index,
           search: searchQuery,
+          category: category
         },
         { withCredentials: true }
       )
@@ -114,7 +117,7 @@ function Hackerboard(props) {
 
   useEffect(() => {
     getData(1);
-  }, []);
+  }, [category]);
 
   const sortData = () => {
     setUsers(users.reverse());
@@ -248,13 +251,13 @@ function Hackerboard(props) {
       <Navbar />
 
       {/* Hidden Stuff */}
-      <img
+      {/* <img
         style={{ display: "none" }}
         src={process.env.REACT_APP_BACKEND_URI + "/api/assets/template.jpg"}
         crossorigin="anonymous"
         id="certImg"
       />
-      <canvas id="canvas" hidden />
+      <canvas id="canvas" hidden /> */}
 
       <div
         className="jumbotron bg-transparent mb-0 pt-3 radius-0"
@@ -269,7 +272,7 @@ function Hackerboard(props) {
               <p className="text-grey lead text-spacey text-center hackerFont">
                 Where the world 's greatest get ranked!
               </p>
-              {globalData.loggedIn &&
+              {/* {globalData.loggedIn &&
                 new Date().getTime() > endTime &&
                 globalData.userData.team && (
                   <div style={{ textAlign: "center" }}>
@@ -283,11 +286,32 @@ function Hackerboard(props) {
                       Download Certificate
                     </button>
                   </div>
-                )}
+                )} */}
             </div>
           </div>
           <div className="row mt-5  justify-content-center">
             <div className="col-xl-10">
+              <div style={{ marginBottom: "25px" }}>
+                <button
+                  className="btn btn-outline-danger btn-shadow"
+                  onClick={() => {
+                    setCategory(null);
+                  }}
+                >
+                  Global
+                </button>
+                {globalData.userCategories.map((c) => (
+                  <button
+                    key={c}
+                    className="btn btn-outline-danger btn-shadow"
+                    onClick={() => {
+                      setCategory(c);
+                    }}
+                  >
+                    {c}
+                  </button>
+                ))}
+              </div>
               <div style={{ marginBottom: "25px" }}>
                 <LineChart
                   startTime={globalData.startTime}
@@ -308,7 +332,9 @@ function Hackerboard(props) {
                   onClick={() => {
                     changeSelection("main");
                   }}
-                  title={selectionMain === "Users" ? "View Teams" : "View Users"}
+                  title={
+                    selectionMain === "Users" ? "View Teams" : "View Users"
+                  }
                 >
                   {selectionMain === "Users" ? (
                     <span className="fa-solid fa-users" />

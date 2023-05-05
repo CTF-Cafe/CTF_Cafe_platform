@@ -345,13 +345,21 @@ exports.submitFlag = async function (req, res) {
       }
     } else {
       // Make sure Regex tests the whole string
-      challenge.flag =
-        challenge.flag[0] != "^" ? "^" + challenge.flag : challenge.flag;
-      challenge.flag =
-        challenge.flag[-1] != "$" ? challenge.flag + "$" : challenge.flag;
+      // challenge.flag =
+      //   challenge.flag[0] != "^" ? "^" + challenge.flag : challenge.flag;
+      // challenge.flag =
+      //   challenge.flag[-1] != "$" ? challenge.flag + "$" : challenge.flag;
 
       // check flag
-      if (!new RegExp(challenge.flag).test(flag)) {
+      // if (!new RegExp(challenge.flag).test(flag)) {
+      //   logController.createLog(req, user, {
+      //     state: "error",
+      //     message: "Wrong Flag :( " + flag,
+      //   });
+      //   throw new Error("Wrong Flag :(");
+      // }
+
+      if (!(challenge.flag === flag)) {
         logController.createLog(req, user, {
           state: "error",
           message: "Wrong Flag :( " + flag,

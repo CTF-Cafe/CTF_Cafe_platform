@@ -67,6 +67,7 @@ exports.resolveTeamsFull = function (match) {
         username: { $first: "$users.username" },
         name: { $first: "$name" },
         teamCaptain: { $first: "$teamCaptain" },
+        category: { $first: "$category" },
       },
     },
     {
@@ -160,6 +161,7 @@ exports.resolveTeamsFull = function (match) {
         username: { $first: "$users.username" },
         name: { $first: "$name" },
         teamCaptain: { $first: "$teamCaptain" },
+        category: { $first: "$category" },
       },
     },
     {
@@ -177,6 +179,7 @@ exports.resolveTeamsFull = function (match) {
         },
         name: { $first: "$name" },
         teamCaptain: { $first: "$teamCaptain" },
+        category: { $first: "$category" },
       },
     },
   ]);
@@ -213,6 +216,7 @@ exports.resolveTeamsMin = function (match) {
         solved: { $push: "$users.solved" },
         name: { $first: "$name" },
         teamCaptain: { $first: "$teamCaptain" },
+        category: { $first: "$category" },
       },
     },
     {
@@ -236,6 +240,7 @@ exports.resolveTeamsMin = function (match) {
         hintsBought: { $push: "$users.hintsBought" },
         name: { $first: "$name" },
         teamCaptain: { $first: "$teamCaptain" },
+        category: { $first: "$category" },
       },
     },
     {
@@ -255,6 +260,7 @@ exports.resolveTeamsMin = function (match) {
         adminPoints: { $sum: "$users.adminPoints" },
         name: { $first: "$name" },
         teamCaptain: { $first: "$teamCaptain" },
+        category: { $first: "$category" },
       },
     },
     {
@@ -321,6 +327,7 @@ exports.resolveTeamsMin = function (match) {
         name: { $first: "$name" },
         hintsBought: { $first: "$hintsBought" },
         adminPoints: { $first: "$adminPoints" },
+        category: { $first: "$category" },
       },
     },
     {
@@ -399,6 +406,7 @@ exports.resolveTeamsMin = function (match) {
         hintsCost: { $sum: "$hintsBought.cost" },
         adminPoints: { $first: "$adminPoints" },
         maxTimestamp: { $first: "$maxTimestamp" },
+        category: { $first: "$category" },
       },
     },
     {
@@ -475,6 +483,7 @@ exports.resolveUsers = function (match) {
         score: { $sum: "$solved.points" },
         solved: { $push: "$solved" },
         maxTimestamp: { $max: "$solved.timestamp" },
+        category: { $first: "$category" },
       },
     },
     {
@@ -550,6 +559,7 @@ exports.resolveUsers = function (match) {
         hintsBought: { $push: "$hintsBought" },
         adminPoints: { $first: "$adminPoints" },
         maxTimestamp: { $first: "$maxTimestamp" },
+        category: { $first: "$category" },
       },
     },
     {
