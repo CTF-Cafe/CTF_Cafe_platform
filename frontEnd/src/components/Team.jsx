@@ -63,12 +63,12 @@ function Team(props) {
                 return (
                   obj.name ===
                   (solve.level === 3
-                    ? "Ninja"
+                    ? "Hardcore"
                     : solve.level === 2
-                    ? "Hard"
-                    : solve.level === 1
                     ? "Medium"
-                    : "Easy")
+                    : solve.level === 1
+                    ? "Easy"
+                    : "Intro")
                 );
               });
 
@@ -80,12 +80,12 @@ function Team(props) {
                 finalDataDifficulty.push({
                   name:
                     solve.level === 3
-                      ? "Ninja"
+                      ? "Hardcore"
                       : solve.level === 2
-                      ? "Hard"
-                      : solve.level === 1
                       ? "Medium"
-                      : "Easy",
+                      : solve.level === 1
+                      ? "Easy"
+                      : "Intro",
                   value: 1,
                 });
               }
@@ -218,7 +218,7 @@ function Team(props) {
                         </tr>
                       </thead>
                       <tbody>
-                        {team.solved.map((solve, index) => {
+                        {team.solved.sort((a,b) => (a.timestamp > b.timestamp) ? 1 : ((b.timestamp > a.timestamp) ? -1 : 0)).map((solve, index) => {
                           return (
                             <tr key={solve._id}>
                               <th scope="row" style={{ textAlign: "center" }}>
@@ -243,7 +243,7 @@ function Team(props) {
                                   `(+${solve.firstBloodPoints})`}
                               </td>
                               <td>{solve.category}</td>
-                              <td>{solve.timestamp}</td>
+                              <td>{new Date(solve.timestamp).toString().split("(")[0]}</td>
                               <td>{solve.username}</td>
                             </tr>
                           );

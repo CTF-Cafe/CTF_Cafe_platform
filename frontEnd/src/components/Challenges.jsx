@@ -38,6 +38,7 @@ const formatHours = (time) => {
   return `${padTime(hours)}:${padTime(minutes)}:${padTime(seconds)}`;
 };
 
+let stoppingDocker = false;
 function Challenges(props) {
   const globalData = useContext(AppContext);
   const [challenges, setChallenges] = useState([]);
@@ -115,11 +116,11 @@ function Challenges(props) {
           setLoading(false);
         } else {
           response.data.challenges.sort((a, b) => {
-            if (a.level < b.level) {
+            if (a.level < b.level || a.category.length < b.category.length) {
               return -1;
             }
 
-            if (a.level > b.level) {
+            if (a.level > b.level || a.category.length > b.category.length) {
               return 1;
             }
 
@@ -140,13 +141,15 @@ function Challenges(props) {
 
           response.data.challenges.forEach((c) => {});
           for (let c of response.data.challenges) {
-            if (c.progress && c.progress !== "finished") {
+            if ((c.progress && c.progress !== "finished") || stoppingDocker) {
               setTimeout(() => {
                 getChallenges();
-              }, 500);
+                stoppingDocker = false;
+              }, 1000);
               break;
             }
           }
+
           setChallenges(response.data.challenges);
           setCategories(response.data.categories);
           setEndTime(response.data.endTime);
@@ -196,6 +199,7 @@ function Challenges(props) {
           setChallenges([...challenges]);
         } else {
           globalData.alert.success("Challenge docker stopped!");
+          stoppingDocker = true;
           getChallenges();
         }
       })

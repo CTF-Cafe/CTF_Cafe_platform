@@ -75,6 +75,11 @@
   background-color: var(--color-1) !important;
 }
 
+.btn-selected {
+  background-color: var(--color-1) !important;
+  color: rgb(255, 255, 255) !important;
+}
+
 .btn-shadow.btn-danger,
 .btn-shadow.btn-danger.focus,
 .btn-shadow.btn-danger:focus,

@@ -179,9 +179,10 @@ exports.getTeams = async function (req, res) {
       }
     }
 
-    const userCategories = (await ctfConfig.findOne({ name: "userCategories" })).value;
+    const userCategories = (await ctfConfig.findOne({ name: "userCategories" }))
+      .value;
 
-    if(userCategory && !userCategories.find(x => x === userCategory))
+    if (userCategory && !userCategories.find((x) => x === userCategory))
       throw new Error("User Category does not exist!");
 
     let teamCount = await teams.count();
@@ -227,8 +228,9 @@ exports.getTeams = async function (req, res) {
 
 exports.getUserTeam = async function (req, res) {
   try {
-    if (!req.body.teamId || !isValidObjectId(req.body.teamId)) {
+    if (!req.body.teamId || !ObjectId.isValid(req.body.teamId)) {
       res.send({ state: "error", message: "teamId is a required parameter!" });
+      return;
     }
 
     const team = await dbController.resolveTeamsFull({
@@ -238,11 +240,14 @@ exports.getUserTeam = async function (req, res) {
     if (team[0]) {
       if (!team[0].users.find((x) => x._id.equals(req.session.userId))) {
         res.send({ state: "error", message: "You are not in this team!" });
+        return;
       }
 
       res.send(team[0]);
+      return;
     } else {
       res.send({ state: "error", message: "You are not in any team!" });
+      return;
     }
   } catch (err) {
     console.log(err);
@@ -324,6 +329,41 @@ exports.getTeam = async function (req, res) {
   }
 };
 
+exports.saveTeamCountry = async function (req, res) {
+  const userToCheck = await users.findById(req.session.userId);
+
+  let userTeamExists;
+  if (ObjectId.isValid(userToCheck.teamId)) {
+    userTeamExists = await teams.findById(userToCheck.teamId);
+  }
+
+  const country = req.body.country;
+
+  if(!/^\p{Emoji}$/u.test(country)) {
+    res.send({ state: "error", message: "Country is not an emoji!" });
+    return;
+  }
+
+  if (userTeamExists) {
+    if (userTeamExists.teamCaptain === req.session.userId) {
+      await teams.findOneAndUpdate(
+        { _id: userTeamExists.id },
+        { $set: { country: country } }
+      );
+
+      res.send({
+        state: "success",
+        message: "Team Country Changed!",
+      });
+
+    } else {
+      res.send({ state: "error", message: "You are not a teamCaptain!" });
+    }
+  } else {
+    res.send({ state: "error", message: "User is not in a team!" });
+  }
+};
+
 exports.kickUser = async function (req, res) {
   const userToCheck = await users.findOne({
     username: req.body.userToKick,
@@ -372,6 +412,6 @@ exports.kickUser = async function (req, res) {
       res.send({ state: "error", message: "You are not a teamCaptain!" });
     }
   } else {
-    res.send({ state: "error", message: "Use is not in a team!" });
+    res.send({ state: "error", message: "User is not in a team!" });
   }
 };
