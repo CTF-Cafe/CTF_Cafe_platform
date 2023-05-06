@@ -44,6 +44,7 @@ exports.resolveTeamsFull = function (match) {
                 name: "$name",
                 category: "$category",
                 timestamp: "$$timestamp",
+                level: "$level"
               },
             },
           },
@@ -296,6 +297,7 @@ exports.resolveTeamsMin = function (match) {
                   },
                 },
                 timestamp: "$$timestamp",
+                level: "$level"
               },
             },
           },
@@ -377,6 +379,7 @@ exports.resolveTeamsMin = function (match) {
                 },
                 timestamp: "$$timestamp",
                 challName: "$name",
+                level: "$level"
               },
             },
           },

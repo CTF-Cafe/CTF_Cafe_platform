@@ -26,9 +26,6 @@ function Rules(props) {
               </p>
               <div className="row justify-content-center hackerFont">
                 <div className="col-md-8">
-                  <h5 className="bold color_white pt-3">
-                    What is Capture the Flag?
-                  </h5>
                   <ul style={{ listStyleType: "none" }}>
                     {globalData.rules.map((rule) => {
                       return (

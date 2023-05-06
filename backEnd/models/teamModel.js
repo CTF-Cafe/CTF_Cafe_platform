@@ -27,6 +27,10 @@ var teamSchema = new Schema({
     category: {
         type: String,
         required: true
+    },
+    country: {
+        type: String,
+        required: false
     }
 });
 
