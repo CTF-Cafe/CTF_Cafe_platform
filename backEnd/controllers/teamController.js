@@ -214,7 +214,7 @@ exports.getTeams = async function (req, res) {
               },
             ],
           })
-          .sort({ totalScore: -1, maxTimestamp: -1, _id: 1 })
+          .sort({ totalScore: -1, maxTimestamp: 1, _id: 1 })
           .skip((page - 1) * 100)
           .limit(100);
 
@@ -326,41 +326,6 @@ exports.getTeam = async function (req, res) {
     res.send(team[0]);
   } else {
     res.send({ state: "error", message: "Team not found" });
-  }
-};
-
-exports.saveTeamCountry = async function (req, res) {
-  const userToCheck = await users.findById(req.session.userId);
-
-  let userTeamExists;
-  if (ObjectId.isValid(userToCheck.teamId)) {
-    userTeamExists = await teams.findById(userToCheck.teamId);
-  }
-
-  const country = req.body.country;
-
-  if(!/^\p{Emoji}$/u.test(country)) {
-    res.send({ state: "error", message: "Country is not an emoji!" });
-    return;
-  }
-
-  if (userTeamExists) {
-    if (userTeamExists.teamCaptain === req.session.userId) {
-      await teams.findOneAndUpdate(
-        { _id: userTeamExists.id },
-        { $set: { country: country } }
-      );
-
-      res.send({
-        state: "success",
-        message: "Team Country Changed!",
-      });
-
-    } else {
-      res.send({ state: "error", message: "You are not a teamCaptain!" });
-    }
-  } else {
-    res.send({ state: "error", message: "User is not in a team!" });
   }
 };
 

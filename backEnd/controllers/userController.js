@@ -384,6 +384,7 @@ exports.getUser = async function (req, res) {
     user.key = "Nice try XD";
     user.isAdmin = false;
     user.score = 0;
+    user.email = undefined;
 
     // Fetch Challenges from solves
     for (let i = 0; i < user.solved.length; i++) {
@@ -478,7 +479,7 @@ exports.getScoreboard = async function (req, res) {
     .resolveTeamsMin({
       users: { $not: { $elemMatch: { shadowBanned: true } } },
     })
-    .sort({ totalScore: -1, maxTimestamp: -1, _id: 1 });
+    .sort({ totalScore: -1, maxTimestamp: 1, _id: 1 });
 
   let finalData = {
     standings: [],

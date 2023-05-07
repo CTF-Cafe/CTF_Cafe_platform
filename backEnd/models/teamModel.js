@@ -28,10 +28,6 @@ var teamSchema = new Schema({
         type: String,
         required: true
     },
-    country: {
-        type: String,
-        required: false
-    }
 });
 
 module.exports = mongoose.model('Teams', teamSchema);

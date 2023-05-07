@@ -16,7 +16,7 @@ if ("WEBHOOK" in process.env) {
 
 exports.getChallenges = async function (req, res) {
   let allChallenges = await challenges
-    .find({ hidden: false })
+    .find({ hidden: false }, { name: 1, category: 1, hints: 1, points: 1, firstBloodPoints: 1, info: 1, level: 1, solveCount: 1, file: 1, codeSnippet: 1, codeLanguage: 1, firstBlood: 1, isInstance: 1, requirement: 1, randomFlag: 1 })
     .sort({ points: 1 });
   const startTime = await ctfConfig.findOne({ name: "startTime" });
   const endTime = await ctfConfig.findOne({ name: "endTime" });
@@ -142,6 +142,114 @@ exports.getChallenges = async function (req, res) {
   }
 };
 
+let deploying = [];
+exports.deployDocker = async function (req, res) {
+  try {
+    const user = await users.findById(req.session.userId);
+    if (!user) throw new Error("User not found");
+    if (!ObjectId.isValid(user.teamId)) throw new Error("Not in a team!");
+
+    const team = await teams.findById(user.teamId);
+    if (!team) throw new Error("Not in a team!");
+
+    if (deploying.find((x) => new ObjectId(x).equals(user.teamId))) {
+      throw new Error("Already deploying a docker");
+    }
+
+    deploying.push(user.teamId);
+
+    try {
+      const startTime = await ctfConfig.findOne({ name: "startTime" });
+      if (parseInt(startTime.value) - Math.floor(new Date().getTime()) >= 0) {
+        throw new Error("CTF has not started!");
+      }
+
+      const challenge = await challenges.findOne({
+        _id: ObjectId(req.body.challengeId),
+      });
+
+      if (!challenge || !challenge.isInstance || !challenge.githubUrl) {
+        throw new Error("Challenge doesn't have a github url!");
+      }
+
+      // Check Team Docker Limit
+      const dockerLimit = await ctfConfig.findOne({ name: "dockerLimit" });
+      const deployed = await getDockers(user.teamId);
+      if (deployed.length >= dockerLimit.value) {
+        throw new Error("Docker limit reached!");
+      }
+
+      const resFetch = await await (
+        await fetch(`${process.env.DEPLOYER_API}/instances`, {
+          method: "POST",
+          headers: {
+            "X-API-KEY": process.env.DEPLOYER_SECRET,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            githubUrl: challenge.githubUrl,
+            owner: user.teamId,
+            challengeId: challenge.id,
+            customEnv: {
+              FLAG: challenge.flag,
+            },
+          }),
+        })
+      ).json();
+
+      if (resFetch.state == "error") {
+        throw new Error(resFetch.message);
+      }
+
+      if (challenge.randomFlag) {
+        if (challenge.randomFlags.find((x) => x.id == user.teamId)) {
+          await challenges.updateOne(
+            { id: challenge._id },
+            {
+              $pull: {
+                randomFlags: { id: user.teamId },
+              },
+            }
+          );
+        }
+
+        await challenges.updateOne(
+          { id: challenge._id },
+          {
+            $push: {
+              randomFlags: { id: user.teamId, flag: resFetch.flag },
+            },
+          }
+        );
+      }
+
+      const statusFetch = await await (
+        await fetch(
+          `${process.env.DEPLOYER_API}/instances/owner/${user.teamId}/{challenge.id}`,
+          {
+            method: "GET",
+            headers: {
+              "X-API-KEY": process.env.DEPLOYER_SECRET,
+              "Content-Type": "application/json",
+            },
+          }
+        )
+      ).json();
+
+      deploying = deploying.filter((x) => !new ObjectId(x).equals(user.teamId));
+
+      if (statusFetch.state == "error") throw new Error(statusFetch.message);
+
+      res.send({ state: "success", message: statusFetch });
+    } catch (e) {
+      deploying = deploying.filter((x) => !new ObjectId(x).equals(user.teamId));
+      throw e;
+    }
+  } catch (error) {
+    res.send({ state: "error", message: error.message });
+  }
+};
+
 exports.deployDocker = async function (req, res) {
   try {
     const user = await users.findById(req.session.userId);
@@ -170,12 +278,12 @@ exports.deployDocker = async function (req, res) {
     if (deployed.length >= dockerLimit.value)
       throw new Error("Docker limit reached!");
 
-    const resFetch = await (await (
+    const resFetch = await await (
       await fetch(`${process.env.DEPLOYER_API}/api/deployDocker`, {
         method: "POST",
         headers: {
           "X-API-KEY": process.env.DEPLOYER_SECRET,
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           githubUrl: challenge.githubUrl,
@@ -184,7 +292,7 @@ exports.deployDocker = async function (req, res) {
           randomFlag: challenge.randomFlag,
         }),
       })
-    ).json());
+    ).json();
 
     if (resFetch.state == "error") throw new Error(resFetch.message);
 
@@ -235,19 +343,19 @@ exports.shutdownDocker = async function (req, res) {
     if (!challenge.githubUrl)
       throw new Error("Challenge doesn't have a github url!");
 
-    const resFetch = await ((
+    const resFetch = await (
       await fetch(`${process.env.DEPLOYER_API}/api/shutdownDocker`, {
         method: "POST",
         headers: {
           "X-API-KEY": process.env.DEPLOYER_SECRET,
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           ownerId: user.teamId,
           challengeId: challenge.id,
         }),
       })
-    ).json());
+    ).json();
 
     if (resFetch.state == "error") throw new Error(resFetch.message);
 
@@ -272,18 +380,18 @@ exports.shutdownDocker = async function (req, res) {
 
 async function getDocker(teamId) {
   try {
-    const deployed = await ((
+    const deployed = await (
       await fetch(`${process.env.DEPLOYER_API}/api/getDockers`, {
         method: "POST",
         headers: {
           "X-API-KEY": process.env.DEPLOYER_SECRET,
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           ownerId: teamId,
         }),
       })
-    ).json());
+    ).json();
 
     return deployed.dockers.map((c) => {
       delete c.githubUrl;
