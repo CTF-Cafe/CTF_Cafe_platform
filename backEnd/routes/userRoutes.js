@@ -38,10 +38,6 @@ router.post("/getUserTeam", (req, res) => {
   teamController.getUserTeam(req, res);
 });
 
-router.post("/saveTeamCountry", (req, res) => {
-  teamController.saveTeamCountry(req, res);
-});
-
 router.post("/deployDocker", (req, res) => {
   challengesController.deployDocker(req, res);
 });
