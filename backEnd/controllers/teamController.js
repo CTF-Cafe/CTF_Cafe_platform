@@ -110,7 +110,19 @@ exports.joinTeam = async function (req, res) {
     if (!userTeamExists) {
       if (teamCodeExists.users.length < 4) {
         if (teamCodeExists.category === userToCheck.category) {
-          await teams
+          
+          conflict = false;
+          // Check solve conflicts
+          teamCodeExists.users.map(teamUser => {
+            teamUser.solved.map((x) => {
+              if(userToCheck.solved.find(y => new ObjectId(y._id).equals(x._id))) {
+                conflict = true;
+              }
+            });
+          });
+
+          if(!conflict) {
+            await teams
             .findOneAndUpdate(
               { inviteCode: teamCode },
               {
@@ -147,6 +159,9 @@ exports.joinTeam = async function (req, res) {
             .catch((error) => {
               res.send({ state: "error", message: error.messsage });
             });
+          }else {
+            res.send({ state: "error", message: "Team has solved conflicts!" });
+          }
         }
       } else {
         res.send({ state: "error", message: "Team is full!" });
