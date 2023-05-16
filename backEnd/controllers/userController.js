@@ -115,7 +115,8 @@ exports.register = async function (req, res) {
     //     throw new Error('Registrations are closed!');
     // }
 
-    const userCategories = (await ctfConfig.findOne({ name: "userCategories" })).value;
+    const userCategories = (await ctfConfig.findOne({ name: "userCategories" }))
+      .value;
 
     if (!userCategories.find((x) => x === userCategory))
       throw new Error("User Category does not exist!");
@@ -182,10 +183,18 @@ exports.register = async function (req, res) {
 
 exports.verifyMail = async function (req, res) {
   try {
-    const user = await users.findOne({ _id: req.params.id });
+    const result = validationResult(req);
+
+    if (!result.isEmpty()) {
+      throw new Error(`${result.errors[0].path}: ${result.errors[0].msg}`);
+    }
+
+    const data = matchedData(req);
+
+    const user = await users.findById(data.id);
     if (!user) throw new Error("Invalid Link");
 
-    if (user.token != req.params.token) throw new Error("Invalid Link");
+    if (user.token !== req.params.token) throw new Error("Invalid Link");
 
     await users.updateOne({ _id: user._id }, { verified: true, token: "" });
 
@@ -294,13 +303,19 @@ exports.updateUsername = async function (req, res) {
 };
 
 exports.getUsers = async function (req, res) {
-  let page = req.body.page;
-  let search = req.body.search;
-  let userCategory = req.body.category;
+  try {
+    const result = validationResult(req);
 
-  if (page <= 0) {
-    res.send({ state: "error", message: "Page cannot be less than 1!" });
-  } else {
+    if (!result.isEmpty()) {
+      throw new Error(`${result.errors[0].path}: ${result.errors[0].msg}`);
+    }
+
+    const data = matchedData(req);
+
+    let page = data.page;
+    let search = data.search;
+    let userCategory = req.body.category;
+    
     const userToCheck = await users.findById(req.session.userId);
     if (!userToCheck || !userToCheck.isAdmin) {
       // DONT SEND USERS IF SCOREBOARD HIDDEN AND NOT ADMIN
@@ -321,32 +336,25 @@ exports.getUsers = async function (req, res) {
 
     let userCount = await users.count();
     if ((page - 1) * 100 > userCount) {
-      res.send({ state: "error", message: "No more pages!" });
-    } else {
-      if (isNaN(page)) {
-        page = 1;
-      }
+      throw new Error("No more pages!");
+    }
 
-      let allUsers = [];
-      try {
-        allUsers = await dbController
-          .resolveUsers({
-            category: userCategory ? userCategory : { $exists: true },
-            username: new RegExp(search, "i"),
-            verified: true,
-            $or: [{ _id: req.session.userId }, { shadowBanned: false }],
-          })
-          .sort({ score: -1, _id: 1 })
-          .skip((page - 1) * 100)
-          .limit(100);
+    let allUsers = [];
+    allUsers = await dbController
+      .resolveUsers({
+        category: userCategory ? userCategory : { $exists: true },
+        username: new RegExp(search, "i"),
+        verified: true,
+        $or: [{ _id: req.session.userId }, { shadowBanned: false }],
+      })
+      .sort({ score: -1, _id: 1 })
+      .skip((page - 1) * 100)
+      .limit(100);
 
-        res.send(allUsers);
-
-        // allUsers = await users.find({}).sort({ score: -1, _id: 1 }).skip((page - 1) * 100).limit(100);
-      } catch (err) {
-        console.log(err);
-        res.send({ state: "error", message: err.message });
-      }
+    res.send(allUsers);
+  } catch (err) {
+    if (err) {
+      res.send({ state: "error", message: err.message });
     }
   }
 };
