@@ -1,3 +1,7 @@
+# TO WORK ON A VPS:
+# CHANGE FRONTEND_URI and BACKEND_URI to http://vps_ip:port
+# FOR HTTPS CHANGE TO https://domain.com/ AND SETUP NGINX FOR ROUTING
+
 version: '3.1'
 
 services:
