@@ -4,7 +4,6 @@ const { v4 } = require("uuid");
 const ObjectId = require("mongoose").Types.ObjectId;
 const dbController = require("./dbController");
 const ctfConfig = require("../models/ctfConfigModel");
-const { isValidObjectId } = require("mongoose");
 
 exports.register = async function (req, res) {
   const teamName = req.body.teamName.trim();
@@ -159,7 +158,7 @@ exports.joinTeam = async function (req, res) {
             .catch((error) => {
               res.send({ state: "error", message: error.messsage });
             });
-          }else {
+          } else {
             res.send({ state: "error", message: "Team has solved conflicts!" });
           }
         }

@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const validation = require("../controllers/validationController");
 const userController = require("../controllers/userController.js");
 const teamController = require("../controllers/teamController.js");
 const users = require("../models/userModel.js");
@@ -7,7 +8,7 @@ const teams = require("../models/teamModel.js");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 
-router.post("/login", (req, res) => {
+router.post("/login", [validation.username, validation.password], (req, res) => {
   userController.login(req, res);
 });
 
@@ -15,7 +16,7 @@ router.get("/logout", (req, res) => {
   userController.logout(req, res);
 });
 
-router.post("/register", (req, res) => {
+router.post("/register", [validation.username, validation.email, validation.password, validation.userCategory], (req, res) => {
   userController.register(req, res);
 });
 
