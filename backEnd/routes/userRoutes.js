@@ -4,7 +4,6 @@ const challengesController = require("../controllers/challengesController.js");
 const teamController = require("../controllers/teamController.js");
 const userController = require("../controllers/userController.js");
 const ctfConfig = require("../models/ctfConfigModel.js");
-const users = require("../models/userModel.js");
 
 router.post("/registerTeam", (req, res) => {
   teamController.register(req, res);

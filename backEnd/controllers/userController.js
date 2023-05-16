@@ -1,3 +1,4 @@
+const { validationResult, matchedData } = require("express-validator");
 const users = require("../models/userModel");
 const { v4 } = require("uuid");
 const ctfConfig = require("../models/ctfConfigModel.js");
@@ -11,44 +12,55 @@ const nodemailer = require("nodemailer");
 const dbController = require("./dbController");
 
 exports.login = async function (req, res) {
-  const username = req.body.username.trim();
-  const password = req.body.password.trim();
+  try {
+    const result = validationResult(req);
 
-  const user = await users.findOne({ username: username });
-
-  if (user) {
-    if (user.verified) {
-      if (await encryptionController.compare(password, user.password)) {
-        const newKey = v4();
-
-        req.session.userId = user._id.toString();
-        req.session.key = newKey;
-        user.password = undefined;
-        await users.updateOne(
-          { username: username },
-          { key: newKey.toString() }
-        );
-
-        // Create log for admins
-        logController.createLog(req, user, {
-          state: "success",
-          message: "Logged In",
-        });
-
-        res.send({ state: "success", message: "Logged In" });
-      } else {
-        logController.createLog(req, user, {
-          state: "error",
-          message: "Wrong Credentials",
-        });
-
-        res.send({ state: "error", message: "Wrong Credentials" });
-      }
-    } else {
-      res.send({ state: "error", message: "Verify email first!" });
+    if (!result.isEmpty()) {
+      throw new Error(`${result.errors[0].path}: ${result.errors[0].msg}`);
     }
-  } else {
-    res.send({ state: "error", message: "Wrong Credentials" });
+
+    const data = matchedData(req);
+
+    const username = data.username;
+    const password = data.password;
+
+    const user = await users.findOne({ username: username });
+
+    if (!user) {
+      throw new Error("Wrong Credentials");
+    }
+
+    if (!user.verified) {
+      throw new Error("Verify email first!");
+    }
+
+    if (!(await encryptionController.compare(password, user.password))) {
+      logController.createLog(req, user, {
+        state: "error",
+        message: "Wrong Credentials",
+      });
+
+      throw new Error("Wrong Credentials");
+    }
+
+    const newKey = v4();
+
+    req.session.userId = user._id.toString();
+    req.session.key = newKey;
+    user.password = undefined;
+    await users.updateOne({ username: username }, { key: newKey.toString() });
+
+    // Create log for admins
+    logController.createLog(req, user, {
+      state: "success",
+      message: "Logged In",
+    });
+
+    res.send({ state: "success", message: "Logged In" });
+  } catch (err) {
+    if (err) {
+      res.send({ state: "error", message: err.message });
+    }
   }
 };
 
@@ -83,19 +95,18 @@ const sendEmail = async (email, subject, text) => {
 
 exports.register = async function (req, res) {
   try {
-    if (
-      req.body.username_old.trim() != req.body.username.trim() ||
-      req.body.password_old.trim() != req.body.password.trim()
-    ) {
-      throw new Error("Please dont use any 'sus' character's");
+    const result = validationResult(req);
+
+    if (!result.isEmpty()) {
+      throw new Error(`${result.errors[0].path}: ${result.errors[0].msg}`);
     }
-    
-    const username = req.body.username.trim();
-    const email = req.body.email.trim();
-    const password = await encryptionController.encrypt(
-      req.body.password.trim()
-    );
-    const userCategory = req.body.userCategory.trim();
+
+    const data = matchedData(req);
+
+    const username = data.username;
+    const email = data.email;
+    const password = await encryptionController.encrypt(data.password);
+    const userCategory = data.userCategory;
 
     // const startTime = await ctfConfig.findOne({ name: "startTime" });
 
@@ -106,27 +117,8 @@ exports.register = async function (req, res) {
 
     const userCategories = (await ctfConfig.findOne({ name: "userCategories" })).value;
 
-    if(!userCategories.find(x => x === userCategory))
+    if (!userCategories.find((x) => x === userCategory))
       throw new Error("User Category does not exist!");
-
-    // Username to short
-    if (username.length < 4)
-      throw new Error("Username is to short! 4 characters minimum!");
-
-    // Username to long
-    if (username.length > 32)
-      throw new Error("Username is to long! 32 characters maximum!");
-
-    // Check password length
-    if (req.body.password.trim().length < 8)
-      throw new Error("Password is to short 8 characters minimum!!");
-
-    if (
-      !email.match(
-        /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-      )
-    )
-      throw new Error("Invalid email!");
 
     // Check if username exists
     const userExists = await users.findOne({ username: username });
@@ -179,7 +171,6 @@ exports.register = async function (req, res) {
       .catch(function (err) {
         throw new Error("User creation failed!");
       });
-
   } catch (err) {
     if (err) {
       res.send({ state: "error", message: err.message });
@@ -322,9 +313,10 @@ exports.getUsers = async function (req, res) {
       }
     }
 
-    const userCategories = (await ctfConfig.findOne({ name: "userCategories" })).value;
+    const userCategories = (await ctfConfig.findOne({ name: "userCategories" }))
+      .value;
 
-    if(userCategory && !userCategories.find(x => x === userCategory))
+    if (userCategory && !userCategories.find((x) => x === userCategory))
       throw new Error("User Category does not exist!");
 
     let userCount = await users.count();

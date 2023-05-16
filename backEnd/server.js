@@ -88,24 +88,23 @@ app.use(
   })
 );
 
-function customSanitize(req, res, next) {
-  Object.entries(req.body).forEach(([key, value]) => {
-    req.body[key + "_old"] = value;
-    req.body[key] = mongoSanitize.sanitize(xssClean(value));
-  });
+// function customSanitize(req, res, next) {
+//   Object.entries(req.body).forEach(([key, value]) => {
+//     req.body[key] = mongoSanitize.sanitize(xssClean(value));
+//   });
 
-  Object.entries(req.query).forEach(([key, value]) => {
-    req.query[key] = mongoSanitize.sanitize(xssClean(value));
-  });
+//   Object.entries(req.query).forEach(([key, value]) => {
+//     req.query[key] = mongoSanitize.sanitize(xssClean(value));
+//   });
 
-  Object.entries(req.params).forEach(([key, value]) => {
-    req.params[key] = mongoSanitize.sanitize(xssClean(value));
-  });
+//   Object.entries(req.params).forEach(([key, value]) => {
+//     req.params[key] = mongoSanitize.sanitize(xssClean(value));
+//   });
 
-  next();
-}
+//   next();
+// }
 
-app.use(customSanitize);
+// app.use(customSanitize);
 
 function checkAuth(req, res, next) {
   users.findById(req.session.userId).then(function (user) {
