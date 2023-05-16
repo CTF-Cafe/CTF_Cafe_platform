@@ -8,6 +8,10 @@ const teams = require("../models/teamModel.js");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 
+router.get("/easteregg", async (req, res) => {
+  res.send("Guacamole soon...");
+});
+
 router.post("/login", [validation.username, validation.password], (req, res) => {
   userController.login(req, res);
 });
@@ -20,11 +24,11 @@ router.post("/register", [validation.username, validation.email, validation.pass
   userController.register(req, res);
 });
 
-router.get("/verify/:id/:token", async (req, res) => {
+router.get("/verify/:id/:token", [validation.id], async (req, res) => {
   userController.verifyMail(req, res);
 });
 
-router.post("/getUsers", (req, res) => {
+router.post("/getUsers", [validation.page, validation.search], (req, res) => {
   userController.getUsers(req, res);
 });
 

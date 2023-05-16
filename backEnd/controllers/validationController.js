@@ -1,4 +1,11 @@
-const { query, body, param, check } = require("express-validator");
+const { check } = require("express-validator");
+const ObjectId = require("mongoose").Types.ObjectId;
+
+function validObjectId(val) {
+  if (!ObjectId.isValid(val)) {
+    throw new Error("Invalid ObjectId");
+  }
+}
 
 exports.username = check("username")
   .notEmpty()
@@ -27,3 +34,27 @@ exports.userCategory = check("userCategory")
   .notEmpty()
   .withMessage("must not be empty")
   .trim();
+
+exports.id = check("id")
+  .notEmpty()
+  .withMessage("must not be empty")
+  .trim()
+  .custom((val) => ObjectId.isValid(val))
+  .withMessage("not a valid ObjectId")
+  .customSanitizer((val) => {
+    if (ObjectId.isValid(val)) {
+      ObjectId(val);
+    }
+  });
+
+exports.page = check("page")
+  .optional()
+  .default(1)
+  .isInt({ min: 0 })
+  .withMessage("must be an int");
+
+exports.search = check("search")
+  .optional()
+  .isString()
+  .withMessage("must be a string")
+  .customSanitizer((val) => new RegExp(val, "i"));
