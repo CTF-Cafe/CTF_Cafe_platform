@@ -461,6 +461,13 @@ exports.resolveUsers = function (match) {
                     else: "$points",
                   },
                 },
+                challenge: {
+                  name: "$name",
+                  category: "$category",
+                  points: "$points",
+                  firstBloodPoints: "$firstBloodPoints",
+                  firstBlood: "$firstBlood"
+                }
               },
             },
           },
@@ -574,3 +581,156 @@ exports.resolveUsers = function (match) {
     },
   ]);
 };
+
+// Resolve one user solves and hintsBought and return the summed score and the solvecount with solved
+exports.resolveUser = function (match) {
+  return users.aggregate([
+    {
+      $match: match,
+    },
+    {
+      $unwind: {
+        path: "$solved",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $lookup: {
+        from: "challenges",
+        let: {
+          challId: "$solved._id",
+          timestamp: "$solved.timestamp",
+          userId: { $toString: "$_id" },
+        },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$$challId", "$_id"] },
+            },
+          },
+          {
+            $project: {
+              _id: 0,
+              solve: {
+                _id: "$_id",
+                timestamp: "$$timestamp",
+                points: {
+                  $cond: {
+                    if: { $eq: ["$firstBlood", "$$userId"] },
+                    then: { $add: ["$points", "$firstBloodPoints"] },
+                    else: "$points",
+                  },
+                },
+              },
+            },
+          },
+          {
+            $replaceRoot: { newRoot: "$solve" },
+          },
+        ],
+        as: "solved",
+      },
+    },
+    {
+      $unwind: {
+        path: "$solved",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $group: {
+        _id: "$_id",
+        username: { $first: "$username" },
+        hintsBought: { $first: "$hintsBought" },
+        adminPoints: { $first: "$adminPoints" },
+        score: { $sum: "$solved.points" },
+        solved: { $push: "$solved" },
+        maxTimestamp: { $max: "$solved.timestamp" },
+        category: { $first: "$category" },
+      },
+    },
+    {
+      $unwind: {
+        path: "$hintsBought",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $lookup: {
+        from: "challenges",
+        let: {
+          chalId: "$hintsBought.challId",
+          timestamp: "$hintsBought.timestamp",
+          hintId: "$hintsBought.hintId",
+        },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$$chalId", "$_id"] },
+            },
+          },
+          {
+            $project: {
+              _id: 0,
+              hintBought: {
+                hintId: "$$hintId",
+                challId: "$_id",
+                cost: {
+                  $toInt: {
+                    $arrayElemAt: [
+                      {
+                        $map: {
+                          input: {
+                            $filter: {
+                              input: "$hints",
+                              cond: { $eq: ["$$this.id", "$$hintId"] },
+                            },
+                          },
+                          as: "h",
+                          in: "$$h.cost",
+                        },
+                      },
+                      0,
+                    ],
+                  },
+                },
+                timestamp: "$$timestamp",
+                challName: "$name",
+              },
+            },
+          },
+          {
+            $replaceRoot: { newRoot: "$hintBought" },
+          },
+        ],
+        as: "hintsBought",
+      },
+    },
+    {
+      $unwind: {
+        path: "$hintsBought",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $group: {
+        _id: "$_id",
+        username: { $first: "$username" },
+        hintsCost: { $sum: "$hintsBought.cost" },
+        score: { $first: "$score" },
+        solved: { $first: "$solved" },
+        hintsBought: { $push: "$hintsBought" },
+        adminPoints: { $first: "$adminPoints" },
+        maxTimestamp: { $first: "$maxTimestamp" },
+        category: { $first: "$category" },
+      },
+    },
+    {
+      $addFields: {
+        score: {
+          $subtract: [{ $add: ["$score", "$adminPoints"] }, "$hintsCost"],
+        },
+      },
+    },
+  ]);
+}

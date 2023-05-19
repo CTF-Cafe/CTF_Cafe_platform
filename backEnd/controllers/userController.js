@@ -1,5 +1,5 @@
 const { validationResult, matchedData } = require("express-validator");
-const users = require("../models/userModel");
+const Users = require("../models/userModel");
 const { v4 } = require("uuid");
 const ctfConfig = require("../models/ctfConfigModel.js");
 const theme = require("../models/themeModel.js");
@@ -24,7 +24,7 @@ exports.login = async function (req, res) {
     const username = data.username;
     const password = data.password;
 
-    const user = await users.findOne({ username: username });
+    const user = await Users.findOne({ username: username });
 
     if (!user) {
       throw new Error("Wrong Credentials");
@@ -48,7 +48,7 @@ exports.login = async function (req, res) {
     req.session.userId = user._id.toString();
     req.session.key = newKey;
     user.password = undefined;
-    await users.updateOne({ username: username }, { key: newKey.toString() });
+    await Users.updateOne({ username: username }, { key: newKey.toString() });
 
     // Create log for admins
     logController.createLog(req, user, {
@@ -122,12 +122,12 @@ exports.register = async function (req, res) {
       throw new Error("User Category does not exist!");
 
     // Check if username exists
-    const userExists = await users.findOne({ username: username });
+    const userExists = await Users.findOne({ username: username });
 
     if (userExists) throw new Error("User name Exists!");
 
     // Check admin has deleted the admin:admin account before allowing others.
-    // const defaultAdminCheck = await users.findOne({
+    // const defaultAdminCheck = await Users.findOne({
     //   username: "admin",
     //   password: "admin",
     //   isAdmin: true,
@@ -142,7 +142,7 @@ exports.register = async function (req, res) {
     // Create new User
     const newKey = v4();
 
-    await users
+    await Users
       .create({
         username: username,
         password: password,
@@ -191,12 +191,12 @@ exports.verifyMail = async function (req, res) {
 
     const data = matchedData(req);
 
-    const user = await users.findById(data.id);
+    const user = await Users.findById(data.id);
     if (!user) throw new Error("Invalid Link");
 
     if (user.token !== req.params.token) throw new Error("Invalid Link");
 
-    await users.updateOne({ _id: user._id }, { verified: true, token: "" });
+    await Users.updateOne({ _id: user._id }, { verified: true, token: "" });
 
     res.send("Email verified!");
   } catch (err) {
@@ -221,7 +221,7 @@ exports.updateUsername = async function (req, res) {
     }
 
     // Check if username exists
-    const userExists = await users.findOne({
+    const userExists = await Users.findOne({
       username: username,
       verified: true,
     });
@@ -230,7 +230,7 @@ exports.updateUsername = async function (req, res) {
       throw new Error("User name Exists!");
     }
 
-    await users
+    await Users
       .findByIdAndUpdate(
         req.session.userId,
         { username: username },
@@ -241,7 +241,7 @@ exports.updateUsername = async function (req, res) {
           userTeamExists = await teams.findById(user.teamId);
 
           if (userTeamExists) {
-            let newUsers = userTeamExists.users;
+            let newUsers = userTeamExists.Users;
             let captain = userTeamExists.teamCaptain;
             newUsers.forEach((userInTeam) => {
               if (userInTeam._id.equals(user._id)) {
@@ -316,7 +316,7 @@ exports.getUsers = async function (req, res) {
     let search = data.search;
     let userCategory = req.body.category;
     
-    const userToCheck = await users.findById(req.session.userId);
+    const userToCheck = await Users.findById(req.session.userId);
     if (!userToCheck || !userToCheck.isAdmin) {
       // DONT SEND USERS IF SCOREBOARD HIDDEN AND NOT ADMIN
       const scoreboardHidden = await ctfConfig.findOne({
@@ -334,7 +334,7 @@ exports.getUsers = async function (req, res) {
     if (userCategory && !userCategories.find((x) => x === userCategory))
       throw new Error("User Category does not exist!");
 
-    let userCount = await users.count();
+    let userCount = await Users.count();
     if ((page - 1) * 100 > userCount) {
       throw new Error("No more pages!");
     }
@@ -360,86 +360,50 @@ exports.getUsers = async function (req, res) {
 };
 
 exports.getUser = async function (req, res) {
-  let user = await users.findOne({
-    username: decodeURIComponent(req.body.username.trim()),
-    verified: true,
-  });
+  
+  try {
+  
+    const result = validationResult(req);
 
-  if (user) {
+    if (!result.isEmpty()) {
+      throw new Error(`${result.errors[0].path}: ${result.errors[0].msg}`);
+    }
+
+    const data = matchedData(req);
+
+    const username = decodeURIComponent(data.username);    
+
+    const users = await dbController.resolveUsers({
+      username: username,
+      verified: true,
+      $or: [{ _id: req.session.userId }, { shadowBanned: false }], 
+    });
+
+
+    if (!users[0]) {
+      throw new Error("User not found!");
+    }
+
+    const user = users[0]
+
     if (!user._id.equals(req.session.userId)) {
-      const userToCheck = await users.findById(req.session.userId);
+      const userToCheck = await Users.findById(req.session.userId);
       if (!userToCheck || !userToCheck.isAdmin) {
         // DONT SEND USER IF SCOREBOARD HIDDEN AND ITS NOT THE USER HIMSELF OR ADMIN
         const scoreboardHidden = await ctfConfig.findOne({
           name: "scoreboardHidden",
         });
         if (scoreboardHidden.value) {
-          res.send({ state: "error", message: "Scoreboard is Hidden!" });
-          return;
+          throw new Error("Scoreboard is Hidden!");
         }
       }
     }
-
-    user.password = "Nice try XD";
-    user.key = "Nice try XD";
-    user.isAdmin = false;
-    user.score = 0;
-    user.email = undefined;
-
-    // Fetch Challenges from solves
-    for (let i = 0; i < user.solved.length; i++) {
-      let challenge = await challenges.findById(user.solved[i]._id, {
-        _id: 1,
-        name: 1,
-        category: 1,
-        points: 1,
-        firstBlood: 1,
-        firstBloodPoints: 1,
-      });
-      if (challenge) {
-        user.solved[i].challenge = challenge;
-        if (user._id.equals(challenge.firstBlood))
-          user.score += challenge.firstBloodPoints;
-        user.score += challenge.points;
-      } else {
-        user.solved.splice(i, 1);
-        i--;
-      }
-    }
-
-    // Fetch challenges from hintsBought
-    for (let i = 0; i < user.hintsBought.length; i++) {
-      let challenge = await challenges.findById(user.hintsBought[i].challId, {
-        _id: 1,
-        name: 1,
-        hints: 1,
-      });
-      if (challenge) {
-        user.hintsBought[i].challName = challenge.name;
-
-        let hint = undefined;
-        if (
-          (hint = challenge.hints.find(
-            (x) => x.id == user.hintsBought[i].hintId
-          ))
-        ) {
-          user.hintsBought[i].cost = hint.cost;
-        }
-      } else {
-        user.hintsBought.splice(i, 1);
-        i--;
-      }
-    }
-
-    for (let i = 0; i < user.hintsBought.length; i++) {
-      user.score -= user.hintsBought[i].cost;
-    }
-
-    user.score += user.adminPoints;
 
     res.send(user);
-  } else {
-    res.send({ state: "error", message: "User not found" });
+  } catch(err) {
+    if (err) {
+      res.send({ state: "error", message: err.message });
+    }
   }
 };
 
