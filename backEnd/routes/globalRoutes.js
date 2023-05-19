@@ -32,15 +32,15 @@ router.post("/getUsers", [validation.page, validation.search], (req, res) => {
   userController.getUsers(req, res);
 });
 
-router.post("/getUser", (req, res) => {
+router.post("/getUser", [validation.username], (req, res) => {
   userController.getUser(req, res);
 });
 
-router.post("/getTeam", (req, res) => {
+router.post("/getTeam", [validation.teamName], (req, res) => {
   teamController.getTeam(req, res);
 });
 
-router.post("/getTeams", (req, res) => {
+router.post("/getTeams", [validation.page], [validation.search], (req, res) => {
   teamController.getTeams(req, res);
 });
 
@@ -63,73 +63,19 @@ router.get("/checkSession", (req, res) => {
     } else if (!(user.key == req.session.key)) {
       res.send({ state: "sessionError" });
     } else {
+      user.password = undefined;
+      user.key = undefined;
+
       if (ObjectId.isValid(user.teamId)) {
-        let team = await teams.aggregate([
-          {
-            $match: { _id: ObjectId(user.teamId) },
-          },
-          {
-            $unwind: {
-              path: "$users",
-              preserveNullAndEmptyArrays: true,
-            },
-          },
-          {
-            $unwind: {
-              path: "$users.solved",
-              preserveNullAndEmptyArrays: true,
-            },
-          },
-          {
-            $lookup: {
-              from: "challenges",
-              let: {
-                chalId: "$users.solved._id",
-                timestamp: "$users.solved.timestamp",
-              },
-              pipeline: [
-                {
-                  $match: {
-                    $expr: { $eq: ["$$chalId", "$_id"] },
-                  },
-                },
-                {
-                  $project: {
-                    _id: 0,
-                    solve: {
-                      _id: "$_id",
-                      points: "$points",
-                    },
-                  },
-                },
-                {
-                  $replaceRoot: { newRoot: "$solve" },
-                },
-              ],
-              as: "users.solved",
-            },
-          },
-          {
-            $group: {
-              _id: "$_id",
-              users: { $push: "$users" },
-              name: { $first: "$name" },
-              teamCaptain: { $first: "$teamCaptain" },
-            },
-          },
-        ]);
+        let team = await teams.findById(ObjectId(user.teamId));
 
-        if (team[0]) {
-          team[0].inviteCode = "Nice try XD";
-          user.password = undefined;
-
-          res.send({ state: "success", user: user, team: team[0] });
+        if (team) {
+          team.inviteCode = undefined;
+          res.send({ state: "success", user: user, team: team });
         } else {
-          user.password = undefined;
           res.send({ state: "success", user: user });
         }
       } else {
-        user.password = undefined;
         res.send({ state: "success", user: user });
       }
     }

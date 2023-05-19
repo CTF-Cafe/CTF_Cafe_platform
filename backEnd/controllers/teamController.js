@@ -1,3 +1,4 @@
+const { validationResult, matchedData } = require("express-validator");
 const teams = require("../models/teamModel");
 const users = require("../models/userModel");
 const { v4 } = require("uuid");
@@ -174,13 +175,19 @@ exports.joinTeam = async function (req, res) {
 };
 
 exports.getTeams = async function (req, res) {
-  let page = req.body.page;
-  let search = req.body.search;
-  let userCategory = req.body.category;
+ try {
+    const result = validationResult(req);
 
-  if (page <= 0) {
-    res.send({ state: "error", message: "Page cannot be less than 1!" });
-  } else {
+    if (!result.isEmpty()) {
+      throw new Error(`${result.errors[0].path}: ${result.errors[0].msg}`);
+    }
+
+    const data = matchedData(req);
+
+    let page = data.page;
+    let search = data.search;
+    let userCategory = req.body.category;
+
     const userToCheck = await users.findById(req.session.userId);
     if (!userToCheck || !userToCheck.isAdmin) {
       // DONT SEND TEAMS IF SCOREBOARD HIDDEN AND NOT ADMIN
@@ -188,8 +195,7 @@ exports.getTeams = async function (req, res) {
         name: "scoreboardHidden",
       });
       if (scoreboardHidden.value) {
-        res.send({ state: "error", message: "Scoreboard is Hidden!" });
-        return;
+        throw new Error("Scoreboard is Hidden!");
       }
     }
 
@@ -201,43 +207,40 @@ exports.getTeams = async function (req, res) {
 
     let teamCount = await teams.count();
     if ((page - 1) * 100 > teamCount) {
-      res.send({ state: "error", message: "No more pages!" });
-    } else {
-      if (isNaN(page)) {
-        page = 1;
-      }
+      throw new Error("No more pages!");
+    }
 
-      let allTeams = [];
-      try {
-        allTeams = await dbController
-          .resolveTeamsMin({
-            category: userCategory ? userCategory : { $exists: true },
-            name: new RegExp(search, "i"),
-            $or: [
-              {
-                users: {
-                  $elemMatch: { _id: req.session.userId },
+    let allTeams = [];
+      allTeams = await dbController
+        .resolveTeamsMin({
+          category: userCategory ? userCategory : { $exists: true },
+          name: new RegExp(search, "i"),
+          $or: [
+            {
+              users: {
+                $elemMatch: { _id: req.session.userId },
+              },
+            },
+            {
+              users: {
+                $not: {
+                  $elemMatch: { shadowBanned: true },
                 },
               },
-              {
-                users: {
-                  $not: {
-                    $elemMatch: { shadowBanned: true },
-                  },
-                },
-              },
-            ],
-          })
-          .sort({ totalScore: -1, maxTimestamp: 1, _id: 1 })
-          .skip((page - 1) * 100)
-          .limit(100);
+            },
+          ],
+        })
+        .sort({ totalScore: -1, maxTimestamp: 1, _id: 1 })
+        .skip((page - 1) * 100)
+        .limit(100);
 
-        res.send(allTeams);
-      } catch (err) {
-        res.send({ state: "error", message: err.message });
-      }
+      res.send(allTeams);
+  } catch (err) {
+    if (err) {
+      res.send({ state: "error", message: err.message }); 
     }
   }
+
 };
 
 exports.getUserTeam = async function (req, res) {
@@ -318,11 +321,26 @@ exports.leaveTeam = async function (req, res) {
 };
 
 exports.getTeam = async function (req, res) {
-  let team = await dbController.resolveTeamsFull({
-    name: decodeURIComponent(req.body.teamName.trim()),
-  });
+  try {
+  
+    const result = validationResult(req);
 
-  if (team[0]) {
+    if (!result.isEmpty()) {
+      throw new Error(`${result.errors[0].path}: ${result.errors[0].msg}`);
+    }
+
+    const data = matchedData(req);
+
+    const teamName = decodeURIComponent(data.teamName);
+
+    let team = await dbController.resolveTeamsFull({
+      name: teamName,
+    });
+
+    if (!team[0]) {
+      throw new Error("Team not found");
+    }
+
     if (!team[0].users.find((x) => x._id.equals(req.session.userId))) {
       const userToCheck = await users.findById(req.session.userId);
       if (!userToCheck || !userToCheck.isAdmin) {
@@ -338,9 +356,13 @@ exports.getTeam = async function (req, res) {
     }
 
     res.send(team[0]);
-  } else {
-    res.send({ state: "error", message: "Team not found" });
+  
+  } catch (err) {
+    if (err) {
+      res.send({ state: "error", message: err.message }); 
+    }
   }
+
 };
 
 exports.kickUser = async function (req, res) {
