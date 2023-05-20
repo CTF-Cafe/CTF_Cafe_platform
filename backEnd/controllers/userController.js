@@ -142,17 +142,16 @@ exports.register = async function (req, res) {
     // Create new User
     const newKey = v4();
 
-    await Users
-      .create({
-        username: username,
-        password: password,
-        email: email,
-        category: userCategory,
-        key: newKey.toString(),
-        isAdmin: false,
-        verified: process.env.MAIL_VERIFICATION == "true" ? false : true,
-        token: process.env.MAIL_VERIFICATION == "true" ? v4() : "",
-      })
+    await Users.create({
+      username: username,
+      password: password,
+      email: email,
+      category: userCategory,
+      key: newKey.toString(),
+      isAdmin: false,
+      verified: process.env.MAIL_VERIFICATION == "true" ? false : true,
+      token: process.env.MAIL_VERIFICATION == "true" ? v4() : "",
+    })
       .then(async function (user) {
         if (process.env.MAIL_VERIFICATION == "true") {
           const message = `Verify your email : ${process.env.BACKEND_URI}/api/verify/${user._id}/${user.token}`;
@@ -206,19 +205,18 @@ exports.verifyMail = async function (req, res) {
   }
 };
 
+// TODO : DONT HANDLE SENDING USER, TEAM
 exports.updateUsername = async function (req, res) {
   try {
-    const username = req.body.newUsername.trim();
+    const result = validationResult(req);
 
-    // Username to short
-    if (username.length < 4) {
-      throw new Error("Username is to short! 4 characters minimum!");
+    if (!result.isEmpty()) {
+      throw new Error(`${result.errors[0].path}: ${result.errors[0].msg}`);
     }
 
-    // Username to long
-    if (username.length > 32) {
-      throw new Error("Username is to long! 32 characters maximum!");
-    }
+    const data = matchedData(req);
+
+    const username = data.newUsername;
 
     // Check if username exists
     const userExists = await Users.findOne({
@@ -230,18 +228,17 @@ exports.updateUsername = async function (req, res) {
       throw new Error("User name Exists!");
     }
 
-    await Users
-      .findByIdAndUpdate(
-        req.session.userId,
-        { username: username },
-        { returnOriginal: false }
-      )
+    await Users.findByIdAndUpdate(
+      req.session.userId,
+      { username: username },
+      { returnOriginal: false }
+    )
       .then(async function (user) {
         if (ObjectId.isValid(user.teamId)) {
           userTeamExists = await teams.findById(user.teamId);
 
           if (userTeamExists) {
-            let newUsers = userTeamExists.Users;
+            let newUsers = userTeamExists.users;
             let captain = userTeamExists.teamCaptain;
             newUsers.forEach((userInTeam) => {
               if (userInTeam._id.equals(user._id)) {
@@ -315,7 +312,7 @@ exports.getUsers = async function (req, res) {
     let page = data.page;
     let search = data.search;
     let userCategory = req.body.category;
-    
+
     const userToCheck = await Users.findById(req.session.userId);
     if (!userToCheck || !userToCheck.isAdmin) {
       // DONT SEND USERS IF SCOREBOARD HIDDEN AND NOT ADMIN
@@ -360,9 +357,7 @@ exports.getUsers = async function (req, res) {
 };
 
 exports.getUser = async function (req, res) {
-  
   try {
-  
     const result = validationResult(req);
 
     if (!result.isEmpty()) {
@@ -371,20 +366,19 @@ exports.getUser = async function (req, res) {
 
     const data = matchedData(req);
 
-    const username = decodeURIComponent(data.username);    
+    const username = decodeURIComponent(data.username);
 
     const users = await dbController.resolveUsers({
       username: username,
       verified: true,
-      $or: [{ _id: req.session.userId }, { shadowBanned: false }], 
+      $or: [{ _id: req.session.userId }, { shadowBanned: false }],
     });
-
 
     if (!users[0]) {
       throw new Error("User not found!");
     }
 
-    const user = users[0]
+    const user = users[0];
 
     if (!user._id.equals(req.session.userId)) {
       const userToCheck = await Users.findById(req.session.userId);
@@ -400,7 +394,7 @@ exports.getUser = async function (req, res) {
     }
 
     res.send(user);
-  } catch(err) {
+  } catch (err) {
     if (err) {
       res.send({ state: "error", message: err.message });
     }

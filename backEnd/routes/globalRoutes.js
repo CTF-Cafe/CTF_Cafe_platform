@@ -12,37 +12,59 @@ router.get("/easteregg", async (req, res) => {
   res.send("Guacamole soon...");
 });
 
-router.post("/login", [validation.username, validation.password], (req, res) => {
-  userController.login(req, res);
-});
+router.post(
+  "/login",
+  [validation.username(), validation.password()],
+  (req, res) => {
+    userController.login(req, res);
+  }
+);
 
 router.get("/logout", (req, res) => {
   userController.logout(req, res);
 });
 
-router.post("/register", [validation.username, validation.email, validation.password, validation.userCategory], (req, res) => {
-  userController.register(req, res);
-});
+router.post(
+  "/register",
+  [
+    validation.username(),
+    validation.email(),
+    validation.password(),
+    validation.userCategory(),
+  ],
+  (req, res) => {
+    userController.register(req, res);
+  }
+);
 
-router.get("/verify/:id/:token", [validation.id], async (req, res) => {
+router.get("/verify/:id/:token", [validation.id()], async (req, res) => {
   userController.verifyMail(req, res);
 });
 
-router.post("/getUsers", [validation.page, validation.search], (req, res) => {
-  userController.getUsers(req, res);
-});
+router.post(
+  "/getUsers",
+  [validation.page(), validation.search()],
+  (req, res) => {
+    userController.getUsers(req, res);
+  }
+);
 
-router.post("/getUser", [validation.username], (req, res) => {
+router.post("/getUser", [validation.username()], (req, res) => {
   userController.getUser(req, res);
 });
 
-router.post("/getTeam", [validation.teamName], (req, res) => {
+router.post("/getTeam", [validation.teamName()], (req, res) => {
   teamController.getTeam(req, res);
 });
 
-router.post("/getTeams", [validation.page], [validation.search], (req, res) => {
-  teamController.getTeams(req, res);
-});
+router.post(
+  "/getTeams",
+  [validation.page()],
+  [validation.search()],
+  (req, res) => {
+    teamController.getTeams(req, res);
+  }
+);
 
 router.get("/getScoreboard", (req, res) => {
   userController.getScoreboard(req, res);
