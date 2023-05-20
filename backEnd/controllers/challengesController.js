@@ -16,7 +16,26 @@ if ("WEBHOOK" in process.env) {
 
 exports.getChallenges = async function (req, res) {
   let allChallenges = await challenges
-    .find({ hidden: false }, { name: 1, category: 1, hints: 1, points: 1, firstBloodPoints: 1, info: 1, level: 1, solveCount: 1, file: 1, codeSnippet: 1, codeLanguage: 1, firstBlood: 1, isInstance: 1, requirement: 1, randomFlag: 1 })
+    .find(
+      { hidden: false },
+      {
+        name: 1,
+        category: 1,
+        hints: 1,
+        points: 1,
+        firstBloodPoints: 1,
+        info: 1,
+        level: 1,
+        solveCount: 1,
+        file: 1,
+        codeSnippet: 1,
+        codeLanguage: 1,
+        firstBlood: 1,
+        isInstance: 1,
+        requirement: 1,
+        randomFlag: 1,
+      }
+    )
     .sort({ points: 1 });
   const startTime = await ctfConfig.findOne({ name: "startTime" });
   const endTime = await ctfConfig.findOne({ name: "endTime" });
@@ -145,113 +164,14 @@ exports.getChallenges = async function (req, res) {
 let deploying = [];
 exports.deployDocker = async function (req, res) {
   try {
-    const user = await users.findById(req.session.userId);
-    if (!user) throw new Error("User not found");
-    if (!ObjectId.isValid(user.teamId)) throw new Error("Not in a team!");
+    const result = validationResult(req);
 
-    const team = await teams.findById(user.teamId);
-    if (!team) throw new Error("Not in a team!");
-
-    if (deploying.find((x) => new ObjectId(x).equals(user.teamId))) {
-      throw new Error("Already deploying a docker");
+    if (!result.isEmpty()) {
+      throw new Error(`${result.errors[0].path}: ${result.errors[0].msg}`);
     }
 
-    deploying.push(user.teamId);
+    const data = matchedData(req);
 
-    try {
-      const startTime = await ctfConfig.findOne({ name: "startTime" });
-      if (parseInt(startTime.value) - Math.floor(new Date().getTime()) >= 0) {
-        throw new Error("CTF has not started!");
-      }
-
-      const challenge = await challenges.findOne({
-        _id: ObjectId(req.body.challengeId),
-      });
-
-      if (!challenge || !challenge.isInstance || !challenge.githubUrl) {
-        throw new Error("Challenge doesn't have a github url!");
-      }
-
-      // Check Team Docker Limit
-      const dockerLimit = await ctfConfig.findOne({ name: "dockerLimit" });
-      const deployed = await getDockers(user.teamId);
-      if (deployed.length >= dockerLimit.value) {
-        throw new Error("Docker limit reached!");
-      }
-
-      const resFetch = await await (
-        await fetch(`${process.env.DEPLOYER_API}/instances`, {
-          method: "POST",
-          headers: {
-            "X-API-KEY": process.env.DEPLOYER_SECRET,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            githubUrl: challenge.githubUrl,
-            owner: user.teamId,
-            challengeId: challenge.id,
-            customEnv: {
-              FLAG: challenge.flag,
-            },
-          }),
-        })
-      ).json();
-
-      if (resFetch.state == "error") {
-        throw new Error(resFetch.message);
-      }
-
-      if (challenge.randomFlag) {
-        if (challenge.randomFlags.find((x) => x.id == user.teamId)) {
-          await challenges.updateOne(
-            { id: challenge._id },
-            {
-              $pull: {
-                randomFlags: { id: user.teamId },
-              },
-            }
-          );
-        }
-
-        await challenges.updateOne(
-          { id: challenge._id },
-          {
-            $push: {
-              randomFlags: { id: user.teamId, flag: resFetch.flag },
-            },
-          }
-        );
-      }
-
-      const statusFetch = await await (
-        await fetch(
-          `${process.env.DEPLOYER_API}/instances/owner/${user.teamId}/{challenge.id}`,
-          {
-            method: "GET",
-            headers: {
-              "X-API-KEY": process.env.DEPLOYER_SECRET,
-              "Content-Type": "application/json",
-            },
-          }
-        )
-      ).json();
-
-      deploying = deploying.filter((x) => !new ObjectId(x).equals(user.teamId));
-
-      if (statusFetch.state == "error") throw new Error(statusFetch.message);
-
-      res.send({ state: "success", message: statusFetch });
-    } catch (e) {
-      deploying = deploying.filter((x) => !new ObjectId(x).equals(user.teamId));
-      throw e;
-    }
-  } catch (error) {
-    res.send({ state: "error", message: error.message });
-  }
-};
-
-exports.deployDocker = async function (req, res) {
-  try {
     const user = await users.findById(req.session.userId);
     if (!user) throw new Error("User not found");
     if (!ObjectId.isValid(user.teamId)) throw new Error("Not in a team!");
@@ -263,9 +183,7 @@ exports.deployDocker = async function (req, res) {
     if (parseInt(startTime.value) - Math.floor(new Date().getTime()) >= 0)
       throw new Error("CTF has not started!");
 
-    const challenge = await challenges.findOne({
-      _id: ObjectId(req.body.challengeId),
-    });
+    const challenge = await challenges.findById(data.challengeId);
 
     if (!challenge) throw new Error("Challenge does not exist!");
     if (!challenge.isInstance) throw new Error("Challenge is not an instance!");
@@ -321,12 +239,22 @@ exports.deployDocker = async function (req, res) {
     delete resFetch.flag;
     res.send({ state: "success", message: resFetch });
   } catch (error) {
-    res.send({ state: "error", message: error.message });
+    if (err) {
+      res.send({ state: "error", message: err.message });
+    }
   }
 };
 
 exports.shutdownDocker = async function (req, res) {
   try {
+    const result = validationResult(req);
+
+    if (!result.isEmpty()) {
+      throw new Error(`${result.errors[0].path}: ${result.errors[0].msg}`);
+    }
+
+    const data = matchedData(req);
+
     const user = await users.findById(req.session.userId);
     if (!user) throw new Error("User not found");
     if (!ObjectId.isValid(user.teamId)) throw new Error("Not in a team!");
@@ -334,9 +262,7 @@ exports.shutdownDocker = async function (req, res) {
     const team = await teams.findById(user.teamId);
     if (!team) throw new Error("Not in a team!");
 
-    const challenge = await challenges.findOne({
-      _id: ObjectId(req.body.challengeId),
-    });
+    const challenge = await challenges.findById(data.challengeId);
 
     if (!challenge) throw new Error("Challenge does not exist!");
     if (!challenge.isInstance) throw new Error("Challenge is not an instance!");
@@ -371,10 +297,8 @@ exports.shutdownDocker = async function (req, res) {
     }
 
     res.send({ state: "success", message: resFetch });
-  } catch (error) {
-    if (error.response?.data?.message)
-      return res.send({ state: "error", message: error.response.data.message });
-    res.send({ state: "error", message: error.message });
+  } catch (err) {
+    if (err) res.send({ state: "error", message: err.message });
   }
 };
 
@@ -402,14 +326,22 @@ async function getDocker(teamId) {
   }
 }
 
+// TODO : DONT HANDLE SENDING FLAG TO USER
 let currentlySubmittingUsers = [];
 let currentlySubmittingTeams = [];
-
 exports.submitFlag = async function (req, res) {
   let teamId = undefined;
   try {
-    // Check if flag is provided
-    if (!req.body.flag) throw new Error("No flag provided!");
+    const result = validationResult(req);
+
+    if (!result.isEmpty()) {
+      throw new Error(`${result.errors[0].path}: ${result.errors[0].msg}`);
+    }
+
+    const data = matchedData(req);
+
+    const flag = data.flag;
+    const challengeId = data.challengeId;
 
     // Check if user is currently submitting flag
     if (currentlySubmittingUsers.includes(req.session.userId))
@@ -426,19 +358,12 @@ exports.submitFlag = async function (req, res) {
       throw new Error("CTF has not started!");
 
     const userId = req.session.userId;
-    const flag = req.body.flag.trim();
     const user = await users.findOne({ _id: userId, verified: true });
 
     // Check if user exists
     if (!user) throw new Error("Not logged in!");
 
-    // Check challengeId is valid
-    if (!ObjectId.isValid(req.body.challengeId))
-      throw new Error("Invalid challengeId!");
-
-    let challenge = await challenges.findOne({
-      _id: ObjectId(req.body.challengeId),
-    });
+    let challenge = await challenges.findById(challengeId);
 
     // Check random flag
     if (challenge.randomFlag) {
@@ -537,12 +462,10 @@ exports.submitFlag = async function (req, res) {
       }
 
       await challenges.updateOne(
-        { _id: ObjectId(req.body.challengeId) },
+        { _id: challengeId },
         { $set: { points: dynamicPoints } }
       );
-      challenge = await challenges.findOne({
-        _id: ObjectId(req.body.challengeId),
-      });
+      challenge = await challenges.findById(challengeId);
     }
 
     await users.updateOne(
@@ -572,7 +495,7 @@ exports.submitFlag = async function (req, res) {
       user._id.equals(challenge.firstBlood)
     ) {
       await challenges.updateOne(
-        { _id: req.body.challengeId },
+        { _id: challengeId },
         { $inc: { solveCount: 1 }, firstBlood: updatedUser._id }
       );
 
@@ -605,7 +528,7 @@ exports.submitFlag = async function (req, res) {
       }
     } else {
       await challenges.updateOne(
-        { _id: req.body.challengeId },
+        { _id: challengeId },
         { $inc: { solveCount: 1 } }
       );
     }
@@ -635,6 +558,17 @@ exports.submitFlag = async function (req, res) {
 
 exports.buyHint = async function (req, res) {
   try {
+    const result = validationResult(req);
+
+    if (!result.isEmpty()) {
+      throw new Error(`${result.errors[0].path}: ${result.errors[0].msg}`);
+    }
+
+    const data = matchedData(req);
+
+    const challengeId = data.challengeId;
+    const hintId = req.body.hintId;
+
     const endTime = await ctfConfig.findOne({ name: "endTime" });
     const startTime = await ctfConfig.findOne({ name: "startTime" });
 
@@ -643,24 +577,12 @@ exports.buyHint = async function (req, res) {
     else if (parseInt(startTime.value) - Math.floor(new Date().getTime()) >= 0)
       throw new Error("CTF has not started!");
 
-    const user = await users.findOne({
-      _id: req.session.userId,
-      verified: true,
-    });
-
-    // Check if user exists
-    if (!user) throw new Error("Not logged in!");
-
-    // Check challengeId is valid
-    if (!ObjectId.isValid(req.body.challengeId))
-      throw new Error("Invalid challengeId!");
-
-    let challenge = await challenges.findOne({
-      _id: ObjectId(req.body.challengeId),
-    });
+    // Get specified challenge
+    let challenge = await challenges.findById(challengeId);
 
     // Check challenge has hint to be bought
-    const hint = challenge.hints.find((x) => x.id == req.body.hintId);
+    const hint = challenge.hints.find((x) => x.id == hintId);
+    if (!hint) throw new Error("Hint does not exist!");
     if (hint.cost <= 0) throw new Error("Challenge hint is free!");
 
     // Check user already bought hint

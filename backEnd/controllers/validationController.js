@@ -1,71 +1,80 @@
 const { check } = require("express-validator");
 const ObjectId = require("mongoose").Types.ObjectId;
 
-function validObjectId(val) {
-  if (!ObjectId.isValid(val)) {
-    throw new Error("Invalid ObjectId");
-  }
-}
+exports.username = (id = "username") =>
+  check(id)
+    .notEmpty()
+    .withMessage("must not be empty")
+    .trim()
+    .isLength({ min: 4, max: 32 })
+    .withMessage("must be >4 and <32")
+    .matches(/^[^"$\n]+$/)
+    .withMessage("dont use any sus characters");
 
-exports.username = check("username")
-  .notEmpty()
-  .withMessage("must not be empty")
-  .trim()
-  .isLength({ min: 4, max: 32 })
-  .withMessage("must be >4 and <32")
-  .matches(/^[^"$\n]+$/)
-  .withMessage("dont use any sus characters");
+exports.password = (id = "password") =>
+  check(id)
+    .notEmpty()
+    .withMessage("must not be empty")
+    .trim()
+    .isLength({ min: 8 })
+    .withMessage("must be >8");
 
-exports.password = check("password")
-  .notEmpty()
-  .withMessage("must not be empty")
-  .trim()
-  .isLength({ min: 8 })
-  .withMessage("must be >8");
+exports.email = (id = "email") =>
+  check(id)
+    .notEmpty()
+    .withMessage("must not be empty")
+    .trim()
+    .isEmail()
+    .withMessage("Not a valid Email");
 
-exports.email = check("email")
-  .notEmpty()
-  .withMessage("must not be empty")
-  .trim()
-  .isEmail()
-  .withMessage("Not a valid Email");
+exports.userCategory = (id = "userCategory") =>
+  check(id).notEmpty().withMessage("must not be empty").trim();
 
-exports.userCategory = check("userCategory")
-  .notEmpty()
-  .withMessage("must not be empty")
-  .trim();
+exports.id = (id = "id") =>
+  check(id)
+    .notEmpty()
+    .withMessage("must not be empty")
+    .trim()
+    .custom((val) => ObjectId.isValid(val))
+    .withMessage("not a valid ObjectId")
+    .customSanitizer((val) => {
+      if (ObjectId.isValid(val)) {
+        ObjectId(val);
+      }
+    });
 
-exports.id = check("id")
-  .notEmpty()
-  .withMessage("must not be empty")
-  .trim()
-  .custom((val) => ObjectId.isValid(val))
-  .withMessage("not a valid ObjectId")
-  .customSanitizer((val) => {
-    if (ObjectId.isValid(val)) {
-      ObjectId(val);
-    }
-  });
+exports.page = (id = "page") =>
+  check(id)
+    .optional()
+    .default(1)
+    .isInt({ min: 0 })
+    .withMessage("must be an int");
 
-exports.page = check("page")
-  .optional()
-  .default(1)
-  .isInt({ min: 0 })
-  .withMessage("must be an int");
+exports.search = (id = "search") =>
+  check(id)
+    .optional()
+    .default("")
+    .isString()
+    .withMessage("must be a string")
+    .customSanitizer((val) => new RegExp(val, "i"));
 
-exports.search = check("search")
-  .optional()
-  .isString()
-  .withMessage("must be a string")
-  .customSanitizer((val) => new RegExp(val, "i"));
+exports.teamName = (id = "teamName") =>
+  check(id)
+    .notEmpty()
+    .withMessage("must not be empty")
+    .trim()
+    .isLength({ min: 4, max: 32 })
+    .withMessage("must be >4 and <32")
+    .matches(/^[^"$\n]+$/)
+    .withMessage("dont use any sus characters");
 
-exports.teamName = check("teamName")
-  .notEmpty()
-  .withMessage("must not be empty")
-  .trim()
-  .isLength({ min: 4, max: 32 })
-  .withMessage("must be >4 and <32")
-  .matches(/^[^"$\n]+$/)
-  .withMessage("dont use any sus characters");
+exports.teamCode = (id = "teamCode") =>
+  check(id)
+    .notEmpty()
+    .withMessage("must not be empty")
+    .trim()
+    .isUUID(4)
+    .withMessage("must be a uuid");
 
-
+exports.flag = (id = "flag") =>
+  check(id).notEmpty().withMessage("must not be empty").trim();

@@ -112,11 +112,8 @@ function UserTeam(props) {
 
   const getTeam = () => {
     axios
-      .post(
+      .get(
         process.env.REACT_APP_BACKEND_URI + "/api/user/getUserTeam",
-        {
-          teamId: globalData.userData.teamId,
-        },
         { withCredentials: true }
       )
       .then((response) => {
@@ -379,11 +376,13 @@ function UserTeam(props) {
                   style={{ textAlign: "center", marginBottom: "25px" }}
                 >
                   {userTeam.name.toUpperCase()} 
+                  {/* 
                   <select defaultValue={userTeam.country ? userTeam.country : "🌐"} onChange={saveUserTeamCountry}>
                     {flags.map(f => (
                       <option value={f}>{f}</option>
                     ))}
-                  </select>
+                  </select> 
+                  */}
                 </h1>
                 <button
                   className="btn btn-outline-danger btn-shadow"
