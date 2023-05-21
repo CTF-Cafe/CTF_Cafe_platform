@@ -1,3 +1,4 @@
+const { validationResult, matchedData } = require("express-validator");
 const challenges = require("../models/challengeModel");
 const users = require("../models/userModel");
 const teams = require("../models/teamModel");
