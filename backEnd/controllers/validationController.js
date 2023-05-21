@@ -37,11 +37,7 @@ exports.id = (id = "id") =>
     .trim()
     .custom((val) => ObjectId.isValid(val))
     .withMessage("not a valid ObjectId")
-    .customSanitizer((val) => {
-      if (ObjectId.isValid(val)) {
-        ObjectId(val);
-      }
-    });
+    .customSanitizer((val) => ObjectId(val));
 
 exports.page = (id = "page") =>
   check(id)
