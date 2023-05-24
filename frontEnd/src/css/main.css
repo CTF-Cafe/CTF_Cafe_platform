@@ -60,6 +60,7 @@
 }
 
 .btn-outline-danger {
+  background-color: black !important;
   color: var(--color-1) !important;
   border-color: var(--color-1) !important;
 }
@@ -742,9 +743,11 @@ input[type="radio"].toggle:checked + label {
   height: 100%;
 }
 
+
 .table td,
 .table th {
   vertical-align: middle !important;
+  background-color: #00040d;  
 }
 
 #preloader {
