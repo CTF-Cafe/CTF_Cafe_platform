@@ -366,7 +366,7 @@ exports.getUser = async function (req, res) {
 
     const data = matchedData(req);
 
-    const username = decodeURIComponent(data.username);
+    const username = data.username;
 
     const users = await dbController.resolveUsers({
       username: username,

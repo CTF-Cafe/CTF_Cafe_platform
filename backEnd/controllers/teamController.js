@@ -376,7 +376,7 @@ exports.getTeam = async function (req, res) {
 
     const data = matchedData(req);
 
-    const teamName = decodeURIComponent(data.teamName);
+    const teamName = data.teamName;
 
     let team = await dbController.resolveTeamsFull({
       name: teamName,
