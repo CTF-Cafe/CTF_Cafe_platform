@@ -557,7 +557,10 @@ exports.submitFlag = async function (req, res) {
   }
 };
 
+let currentlyBuyingUsers = [];
+let currentlyBuyingTeams = [];
 exports.buyHint = async function (req, res) {
+  let teamId = undefined;
   try {
     const result = validationResult(req);
 
@@ -569,6 +572,12 @@ exports.buyHint = async function (req, res) {
 
     const challengeId = data.challengeId;
     const hintId = req.body.hintId;
+
+    // Check if user is currently submitting flag
+    if (currentlyBuyingUsers.includes(req.session.userId))
+      throw new Error("Submiting to fast!");
+
+    currentlyBuyingUsers.push(req.session.userId);
 
     const endTime = await ctfConfig.findOne({ name: "endTime" });
     const startTime = await ctfConfig.findOne({ name: "startTime" });
@@ -604,6 +613,16 @@ exports.buyHint = async function (req, res) {
     // Check Team Exists
     if (!team) throw new Error("Not in a team!");
 
+    // Check if team is currently submitting
+    if (currentlyBuyingTeams.includes(user.teamId)) {
+      logController.createLog(req, user, {
+        state: "error",
+        message: "Submiting too fast!",
+      });
+      throw new Error("Submiting too fast!");
+    }
+
+    currentlyBuyingTeams.push(user.teamId);
     teamId = user.teamId;
 
     // Check Team bought Hint
@@ -670,6 +689,16 @@ exports.buyHint = async function (req, res) {
   } catch (err) {
     if (err) {
       res.send({ state: "error", message: err.message });
+    }
+  } finally {
+    currentlyBuyingUsers = currentlyBuyingUsers.filter(
+      (item) => item !== req.session.userId
+    );
+
+    if (teamId) {
+      currentlyBuyingTeams = currentlyBuyingTeams.filter(
+        (item) => item !== teamId
+      );
     }
   }
 };
