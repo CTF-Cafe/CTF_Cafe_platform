@@ -632,6 +632,7 @@ function Challenges(props) {
                                 />
                                 <div className="input-group-append">
                                   <button
+                                    style={{ borderTopRightRadius: '6px', borderBottomRightRadius: '6px' }}
                                     id="submit_p2"
                                     className="btn btn-outline-danger"
                                     type="button"
