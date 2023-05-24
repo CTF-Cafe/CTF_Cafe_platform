@@ -6,7 +6,7 @@ import PieChart from "./Charts/PieChart";
 
 function Team(props) {
   const location = useLocation();
-  const selectedTeam = location.pathname.replace("/team/", "");
+  const selectedTeam = decodeURIComponent(location.pathname.replace("/team/", ""));
   const [team, setTeam] = useState({});
   const [challengeStatsCategory, setChallengeStatsCategory] = useState([]);
   const [challengeStatsDifficulty, setChallengeStatsDifficulty] = useState([]);

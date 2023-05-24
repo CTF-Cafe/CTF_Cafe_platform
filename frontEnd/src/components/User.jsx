@@ -6,7 +6,7 @@ import PieChart from "./Charts/PieChart";
 
 function User(props) {
   const location = useLocation();
-  const selectedUser = location.pathname.replace("/user/", "");
+  const selectedUser = decodeURIComponent(location.pathname.replace("/user/", ""));
   const [user, setUser] = useState({});
   const [challengeStatsCategory, setChallengeStatsCategory] = useState([]);
   const [challengeStatsDifficulty, setChallengeStatsDifficulty] = useState([]);
