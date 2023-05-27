@@ -466,13 +466,15 @@ function Challenges(props) {
                               >
                                 {challenge.points} points
                               </span>
-                              <span className="badge align-self-end">
-                                (+{challenge.firstBloodPoints}){" "}
-                                <span
-                                  className="fa-solid fa-droplet"
-                                  style={{ fontSize: "11px", color: "red" }}
-                                ></span>
-                              </span>
+                              {challenge.firstBloodPoints > 0 && (
+                                <span className="badge align-self-end">
+                                  (+{challenge.firstBloodPoints}){" "}
+                                  <span
+                                    className="fa-solid fa-droplet"
+                                    style={{ fontSize: "11px", color: "red" }}
+                                  ></span>
+                                </span>
+                              )}
                             </div>
                           </div>
                           <div id={"problem_id_" + index} className="collapse">

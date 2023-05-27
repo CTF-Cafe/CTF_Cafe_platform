@@ -292,7 +292,6 @@ function Hackerboard(props) {
           <div className="row mt-5  justify-content-center">
             <div className="col-xl-10">
               <div style={{ marginBottom: "25px" }}>
-                {console.log(category)}
                 <button
                   className={"btn btn-outline-danger btn-shadow " + (category === null ? "btn-selected" : "")}
                   onClick={() => {
