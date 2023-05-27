@@ -11,7 +11,7 @@ import Prism from "prismjs";
 import "prismjs/plugins/line-numbers/prism-line-numbers";
 import "prismjs/components/prism-python";
 import "prismjs/components/prism-javascript";
-import ReactMarkdown from 'react-markdown'
+import ReactMarkdown from "react-markdown";
 
 // Prepend `0` for one digit numbers. For that the number has to be
 // converted to string, as numbers don't have length method
@@ -288,6 +288,19 @@ function Challenges(props) {
     }
   };
 
+  // Content Templating
+  const templateParse = (content) => {
+    let tmp = content
+
+    // replace user name
+    tmp = tmp.replace("${username}", globalData.userData.username);
+
+    // replace team name
+    tmp = tmp.replace("${teamName}", globalData.userData.team.name);
+
+    return tmp;
+  };
+
   return (
     <div>
       {loading !== undefined && (
@@ -347,7 +360,9 @@ function Challenges(props) {
                           style={{
                             borderTop:
                               "4px solid " +
-                              globalData.categoryColors.find((x) => x.name === challenge.category).color,
+                              globalData.categoryColors.find(
+                                (x) => x.name === challenge.category
+                              ).color,
                           }}
                         >
                           <div
@@ -383,7 +398,10 @@ function Challenges(props) {
                               {challenge.isInstance && (
                                 <span
                                   className="fa-brands fa-docker"
-                                  style={{ fontSize: "22px", marginRight: "10px" }}
+                                  style={{
+                                    fontSize: "22px",
+                                    marginRight: "10px",
+                                  }}
                                 ></span>
                               )}
                               {challenge.firstBlood ===
@@ -489,7 +507,9 @@ function Challenges(props) {
                                   </span>
                                 </h6>
                               </div>
-                              <ReactMarkdown children={challenge.info} />
+                              <ReactMarkdown
+                                children={templateParse(challenge.info)}
+                              />
 
                               {challenge.isInstance && (
                                 <button
@@ -622,7 +642,10 @@ function Challenges(props) {
                                 />
                                 <div className="input-group-append">
                                   <button
-                                    style={{ borderTopRightRadius: '6px', borderBottomRightRadius: '6px' }}
+                                    style={{
+                                      borderTopRightRadius: "6px",
+                                      borderBottomRightRadius: "6px",
+                                    }}
                                     id="submit_p2"
                                     className="btn btn-outline-danger"
                                     type="button"
