@@ -74,3 +74,11 @@ exports.teamCode = (id = "teamCode") =>
 
 exports.flag = (id = "flag") =>
   check(id).notEmpty().withMessage("must not be empty").trim();
+
+exports.emoji = (id = "emoji") =>
+  check(id)
+    .notEmpty()
+    .withMessage("must not be empty")
+    .trim()
+    .matches(/^[\uD83C][\uDDE6-\uDDFF][\uD83C][\uDDE6-\uDDFF]$/)
+    .withMessage("must be an emoji!");

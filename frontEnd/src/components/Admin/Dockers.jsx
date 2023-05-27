@@ -185,10 +185,11 @@ function Dockers(props) {
                 </th>
                 <td>{docker.challenge.name}</td>
                 <td>
-                  <Link to={`/team/${docker.team.name}`}>
-                    <a className="p-3 text-decoration-none text-light bold">
-                      {docker.team.name}
-                    </a>
+                  <Link
+                    to={`/team/${docker.team.name}`}
+                    className="text-decoration-none text-light bold"
+                  >
+                    {docker.team.name}
                   </Link>
                 </td>
                 <td>{docker.mappedPort}</td>

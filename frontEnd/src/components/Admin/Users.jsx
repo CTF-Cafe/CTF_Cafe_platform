@@ -355,10 +355,11 @@ function Users(props) {
                   {index + (page - 1) * 100}
                 </th>
                 <td>
-                  <Link to={`/user/${user.username}`}>
-                    <a className="p-3 text-decoration-none text-light bold">
-                      {user.username}
-                    </a>
+                  <Link
+                    to={`/user/${user.username}`}
+                    className="text-decoration-none text-light bold"
+                  >
+                    {user.username}
                   </Link>
                 </td>
                 <td>{user.category}</td>

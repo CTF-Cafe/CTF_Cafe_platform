@@ -42,6 +42,10 @@ router.get("/getUserTeam", (req, res) => {
   teamController.getUserTeam(req, res);
 });
 
+router.post("/saveTeamCountry", [validation.emoji("country")], (req, res) => {
+  teamController.saveTeamCountry(req, res);
+});
+
 router.post("/deployDocker", [validation.id("challengeId")], (req, res) => {
   challengesController.deployDocker(req, res);
 });

@@ -6,19 +6,24 @@ import PieChart from "./Charts/PieChart";
 
 function Team(props) {
   const location = useLocation();
-  const selectedTeam = decodeURIComponent(location.pathname.replace("/team/", ""));
+  const selectedTeam = decodeURIComponent(
+    location.pathname.replace("/team/", "")
+  );
   const [team, setTeam] = useState({});
   const [challengeStatsCategory, setChallengeStatsCategory] = useState([]);
   const [challengeStatsDifficulty, setChallengeStatsDifficulty] = useState([]);
 
   const getTeam = (teamName) => {
     axios
-      .post(process.env.REACT_APP_BACKEND_URI + "/api/getTeam", {
-        teamName: teamName,
-      },
-      {
-        withCredentials: true
-      })
+      .post(
+        process.env.REACT_APP_BACKEND_URI + "/api/getTeam",
+        {
+          teamName: teamName,
+        },
+        {
+          withCredentials: true,
+        }
+      )
       .then((response) => {
         if (response.data.state !== "error") {
           let finalDataCategory = [];
@@ -36,7 +41,7 @@ function Team(props) {
               });
 
               // Add FirstBlood Points if match
-              if(solve.firstBlood === user._id) {
+              if (solve.firstBlood === user._id) {
                 user.score += solve.firstBloodPoints;
                 response.data.score += solve.firstBloodPoints;
               }
@@ -147,6 +152,7 @@ function Team(props) {
                   className="display-1 bold color_white cool"
                   style={{ textAlign: "center", marginBottom: "25px" }}
                 >
+                  <span style={{ fontSize: "50px", marginRight: "10px" }}>{team.country}</span>
                   {team.name.toUpperCase()}
                 </h1>
                 <div style={{ textAlign: "center" }}>
@@ -218,36 +224,50 @@ function Team(props) {
                         </tr>
                       </thead>
                       <tbody>
-                        {team.solved.sort((a,b) => (a.timestamp > b.timestamp) ? 1 : ((b.timestamp > a.timestamp) ? -1 : 0)).map((solve, index) => {
-                          return (
-                            <tr key={solve._id}>
-                              <th scope="row" style={{ textAlign: "center" }}>
-                                {index}
-                              </th>
-                              <td>
-                                {solve.firstBlood === solve.userId ? (
-                                  <span
-                                    className="fa-solid fa-droplet"
-                                    style={{
-                                      fontSize: "22px",
-                                      color: "red",
-                                      marginRight: "5px",
-                                    }}
-                                  ></span>
-                                ) : null}
-                                {solve.name}
-                              </td>
-                              <td>
-                                {solve.points}{" "}
-                                {solve.firstBlood === solve.userId &&
-                                  `(+${solve.firstBloodPoints})`}
-                              </td>
-                              <td>{solve.category}</td>
-                              <td>{new Date(solve.timestamp).toString().split("(")[0]}</td>
-                              <td>{solve.username}</td>
-                            </tr>
-                          );
-                        })}
+                        {team.solved
+                          .sort((a, b) =>
+                            a.timestamp > b.timestamp
+                              ? 1
+                              : b.timestamp > a.timestamp
+                              ? -1
+                              : 0
+                          )
+                          .map((solve, index) => {
+                            return (
+                              <tr key={solve._id}>
+                                <th scope="row" style={{ textAlign: "center" }}>
+                                  {index}
+                                </th>
+                                <td>
+                                  {solve.firstBlood === solve.userId ? (
+                                    <span
+                                      className="fa-solid fa-droplet"
+                                      style={{
+                                        fontSize: "22px",
+                                        color: "red",
+                                        marginRight: "5px",
+                                      }}
+                                    ></span>
+                                  ) : null}
+                                  {solve.name}
+                                </td>
+                                <td>
+                                  {solve.points}{" "}
+                                  {solve.firstBlood === solve.userId &&
+                                    `(+${solve.firstBloodPoints})`}
+                                </td>
+                                <td>{solve.category}</td>
+                                <td>
+                                  {
+                                    new Date(solve.timestamp)
+                                      .toString()
+                                      .split("(")[0]
+                                  }
+                                </td>
+                                <td>{solve.username}</td>
+                              </tr>
+                            );
+                          })}
                       </tbody>
                     </table>
                   </div>

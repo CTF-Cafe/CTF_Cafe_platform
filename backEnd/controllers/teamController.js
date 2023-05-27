@@ -474,3 +474,45 @@ exports.kickUser = async function (req, res) {
     }
   }
 };
+
+exports.saveTeamCountry = async function (req, res) {
+  try {
+    const result = validationResult(req);
+
+    if (!result.isEmpty()) {
+      throw new Error(`${result.errors[0].path}: ${result.errors[0].msg}`);
+    }
+
+    const data = matchedData(req);
+
+    const country = data.country;
+
+    const userToCheck = await users.findById(req.session.userId);
+
+    let userTeamExists;
+    if (ObjectId.isValid(userToCheck.teamId)) {
+      userTeamExists = await teams.findById(userToCheck.teamId);
+    }
+
+    if (!userTeamExists) {
+      throw new Error("User is not in a team!");
+    }
+    if (userTeamExists.teamCaptain !== req.session.userId) {
+      throw new Error("You are not a teamCaptain!");
+    }
+
+    await teams.findOneAndUpdate(
+      { _id: userTeamExists.id },
+      { $set: { country: country } }
+    );
+
+    res.send({
+      state: "success",
+      message: "Team Country Changed!",
+    });
+  } catch (err) {
+    if (err) {
+      res.send({ state: "error", message: err.message });
+    }
+  }
+};
