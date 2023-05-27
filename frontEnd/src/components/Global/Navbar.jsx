@@ -90,7 +90,9 @@ function Navbar() {
                     to={`/userteam`}
                     style={{ marginRight: "25px" }}
                     className="text-decoration-none text-light bold"
-                  ></Link>
+                  >
+                    Team
+                  </Link>
                   <Link
                     to={`/logout`}
                     style={{ marginRight: "25px" }}
