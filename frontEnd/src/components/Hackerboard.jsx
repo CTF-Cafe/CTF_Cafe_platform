@@ -266,7 +266,7 @@ function Hackerboard(props) {
         <div className="container">
           <div className="row">
             <div className="col-xl-12">
-              <h1 className="display-1 bold color_white text-center">
+              <h1 className="display-1 bold color_white text-center cool">
                 <span className="color_danger"> HACKER </span>BOARD
               </h1>
               <p className="text-grey lead text-spacey text-center hackerFont">
@@ -376,7 +376,7 @@ function Hackerboard(props) {
 
               {/* Scoreboard Title */}
               <div style={{ textAlign: "center" }}>
-                <h1>{selectionMain.toUpperCase() + " SCOREBOARD"}</h1>
+                <h1 className="cool">{selectionMain.toUpperCase() + " SCOREBOARD"}</h1>
               </div>
 
               <table className="table table-hover table-striped">

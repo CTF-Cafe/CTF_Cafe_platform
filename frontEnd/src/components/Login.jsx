@@ -84,7 +84,7 @@ function Login(props) {
         <div className="container">
           <div className="row">
             <div className="col-xl-8">
-              <h1 className="display-1 bold color_white content__title">
+              <h1 className="display-1 bold color_white content__title cool">
                 {process.env.REACT_APP_CTF_NAME.toUpperCase()}
                 <span className="vim-caret">&nbsp;</span>
               </h1>

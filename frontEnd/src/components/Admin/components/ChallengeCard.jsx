@@ -150,9 +150,11 @@ function ChallengeCard(props) {
                   <label>Info:</label>
                   <p
                     contentEditable="true"
+                    suppressContentEditableWarning={true}
                     style={{
                       backgroundColor: "rgb(30, 32, 55)",
                       outline: "none",
+                      whiteSpace: "pre-wrap"
                     }}
                     id={"info" + challenge._id}
                   >
@@ -219,6 +221,7 @@ function ChallengeCard(props) {
                             outline: "none",
                           }}
                           contentEditable="true"
+                          suppressContentEditableWarning={true}
                           id={i + "hintContent" + challenge._id}
                         >
                           {hint.content}
@@ -234,6 +237,7 @@ function ChallengeCard(props) {
                             minWidth: "5%",
                           }}
                           contentEditable="true"
+                          suppressContentEditableWarning={true}
                           id={i + "hintCost" + challenge._id}
                         >
                           {hint.cost}
@@ -374,6 +378,7 @@ function ChallengeCard(props) {
                   <label>Github URL:</label>
                   <p
                     contentEditable="true"
+                    suppressContentEditableWarning={true}
                     style={{
                       backgroundColor: "rgb(30, 32, 55)",
                       outline: "none",
@@ -459,6 +464,7 @@ function ChallengeCard(props) {
                       minWidth: "5%",
                     }}
                     contentEditable="true"
+                    suppressContentEditableWarning={true}
                     id={"firstBloodPoints" + challenge._id}
                   >
                     {challenge.firstBloodPoints}
@@ -471,6 +477,7 @@ function ChallengeCard(props) {
                     <label>Minimum Points:</label>{" "}
                     <p
                       contentEditable="true"
+                      suppressContentEditableWarning={true}
                       style={{
                         backgroundColor: "rgb(30, 32, 55)",
                         outline: "none",
@@ -518,6 +525,7 @@ function ChallengeCard(props) {
                     <label>Flag:</label>
                     <p
                       contentEditable="true"
+                      suppressContentEditableWarning={true}
                       style={{
                         backgroundColor: "rgb(30, 32, 55)",
                         outline: "none",

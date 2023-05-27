@@ -197,6 +197,11 @@ body {
 
 h1,
 h2 {
+  font-family: "Fira Code", monospace !important;
+}
+
+h1.cool,
+h2.cool {
   font-family: "PhelixBoomgartner" !important;
 }
 

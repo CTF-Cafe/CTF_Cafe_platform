@@ -26,53 +26,77 @@ function Navbar() {
           </button>
           <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div className="navbar-nav">
-              <Link to={`/`} style={{ display: "flex", paddingRight: "10px" }}>
-                <a className="pl-md-0 p-3 text-decoration-none text-light">
-                  <h3 className="bold" style={{ margin: 0 }}>
-                    {process.env.REACT_APP_CTF_NAME.split("_").map((text, i) =>
-                      i % 2 ? (
-                        <span className="color_white" key={text}>{text}</span>
-                      ) : (
-                        <span className="color_danger" key={text}>{text}</span>
-                      )
-                    )}
-                  </h3>
-                </a>
+              <Link
+                to={`/`}
+                style={{ display: "flex", paddingRight: "10px" }}
+                className="pl-md-0 p-3 text-decoration-none text-light"
+              >
+                <h3 className="bold" style={{ margin: 0 }}>
+                  {process.env.REACT_APP_CTF_NAME.split("_").map((text, i) =>
+                    i % 2 ? (
+                      <span className="color_white" key={text}>
+                        {text}
+                      </span>
+                    ) : (
+                      <span className="color_danger" key={text}>
+                        {text}
+                      </span>
+                    )
+                  )}
+                </h3>
               </Link>
             </div>
             <div className="navbar-nav ml-auto">
               {globalData.userData.isAdmin && globalData.loggedIn ? (
-                <Link to={`/admin`} style={{ marginRight: "25px" }}>
-                  <a className="text-decoration-none text-light bold">
-                    Admin_Mode
-                  </a>
+                <Link
+                  to={`/admin`}
+                  style={{ marginRight: "25px" }}
+                  className="text-decoration-none text-light bold"
+                >
+                  Admin_Mode
                 </Link>
               ) : null}
-              <Link to={`/`} style={{ marginRight: "25px" }}>
-                <a className="text-decoration-none text-light bold">Home</a>
+              <Link
+                to={`/`}
+                style={{ marginRight: "25px" }}
+                className="text-decoration-none text-light bold"
+              >
+                Home
               </Link>
-              <Link to={`/rules`} style={{ marginRight: "25px" }}>
-                <a className="text-decoration-none text-light bold">Rules</a>
+              <Link
+                to={`/rules`}
+                style={{ marginRight: "25px" }}
+                className="text-decoration-none text-light bold"
+              >
+                Rules
               </Link>
-              <Link to={`/hackerboard`} style={{ marginRight: "25px" }}>
-                <a className="text-decoration-none text-light bold">
-                  Hackerboard
-                </a>
+              <Link
+                to={`/hackerboard`}
+                style={{ marginRight: "25px" }}
+                className="text-decoration-none text-light bold"
+              >
+                Hackerboard
               </Link>
               {globalData.loggedIn ? (
                 <>
-                  <Link to={`/challenges`} style={{ marginRight: "25px" }}>
-                    <a className="text-decoration-none text-light bold">
-                      Challenges
-                    </a>
+                  <Link
+                    to={`/challenges`}
+                    style={{ marginRight: "25px" }}
+                    className="text-decoration-none text-light bold"
+                  >
+                    Challenges
                   </Link>
-                  <Link to={`/userteam`} style={{ marginRight: "25px" }}>
-                    <a className="text-decoration-none text-light bold">Team</a>
-                  </Link>
-                  <Link to={`/logout`} style={{ marginRight: "25px" }}>
-                    <a className="text-decoration-none text-light bold">
-                      Logout
-                    </a>
+                  <Link
+                    to={`/userteam`}
+                    style={{ marginRight: "25px" }}
+                    className="text-decoration-none text-light bold"
+                  ></Link>
+                  <Link
+                    to={`/logout`}
+                    style={{ marginRight: "25px" }}
+                    className="text-decoration-none text-light bold"
+                  >
+                    Logout
                   </Link>
                   <a className="btn-group" style={{ marginRight: "10px" }}>
                     {globalData.notifications.length > 0 ? (
@@ -220,15 +244,19 @@ function Navbar() {
                 </>
               ) : (
                 <>
-                  <Link to={`/login`} style={{ marginRight: "25px" }}>
-                    <a className="text-decoration-none text-light bold">
-                      Login
-                    </a>
+                  <Link
+                    to={`/login`}
+                    style={{ marginRight: "25px" }}
+                    className="text-decoration-none text-light bold"
+                  >
+                    Login
                   </Link>
-                  <Link to={`/register`} style={{ marginRight: "25px" }}>
-                    <a className="text-decoration-none text-light bold">
-                      Register
-                    </a>
+                  <Link
+                    to={`/register`}
+                    style={{ marginRight: "25px" }}
+                    className="text-decoration-none text-light bold"
+                  >
+                    Register
                   </Link>
                 </>
               )}
