@@ -179,7 +179,7 @@ function Challenges(props) {
     const level = document.getElementById("level" + oldChallenge._id).value;
     formData.append("level", level);
 
-    const info = document.getElementById("info" + oldChallenge._id).textContent;
+    const info = document.getElementById("info" + oldChallenge._id).innerText;
     formData.append("info", info);
 
     let hints = [];
@@ -396,7 +396,7 @@ function Challenges(props) {
   return (
     <div>
       <h1
-        className="display-1 bold color_white"
+        className="display-1 bold color_white cool"
         style={{ textAlign: "center", marginBottom: "50px" }}
       >
         CHALLENGES
@@ -461,7 +461,7 @@ function Challenges(props) {
           <br />
           Challenge Types:
           {globalData.categoryColors.map((category) => (
-            <span className="p-1" style={{ backgroundColor: category.color }}>
+            <span className="p-1" style={{ backgroundColor: category.color }} key={category.color}>
               {category.name}
             </span>
           ))}

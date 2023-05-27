@@ -17,7 +17,7 @@ function Rules(props) {
         <div className="container">
           <div className="row">
             <div className="col-xl-12">
-              <h1 className="display-1 bold color_white text-center">
+              <h1 className="display-1 bold color_white text-center cool">
                 CTF<span className="color_danger">RULES</span>
               </h1>
               <p className="text-grey text-spacey text-center hackerFont lead">

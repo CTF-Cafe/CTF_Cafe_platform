@@ -120,7 +120,7 @@ function Stats(props) {
   return (
     <div>
       <h1
-        className="display-1 bold color_white"
+        className="display-1 bold color_white cool"
         style={{ textAlign: "center", marginBottom: "50px" }}
       >
         STATS

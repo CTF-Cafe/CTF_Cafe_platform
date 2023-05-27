@@ -11,6 +11,7 @@ import Prism from "prismjs";
 import "prismjs/plugins/line-numbers/prism-line-numbers";
 import "prismjs/components/prism-python";
 import "prismjs/components/prism-javascript";
+import ReactMarkdown from 'react-markdown'
 
 // Prepend `0` for one digit numbers. For that the number has to be
 // converted to string, as numbers don't have length method
@@ -308,7 +309,7 @@ function Challenges(props) {
         <div className="container">
           <div className="row">
             <div className="col-xl-12  text-center">
-              <h1 className="display-1 bold color_white">CHALLENGES</h1>
+              <h1 className="display-1 bold color_white cool">CHALLENGES</h1>
               <p className="text-grey text-spacey hackerFont lead mb-5">
                 Its time to show the world what you can do!
               </p>
@@ -317,7 +318,7 @@ function Challenges(props) {
 
           {counter > 0 ? (
             <div style={{ textAlign: "center" }}>
-              <h2>CTF NOT STARTED YET!</h2>
+              <h2 className="cool">CTF NOT STARTED YET!</h2>
               <p>
                 {counter < 0 ? (
                   "Refresh :)"
@@ -488,18 +489,7 @@ function Challenges(props) {
                                   </span>
                                 </h6>
                               </div>
-                              <p>
-                                {challenge.info
-                                  .split("\\n")
-                                  .map(function (item, idx) {
-                                    return (
-                                      <span key={idx}>
-                                        {item}
-                                        <br />
-                                      </span>
-                                    );
-                                  })}
-                              </p>
+                              <ReactMarkdown children={challenge.info} />
 
                               {challenge.isInstance && (
                                 <button

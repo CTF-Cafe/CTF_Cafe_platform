@@ -24,7 +24,7 @@ function FourOFour(props) {
             <div className="col-xl-12 text-center">
               <h1
                 style={{ backgroundColor: "#000000A4" }}
-                className="py-5 display-1 bold color_white content__title"
+                className="py-5 display-1 bold color_white content__title cool"
               >
                 404 N07 F0UND<span className="vim-caret">&nbsp;</span>
               </h1>

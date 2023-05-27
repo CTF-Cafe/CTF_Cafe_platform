@@ -314,7 +314,7 @@ function UserTeam(props) {
               <div className="container">
                 <div className="row">
                   <div className="col-xl-8">
-                    <h1 className="display-1 bold color_white">
+                    <h1 className="display-1 bold color_white cool">
                       {process.env.REACT_APP_CTF_NAME.toUpperCase()}
                       <span className="vim-caret">&nbsp;</span>
                     </h1>
@@ -372,7 +372,7 @@ function UserTeam(props) {
             <div>
               <div style={{ textAlign: "center" }}>
                 <h1
-                  className="display-1 bold color_white"
+                  className="display-1 bold color_white cool"
                   style={{ textAlign: "center", marginBottom: "25px" }}
                 >
                   {userTeam.name.toUpperCase()} 

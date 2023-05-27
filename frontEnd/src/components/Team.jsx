@@ -134,7 +134,7 @@ function Team(props) {
           {!team.name ? (
             <div>
               <h1
-                className="display-1 bold color_white"
+                className="display-1 bold color_white cool"
                 style={{ textAlign: "center", marginBottom: "25px" }}
               >
                 TEAM NOT FOUND
@@ -144,7 +144,7 @@ function Team(props) {
             <div>
               <div style={{ textAlign: "center" }}>
                 <h1
-                  className="display-1 bold color_white"
+                  className="display-1 bold color_white cool"
                   style={{ textAlign: "center", marginBottom: "25px" }}
                 >
                   {team.name.toUpperCase()}

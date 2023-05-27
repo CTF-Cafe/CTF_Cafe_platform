@@ -38,71 +38,86 @@ function Admin(props) {
             </button>
             <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
               <div className="navbar-nav">
-                <Link to={`/`} style={{ display: "flex" }}>
-                  <a className="pl-md-0 p-3 text-decoration-none text-light">
-                    <h3 className="bold" style={{ margin: 0 }}>
-                      {process.env.REACT_APP_CTF_NAME.split("_").map(
-                        (text, i) =>
-                          i % 2 ? (
-                            <span className="color_white">{text}</span>
-                          ) : (
-                            <span className="color_danger">{text}</span>
-                          )
-                      )}
-                    </h3>
-                  </a>
+                <Link
+                  to={`/`}
+                  style={{ display: "flex" }}
+                  className="pl-md-0 p-3 text-decoration-none text-light"
+                >
+                  <h3 className="bold" style={{ margin: 0 }}>
+                    {process.env.REACT_APP_CTF_NAME.split("_").map((text, i) =>
+                      i % 2 ? (
+                        <span className="color_white" key={i}>
+                          {text}
+                        </span>
+                      ) : (
+                        <span className="color_danger" key={i}>
+                          {text}
+                        </span>
+                      )
+                    )}
+                  </h3>
                 </Link>
               </div>
               <div className="navbar-nav ml-auto">
-                <Link to={`/admin/`}>
-                  <a className="p-3 text-decoration-none text-light bold">
-                    Stats
-                  </a>
+                <Link
+                  to={`/admin/`}
+                  className="p-3 text-decoration-none text-light bold"
+                >
+                  Stats
                 </Link>
-                <Link to={`/admin/users`}>
-                  <a className="p-3 text-decoration-none text-light bold">
-                    Users
-                  </a>
+                <Link
+                  to={`/admin/users`}
+                  className="p-3 text-decoration-none text-light bold"
+                >
+                  Users
                 </Link>
-                <Link to={`/admin/teams`}>
-                  <a className="p-3 text-decoration-none text-light bold">
-                    Teams
-                  </a>
+                <Link
+                  to={`/admin/teams`}
+                  className="p-3 text-decoration-none text-light bold"
+                >
+                  Teams
                 </Link>
-                <Link to={`/admin/challenges`}>
-                  <a className="p-3 text-decoration-none text-light bold">
-                    Challenges
-                  </a>
+                <Link
+                  to={`/admin/challenges`}
+                  className="p-3 text-decoration-none text-light bold"
+                >
+                  Challenges
                 </Link>
-                <Link to={`/admin/assets`}>
-                  <a className="p-3 text-decoration-none text-light bold">
-                    Assets
-                  </a>
+                <Link
+                  to={`/admin/assets`}
+                  className="p-3 text-decoration-none text-light bold"
+                >
+                  Assets
                 </Link>
-                <Link to={`/admin/config`}>
-                  <a className="p-3 text-decoration-none text-light bold">
-                    Config
-                  </a>
+                <Link
+                  to={`/admin/config`}
+                  className="p-3 text-decoration-none text-light bold"
+                >
+                  Config
                 </Link>
-                <Link to={`/admin/theme`}>
-                  <a className="p-3 text-decoration-none text-light bold">
-                    Theme
-                  </a>
+                <Link
+                  to={`/admin/theme`}
+                  className="p-3 text-decoration-none text-light bold"
+                >
+                  Theme
                 </Link>
-                <Link to={`/admin/tools`}>
-                  <a className="p-3 text-decoration-none text-light bold">
-                    Tools
-                  </a>
+                <Link
+                  to={`/admin/tools`}
+                  className="p-3 text-decoration-none text-light bold"
+                >
+                  Tools
                 </Link>
-                <Link to={`/admin/logs`}>
-                  <a className="p-3 text-decoration-none text-light bold">
-                    Logs
-                  </a>
+                <Link
+                  to={`/admin/logs`}
+                  className="p-3 text-decoration-none text-light bold"
+                >
+                  Logs
                 </Link>
-                <Link to={`/admin/dockers`}>
-                  <a className="p-3 text-decoration-none text-light bold">
-                    Dockers
-                  </a>
+                <Link
+                  to={`/admin/dockers`}
+                  className="p-3 text-decoration-none text-light bold"
+                >
+                  Dockers
                 </Link>
               </div>
             </div>
@@ -132,7 +147,7 @@ function Admin(props) {
           ) : pathName == "/dockers/" || pathName == "/dockers" ? (
             <Dockers setAction={setAction} />
           ) : (
-            <h1 className="display-1 bold color_white content__title">
+            <h1 className="display-1 bold color_white content__title cool">
               404<span className="vim-caret">&nbsp;</span>
             </h1>
           )}

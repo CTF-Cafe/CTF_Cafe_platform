@@ -22,7 +22,7 @@ function Index(props) {
         <div className="container">
           <div className="row">
             <div className="col-xl-8">
-              <h1 className="display-1 bold color_white content__title">
+              <h1 className="display-1 bold color_white content__title cool">
                 {process.env.REACT_APP_CTF_NAME.toUpperCase()}
                 <span className="vim-caret">&nbsp;</span>
               </h1>
@@ -110,7 +110,7 @@ function Index(props) {
             >
               {globalData.sponsors.length > 0 ? (
                 <>
-                  <h2 className="display-2 bold color_white">SPONSORS</h2>
+                  <h2 className="display-2 bold color_white cool">SPONSORS</h2>
                   {globalData.sponsors.map((sponsor) => {
                     return (
                       <img
