@@ -62,7 +62,7 @@ function Hackerboard(props) {
         {
           page: index,
           search: searchQuery,
-          category: category
+          category: category,
         },
         { withCredentials: true }
       )
@@ -91,7 +91,7 @@ function Hackerboard(props) {
         {
           page: index,
           search: searchQuery,
-          category: category
+          category: category,
         },
         { withCredentials: true }
       )
@@ -293,7 +293,10 @@ function Hackerboard(props) {
             <div className="col-xl-10">
               <div style={{ marginBottom: "25px" }}>
                 <button
-                  className={"btn btn-outline-danger btn-shadow " + (category === null ? "btn-selected" : "")}
+                  className={
+                    "btn btn-outline-danger btn-shadow " +
+                    (category === null ? "btn-selected" : "")
+                  }
                   onClick={() => {
                     setCategory(null);
                   }}
@@ -303,7 +306,10 @@ function Hackerboard(props) {
                 {globalData.userCategories.map((c) => (
                   <button
                     key={c}
-                    className={"btn btn-outline-danger btn-shadow " + (category === c ? "btn-selected" : "")}
+                    className={
+                      "btn btn-outline-danger btn-shadow " +
+                      (category === c ? "btn-selected" : "")
+                    }
                     onClick={() => {
                       setCategory(c);
                     }}
@@ -375,7 +381,9 @@ function Hackerboard(props) {
 
               {/* Scoreboard Title */}
               <div style={{ textAlign: "center" }}>
-                <h1 className="cool">{selectionMain.toUpperCase() + " SCOREBOARD"}</h1>
+                <h1 className="cool">
+                  {selectionMain.toUpperCase() + " SCOREBOARD"}
+                </h1>
               </div>
 
               <table className="table table-hover table-striped">
@@ -467,10 +475,11 @@ function Hackerboard(props) {
                               )}
                             </th>
                             <td style={{ textAlign: "left" }}>
-                              <Link to={`/user/${user.username}`}>
-                                <a className="p-3 text-decoration-none text-light bold">
-                                  {user.username}
-                                </a>
+                              <Link
+                                to={`/user/${user.username}`}
+                                className="text-decoration-none text-light bold"
+                              >
+                                {user.username}
                               </Link>
                             </td>
                             <td> {user.solved.length} </td>
@@ -540,10 +549,11 @@ function Hackerboard(props) {
                               )}
                             </th>
                             <td style={{ textAlign: "left" }}>
-                              <Link to={`/team/${team.name}`}>
-                                <a className="p-3 text-decoration-none text-light bold">
-                                  {team.name}
-                                </a>
+                              <Link
+                                to={`/team/${team.name}`}
+                                className="text-decoration-none text-light bold"
+                              >
+                                {team.country} {team.name}
                               </Link>
                             </td>
                             <td> {team.totalSolved} </td>

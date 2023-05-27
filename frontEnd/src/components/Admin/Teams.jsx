@@ -155,10 +155,11 @@ function Teams(props) {
                   {index + (page - 1) * 100}
                 </th>
                 <td>
-                  <Link to={`/team/${team.name}`}>
-                    <a className="p-3 text-decoration-none text-light bold">
-                      {team.name}
-                    </a>
+                  <Link
+                    to={`/team/${team.name}`}
+                    className="text-decoration-none text-light bold"
+                  >
+                    {team.name}
                   </Link>
                 </td>
                 <td>
@@ -166,9 +167,7 @@ function Teams(props) {
                     return <p key={user.username}>{user.username}</p>;
                   })}
                 </td>
-                <td>
-                  {team.category}
-                </td>
+                <td>{team.category}</td>
                 {editMode && (
                   <td>
                     <button

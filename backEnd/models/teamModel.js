@@ -28,6 +28,10 @@ var teamSchema = new Schema({
         type: String,
         required: true
     },
+    country: {
+        type: String,
+        default: "🌐"
+    }
 });
 
 module.exports = mongoose.model('Teams', teamSchema);

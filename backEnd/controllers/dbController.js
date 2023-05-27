@@ -69,6 +69,7 @@ exports.resolveTeamsFull = function (match) {
         name: { $first: "$name" },
         teamCaptain: { $first: "$teamCaptain" },
         category: { $first: "$category" },
+        country: { $first: "$country" },
       },
     },
     {
@@ -85,6 +86,7 @@ exports.resolveTeamsFull = function (match) {
         },
         name: { $first: "$name" },
         teamCaptain: { $first: "$teamCaptain" },
+        country: { $first: "$country" },
       },
     },
     {
@@ -163,6 +165,7 @@ exports.resolveTeamsFull = function (match) {
         name: { $first: "$name" },
         teamCaptain: { $first: "$teamCaptain" },
         category: { $first: "$category" },
+        country: { $first: "$country" },
       },
     },
     {
@@ -181,6 +184,7 @@ exports.resolveTeamsFull = function (match) {
         name: { $first: "$name" },
         teamCaptain: { $first: "$teamCaptain" },
         category: { $first: "$category" },
+        country: { $first: "$country" },
       },
     },
   ]);
@@ -218,6 +222,7 @@ exports.resolveTeamsMin = function (match) {
         name: { $first: "$name" },
         teamCaptain: { $first: "$teamCaptain" },
         category: { $first: "$category" },
+        country: { $first: "$country" },
       },
     },
     {
@@ -242,6 +247,7 @@ exports.resolveTeamsMin = function (match) {
         name: { $first: "$name" },
         teamCaptain: { $first: "$teamCaptain" },
         category: { $first: "$category" },
+        country: { $first: "$country" },
       },
     },
     {
@@ -262,6 +268,7 @@ exports.resolveTeamsMin = function (match) {
         name: { $first: "$name" },
         teamCaptain: { $first: "$teamCaptain" },
         category: { $first: "$category" },
+        country: { $first: "$country" },
       },
     },
     {
@@ -330,6 +337,7 @@ exports.resolveTeamsMin = function (match) {
         hintsBought: { $first: "$hintsBought" },
         adminPoints: { $first: "$adminPoints" },
         category: { $first: "$category" },
+        country: { $first: "$country" },
       },
     },
     {
@@ -410,6 +418,7 @@ exports.resolveTeamsMin = function (match) {
         adminPoints: { $first: "$adminPoints" },
         maxTimestamp: { $first: "$maxTimestamp" },
         category: { $first: "$category" },
+        country: { $first: "$country" },
       },
     },
     {
