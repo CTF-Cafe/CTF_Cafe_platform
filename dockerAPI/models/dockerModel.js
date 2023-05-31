@@ -20,8 +20,8 @@ var dockerSchema = new Schema({
         required: true,
     },
     deployTime: {
-        type: Date,
-        default: new Date()
+        type: String,
+        default: new Date().getTime()
     },
     githubUrl: {
         type: String,

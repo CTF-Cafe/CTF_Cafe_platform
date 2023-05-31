@@ -660,14 +660,19 @@ function Challenges(props) {
                                 </div>
 
                                 {challenge.url ? (
-                                  <a
-                                    href={`${challenge.url}`}
-                                    target="_blank"
-                                    className="btn btn-outline-danger btn-shadow mt-3"
-                                    rel="noreferrer"
-                                  >
-                                    {challenge.url}
-                                  </a>
+                                  <div>
+                                    <a
+                                      href={`${challenge.url}`}
+                                      target="_blank"
+                                      className="btn btn-outline-danger btn-shadow mt-3"
+                                      rel="noreferrer"
+                                    >
+                                      {challenge.url}
+                                    </a>
+                                    <span className="btn btn-outline-danger btn-shadow mt-3">
+                                      {formatHours(((new Date(parseInt(challenge.deployTime)).getTime() + 2 * 60 * 60 * 1000) - new Date().getTime()) / 1000)}
+                                    </span>
+                                  </div>
                                 ) : null}
                               </blockquote>
                             </div>

@@ -50,9 +50,9 @@ async function checkDockerExists(githubUrl) {
   let infos = await getInfosfromUrl(githubUrl);
 
   // Path where the project will be cloned
-  const dockerPath = `${__dirname}/../dockers/${
+  let dockerPath = `${__dirname}/../dockers/${
     infos.user
-  }/${infos.project.replace(" ", "_")}/${infos.projectPath}`;
+  }/${infos.project.replace(" ", "_")}`;
 
   // Create directory for the project
   let res = await fs.mkdirSync(dockerPath, { recursive: true });
@@ -70,6 +70,8 @@ async function checkDockerExists(githubUrl) {
   } else {
     await git.fetch();
   }
+
+  dockerPath += `/${infos.projectPath}`;
 
   // Pull project
   await git.pull("origin", infos.committish);

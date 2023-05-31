@@ -139,6 +139,7 @@ exports.getChallenges = async function (req, res) {
             } else {
               copy.progress = challengeDeployed.progress;
             }
+            copy.deployTime = challengeDeployed.deployTime;
           }
 
           delete copy.flag;
@@ -240,8 +241,8 @@ exports.deployDocker = async function (req, res) {
     delete resFetch.flag;
     res.send({ state: "success", message: resFetch });
   } catch (error) {
-    if (err) {
-      res.send({ state: "error", message: err.message });
+    if (error) {
+      res.send({ state: "error", message: error.message });
     }
   }
 };
