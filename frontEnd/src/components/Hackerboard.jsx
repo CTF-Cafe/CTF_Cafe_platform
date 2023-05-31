@@ -21,6 +21,8 @@ function Hackerboard(props) {
   const [endTime, setEndTime] = useState(2651526762);
   const [teamCount, setTeamCount] = useState(0);
   const [category, setCategory] = useState(null);
+  const [liveReload, setLiveReload] = useState(false);
+  const [reload, setReload] = useState(false);
 
   useEffect(() => {
     selectionMain === "Teams" ? getTeams(page) : getUsers(page);
@@ -118,6 +120,15 @@ function Hackerboard(props) {
   useEffect(() => {
     getData(1);
   }, [category]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (liveReload) {
+        getData(page);
+        setReload(!reload);
+      }
+    }, 15000);
+  }, [reload, liveReload]);
 
   const sortData = () => {
     setUsers(users.reverse());
@@ -333,21 +344,37 @@ function Hackerboard(props) {
                   marginBottom: "25px",
                 }}
               >
-                <button
-                  className="btn btn-outline-danger btn-shadow"
-                  onClick={() => {
-                    changeSelection("main");
-                  }}
-                  title={
-                    selectionMain === "Users" ? "View Teams" : "View Users"
-                  }
-                >
-                  {selectionMain === "Users" ? (
-                    <span className="fa-solid fa-users" />
-                  ) : (
-                    <span className="fa-solid fa-user" />
-                  )}
-                </button>
+                <div>
+                  <button
+                    className="btn btn-outline-danger btn-shadow"
+                    onClick={() => {
+                      changeSelection("main");
+                    }}
+                    title={
+                      selectionMain === "Users" ? "View Teams" : "View Users"
+                    }
+                  >
+                    {selectionMain === "Users" ? (
+                      <span className="fa-solid fa-users" />
+                    ) : (
+                      <span className="fa-solid fa-user" />
+                    )}
+                  </button>
+                  <button
+                    className="btn btn-outline-danger btn-shadow"
+                    onClick={() => setLiveReload(!liveReload)}
+                    title={!liveReload}
+                  >
+                    {liveReload ? (
+                      <span className="fa-solid fa-rss" />
+                    ) : (
+                      <span
+                        className="fa-solid fa-rss"
+                        style={{ opacity: "20%" }}
+                      />
+                    )}
+                  </button>
+                </div>
                 <div>
                   <input
                     type="text"
