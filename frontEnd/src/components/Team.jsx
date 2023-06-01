@@ -1,16 +1,18 @@
 import { Link, useLocation } from "react-router-dom";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import AppContext from "./Data/AppContext";
 import Navbar from "./Global/Navbar";
 import PieChart from "./Charts/PieChart";
 
 function Team(props) {
+  const globalData = useContext(AppContext);
   const location = useLocation();
   const selectedTeam = decodeURIComponent(
     location.pathname.replace("/team/", "")
   );
   const [team, setTeam] = useState({});
-  const [challengeStatsCategory, setChallengeStatsCategory] = useState([]);
+  const [challengeStatsTags, setChallengeStatsTags] = useState([]);
   const [challengeStatsDifficulty, setChallengeStatsDifficulty] = useState([]);
 
   const getTeam = (teamName) => {
@@ -26,7 +28,7 @@ function Team(props) {
       )
       .then((response) => {
         if (response.data.state !== "error") {
-          let finalDataCategory = [];
+          let finalDataTags = [];
           let finalDataDifficulty = [];
 
           response.data.solved = [];
@@ -49,20 +51,20 @@ function Team(props) {
               user.score += solve.points;
               response.data.score += solve.points;
 
-              var category = finalDataCategory.find((obj) => {
-                return obj.name === solve.category;
-              });
-
-              if (category) {
-                finalDataCategory[
-                  finalDataCategory.indexOf(category)
-                ].value += 1;
-              } else {
-                finalDataCategory.push({
-                  name: solve.category,
-                  value: 1,
+              solve.tags.forEach((tag) => {
+                let exists = finalDataTags.find((obj) => {
+                  return obj.name == tag;
                 });
-              }
+
+                if (exists) {
+                  exists.value += 1;
+                } else {
+                  finalDataTags.push({
+                    name: tag,
+                    value: 1,
+                  });
+                }
+              });
 
               var difficulty = finalDataDifficulty.find((obj) => {
                 return (
@@ -111,7 +113,7 @@ function Team(props) {
 
           response.data.users.sort((a, b) => b.score - a.score);
 
-          setChallengeStatsCategory(finalDataCategory);
+          setChallengeStatsTags(finalDataTags);
 
           setChallengeStatsDifficulty(finalDataDifficulty);
 
@@ -152,7 +154,9 @@ function Team(props) {
                   className="display-1 bold color_white cool"
                   style={{ textAlign: "center", marginBottom: "25px" }}
                 >
-                  <span style={{ fontSize: "50px", marginRight: "10px" }}>{team.country}</span>
+                  <span style={{ fontSize: "50px", marginRight: "10px" }}>
+                    {team.country}
+                  </span>
                   {team.name.toUpperCase()}
                 </h1>
                 <div style={{ textAlign: "center" }}>
@@ -196,8 +200,8 @@ function Team(props) {
                   <div className="row" style={{ textAlign: "center" }}>
                     <div className="col-md-6 mb-3">
                       <div>
-                        <h3>Solves by Category</h3>
-                        <PieChart data={challengeStatsCategory} />
+                        <h3>Solves by Tags</h3>
+                        <PieChart data={challengeStatsTags} />
                       </div>
                     </div>
                     <div className="col-md-6 mb-3">
@@ -218,7 +222,7 @@ function Team(props) {
                           </th>
                           <th scope="col">Challenge Name</th>
                           <th scope="col">Challenge Points</th>
-                          <th scope="col">Challenge Category</th>
+                          <th scope="col">Challenge Tags</th>
                           <th scope="col">Time Solved</th>
                           <th scope="col">Flagger</th>
                         </tr>
@@ -256,7 +260,24 @@ function Team(props) {
                                   {solve.firstBlood === solve.userId &&
                                     `(+${solve.firstBloodPoints})`}
                                 </td>
-                                <td>{solve.category}</td>
+                                <td>
+                                  {solve.tags.map((tag) => (
+                                    <span
+                                      key={tag + solve._id}
+                                      className="badge color_white align-self-end"
+                                      style={{
+                                        marginRight: "5px",
+                                        backgroundColor: (
+                                          globalData.tagColors.find(
+                                            (x) => tag == x.name
+                                          ) || { color: "black" }
+                                        ).color,
+                                      }}
+                                    >
+                                      {tag}
+                                    </span>
+                                  ))}
+                                </td>
                                 <td>
                                   {
                                     new Date(solve.timestamp)

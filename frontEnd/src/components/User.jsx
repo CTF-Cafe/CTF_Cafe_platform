@@ -1,48 +1,56 @@
 import { useLocation } from "react-router-dom";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import Navbar from "./Global/Navbar";
 import PieChart from "./Charts/PieChart";
+import AppContext from "./Data/AppContext";
 
 function User(props) {
+  const globalData = useContext(AppContext);
   const location = useLocation();
-  const selectedUser = decodeURIComponent(location.pathname.replace("/user/", ""));
+  const selectedUser = decodeURIComponent(
+    location.pathname.replace("/user/", "")
+  );
   const [user, setUser] = useState({});
-  const [challengeStatsCategory, setChallengeStatsCategory] = useState([]);
+  const [challengeStatsTags, setChallengeStatsTags] = useState([]);
   const [challengeStatsDifficulty, setChallengeStatsDifficulty] = useState([]);
 
   const getUser = (username) => {
     axios
-      .post(process.env.REACT_APP_BACKEND_URI + "/api/getUser", {
-        username: username,
-      }, {
-        withCredentials: true
-      })
+      .post(
+        process.env.REACT_APP_BACKEND_URI + "/api/getUser",
+        {
+          username: username,
+        },
+        {
+          withCredentials: true,
+        }
+      )
       .then((response) => {
         if (response.data.state !== "error") {
           setUser(response.data);
 
           if (response.data.solved.length > 0) {
-            let finalDataCategory = [];
+            let finalDataTags = [];
             let finalDataDifficulty = [];
 
             response.data.solved.forEach((solve) => {
-              var category = finalDataCategory.find((obj) => {
-                return obj.name === solve.challenge.category;
+              solve.challenge.tags.forEach((tag) => {
+                let exists = finalDataTags.find((obj) => {
+                  return obj.name == tag;
+                });
+
+                if (exists) {
+                  exists.value += 1;
+                } else {
+                  finalDataTags.push({
+                    name: tag,
+                    value: 1,
+                  });
+                }
               });
 
-              if (category) {
-                finalDataCategory[
-                  finalDataCategory.indexOf(category)
-                ].value += 1;
-              } else {
-                finalDataCategory.push({
-                  name: solve.challenge.category,
-                  value: 1,
-                });
-              }
-
-              setChallengeStatsCategory(finalDataCategory);
+              setChallengeStatsTags(finalDataTags);
 
               var difficulty = finalDataDifficulty.find((obj) => {
                 return (
@@ -108,15 +116,23 @@ function User(props) {
                 {user.username.toUpperCase()}
               </h1>
               <div style={{ textAlign: "center" }}>
-                <p>Score : {user.score} {user.adminPoints !== 0 && `(${user.adminPoints > 0 ? '+' + user.adminPoints : user.adminPoints})`}</p>
+                <p>
+                  Score : {user.score}{" "}
+                  {user.adminPoints !== 0 &&
+                    `(${
+                      user.adminPoints > 0
+                        ? "+" + user.adminPoints
+                        : user.adminPoints
+                    })`}
+                </p>
                 <p>Category : {user.category}</p>
               </div>
               {/* User Solve Stats */}
               <div className="row" style={{ textAlign: "center" }}>
                 <div className="col-md-6 mb-3">
                   <div>
-                    <h3>Solves by Category</h3>
-                    <PieChart data={challengeStatsCategory} />
+                    <h3>Solves by Tags</h3>
+                    <PieChart data={challengeStatsTags} />
                   </div>
                 </div>
                 <div className="col-md-6 mb-3">
@@ -137,7 +153,7 @@ function User(props) {
                       </th>
                       <th scope="col">Challenge Name</th>
                       <th scope="col">Challenge Points</th>
-                      <th scope="col">Challenge Category</th>
+                      <th scope="col">Challenge Tags</th>
                       <th scope="col">Time Solved</th>
                     </tr>
                   </thead>
@@ -166,7 +182,24 @@ function User(props) {
                             {solve.challenge.firstBlood == user._id &&
                               `(+${solve.challenge.firstBloodPoints})`}
                           </td>
-                          <td>{solve.challenge.category}</td>
+                          <td>
+                            {solve.challenge.tags.map((tag) => (
+                              <span
+                                key={tag + solve._id}
+                                className="badge color_white align-self-end"
+                                style={{
+                                  marginRight: "5px",
+                                  backgroundColor: (
+                                    globalData.tagColors.find(
+                                      (x) => tag == x.name
+                                    ) || { color: "black" }
+                                  ).color,
+                                }}
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </td>
                           <td>{solve.timestamp}</td>
                         </tr>
                       );

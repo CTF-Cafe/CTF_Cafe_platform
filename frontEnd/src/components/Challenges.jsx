@@ -158,11 +158,11 @@ function Challenges(props) {
           setLoading(false);
         } else {
           response.data.challenges.sort((a, b) => {
-            if (a.level < b.level || a.tags.length < b.tags.length) {
+            if (a.level < b.level) {
               return -1;
             }
 
-            if (a.level > b.level || a.tags.length > b.tags.length) {
+            if (a.level > b.level) {
               return 1;
             }
 
@@ -392,8 +392,9 @@ function Challenges(props) {
                 <div className="col-md-12">
                   <h4>{capitalize(tag)}</h4>
                 </div>
-                {challenges.map((challenge, index) => {
-                  if (challenge.tags.includes(tag)) {
+                {challenges
+                  .filter((x) => x.tags[0] === tag)
+                  .map((challenge, index) => {
                     return (
                       <div className="col-md-6 mb-3" key={index + tag}>
                         <div
@@ -471,18 +472,30 @@ function Challenges(props) {
                                 alignItems: "flex-end",
                               }}
                             >
-                              {globalData.userData.solved.filter((obj) => {
-                                return obj._id === challenge._id;
-                              }).length > 0 ? (
-                                <>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "row-reverse",
+                                }}
+                              >
+                                {challenge.tags.map((tag) => (
                                   <span
-                                    className="badge"
-                                    style={{ marginRight: "5px" }}
+                                    key={tag + challenge._id}
+                                    className="badge color_white align-self-end"
+                                    style={{
+                                      marginRight: "5px",
+                                      backgroundColor: (
+                                        globalData.tagColors.find(
+                                          (x) => tag == x.name
+                                        ) || { color: "black" }
+                                      ).color,
+                                    }}
                                   >
-                                    solved
-                                  </span>{" "}
-                                </>
-                              ) : null}
+                                    {tag}
+                                  </span>
+                                ))}
+                              </div>
+                              {/* DIFFICULTY BADGE */}
                               <span
                                 className={
                                   challenge.level === 0
@@ -507,7 +520,7 @@ function Challenges(props) {
                                 className="badge align-self-end"
                                 style={{ marginRight: "5px" }}
                               >
-                                {challenge.points} points
+                                {challenge.points}pts
                               </span>
                               {challenge.firstBloodPoints > 0 && (
                                 <span className="badge align-self-end">
@@ -518,6 +531,18 @@ function Challenges(props) {
                                   ></span>
                                 </span>
                               )}
+                              {globalData.userData.solved.filter((obj) => {
+                                return obj._id === challenge._id;
+                              }).length > 0 ? (
+                                <>
+                                  <span
+                                    className="badge"
+                                    style={{ marginRight: "5px" }}
+                                  >
+                                    solved
+                                  </span>{" "}
+                                </>
+                              ) : null}
                             </div>
                           </div>
                           <div
@@ -737,8 +762,7 @@ function Challenges(props) {
                         </div>
                       </div>
                     );
-                  }
-                })}
+                  })}
               </div>
             );
           })}

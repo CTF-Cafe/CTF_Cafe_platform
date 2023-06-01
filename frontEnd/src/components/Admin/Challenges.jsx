@@ -128,16 +128,17 @@ function Challenges(props) {
           });
 
           response.data.tags.sort((a, b) => {
-            if (a == "misc") {
+            if (a === "misc") {
               return 1;
             }
 
-            if (b == "misc") {
+            if (b === "misc") {
               return -1;
             }
 
             return 0;
           });
+
           setChallenges(response.data.challenges);
         }
       })
@@ -161,9 +162,7 @@ function Challenges(props) {
     const name = document.getElementById("name" + oldChallenge._id).value;
     formData.append("name", name);
 
-    const points = document.getElementById(
-      "points" + oldChallenge._id
-    ).value;
+    const points = document.getElementById("points" + oldChallenge._id).value;
     formData.append("points", points);
 
     const firstBloodPoints = document.getElementById(
@@ -316,7 +315,9 @@ function Challenges(props) {
         {
           tags: [tag],
         },
-        { withCredentials: true }
+        {
+          withCredentials: true,
+        }
       )
       .then((response) => {
         if (response.data.state == "sessionError") {
@@ -361,9 +362,7 @@ function Challenges(props) {
               id={tag}
               style={{ marginBottom: "10px" }}
             >
-              <h4 style={{ display: "inline-block" }}>
-                {capitalize(tag)}
-              </h4>
+              <h4 style={{ display: "inline-block" }}>{capitalize(tag)}</h4>
               <a
                 href="#"
                 className="btn btn-outline-danger btn-shadow"
@@ -375,8 +374,9 @@ function Challenges(props) {
                 <span className="fa-solid fa-plus"> </span>
               </a>
             </div>
-            {challenges.map((challenge, index) => {
-              if (challenge.tags.includes(tag)) {
+            {challenges
+              .filter((x) => x.tags[0] == tag)
+              .map((challenge, index) => {
                 return (
                   <ChallengeCard
                     challenge={challenge}
@@ -392,8 +392,7 @@ function Challenges(props) {
                     tags={globalData.tags}
                   />
                 );
-              }
-            })}
+              })}
           </div>
         );
       })}
@@ -409,7 +408,11 @@ function Challenges(props) {
           <br />
           Challenge Types:
           {globalData.tagColors.map((tag) => (
-            <span className="p-1" style={{ backgroundColor: tag.color }} key={tag.color}>
+            <span
+              className="p-1"
+              style={{ backgroundColor: tag.color }}
+              key={tag.color}
+            >
               {tag.name}
             </span>
           ))}

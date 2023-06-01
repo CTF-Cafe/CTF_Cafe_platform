@@ -10,7 +10,7 @@ function Stats(props) {
   const globalData = useContext(AppContext);
   const [counts, setCounts] = useState({});
   const [challengeSolves, setChallengeSolves] = useState([]);
-  const [challengeStatsCategory, setChallengeStatsCategory] = useState([]);
+  const [challengeStatsTags, setChallengeStatsTags] = useState([]);
   const [challengeStatsDifficulty, setChallengeStatsDifficulty] = useState([]);
   const navigate = useNavigate();
 
@@ -52,25 +52,31 @@ function Stats(props) {
           globalData.setLoggedIn(false);
           globalData.navigate("/", { replace: true });
         } else {
-          let finalDataCategory = [];
+          let finalDataTags = [];
           let finalDataDifficulty = [];
           let finalDataSolves = [];
 
           response.data.forEach((data) => {
-            finalDataSolves.push({ name: data.name, solves: data.solveCount, category: data.category});
-            var result = finalDataCategory.find((obj) => {
-              return obj.name == data.category;
+            finalDataSolves.push({
+              name: data.name,
+              solves: data.solveCount,
+              tag: data.tags,
             });
 
-            if (result) {
-              finalDataCategory[finalDataCategory.indexOf(result)].value +=
-                data.solveCount;
-            } else {
-              finalDataCategory.push({
-                name: data.category,
-                value: data.solveCount,
+            data.tags.forEach((tag) => {
+              var result = finalDataTags.find((obj) => {
+                return obj.name == tag;
               });
-            }
+
+              if (result) {
+                result.value += data.solveCount;
+              } else {
+                finalDataTags.push({
+                  name: tag,
+                  value: data.solveCount,
+                });
+              }
+            });
 
             var result = finalDataDifficulty.find((obj) => {
               return (
@@ -104,7 +110,7 @@ function Stats(props) {
           });
 
           setChallengeSolves(finalDataSolves);
-          setChallengeStatsCategory(finalDataCategory);
+          setChallengeStatsTags(finalDataTags);
           setChallengeStatsDifficulty(finalDataDifficulty);
         }
       })
@@ -134,14 +140,14 @@ function Stats(props) {
         </div>
         <div className="col-md-6 mb-3">
           <h3>Solve Counts</h3>
-          <ColumnChart data={challengeSolves} />
+          <ColumnChart data={challengeSolves} tagColors={globalData.tagColors}/>
         </div>
       </div>
       <div className="row">
         <div className="col-md-6 mb-3">
           <div>
-            <h3>Solves by Category</h3>
-            <PieChart data={challengeStatsCategory} />
+            <h3>Solves by Tags</h3>
+            <PieChart data={challengeStatsTags} />
           </div>
         </div>
         <div className="col-md-6 mb-3">

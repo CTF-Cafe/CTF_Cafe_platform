@@ -36,8 +36,11 @@ function ChallengeCard(props) {
           style={{
             borderTop:
               "4px solid " +
-              (props.tagColors.find((x) => challenge.tags.includes(x.name)) || {color: "white"})
-                .color,
+              (
+                props.tagColors.find((x) => challenge.tags[0] === x.name) || {
+                  color: "white",
+                }
+              ).color,
           }}
           id={"challenge" + challenge._id}
         >
@@ -67,18 +70,48 @@ function ChallengeCard(props) {
                 type="text"
               />
             </div>
-            <span className="badge align-self-end">
-              <input
-                onClick={(e) => e.stopPropagation()}
-                id={"points" + challenge._id}
-                defaultValue={challenge.points}
-                placeholder="0"
-                style={{ width: "50px" }}
-                type="number"
-                step="25"
-              />{" "}
-              points
-            </span>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "flex-end",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row-reverse",
+                }}
+              >
+                {challenge.tags.map((tag) => (
+                  <span
+                    key={tag + challenge._id}
+                    className="badge color_white align-self-end"
+                    style={{
+                      marginRight: "5px",
+                      backgroundColor: (
+                        props.tagColors.find((x) => tag == x.name) || {
+                          color: "black",
+                        }
+                      ).color,
+                    }}
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              <span className="badge align-self-end">
+                <input
+                  onClick={(e) => e.stopPropagation()}
+                  id={"points" + challenge._id}
+                  defaultValue={challenge.points}
+                  placeholder="0"
+                  style={{ width: "50px" }}
+                  type="number"
+                  step="25"
+                />{" "}
+                points
+              </span>
+            </div>
           </div>
           <div id={"problem_id_" + challenge._id} className="collapse">
             <div className="card-body">
