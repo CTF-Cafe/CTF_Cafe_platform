@@ -70,12 +70,12 @@ function Team(props) {
                 return (
                   obj.name ===
                   (solve.level === 3
-                    ? "Hardcore"
+                    ? "Ninja"
                     : solve.level === 2
-                    ? "Medium"
+                    ? "Hard"
                     : solve.level === 1
-                    ? "Easy"
-                    : "Intro")
+                    ? "Medium"
+                    : "Easy")
                 );
               });
 
@@ -87,12 +87,12 @@ function Team(props) {
                 finalDataDifficulty.push({
                   name:
                     solve.level === 3
-                      ? "Hardcore"
+                      ? "Ninja"
                       : solve.level === 2
-                      ? "Medium"
+                      ? "Hard"
                       : solve.level === 1
-                      ? "Easy"
-                      : "Intro",
+                      ? "Medium"
+                      : "Easy",
                   value: 1,
                 });
               }

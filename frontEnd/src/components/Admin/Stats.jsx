@@ -1,9 +1,7 @@
-import { Outlet, Routes, Route, Link } from "react-router-dom";
 import ColumnChart from "../Charts/ColumnChart";
 import PieChart from "../Charts/PieChart";
 import { useState, useEffect, useContext } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import AppContext from "../Data/AppContext";
 
 function Stats(props) {
@@ -12,7 +10,6 @@ function Stats(props) {
   const [challengeSolves, setChallengeSolves] = useState([]);
   const [challengeStatsTags, setChallengeStatsTags] = useState([]);
   const [challengeStatsDifficulty, setChallengeStatsDifficulty] = useState([]);
-  const navigate = useNavigate();
 
   const getStats = () => {
     axios

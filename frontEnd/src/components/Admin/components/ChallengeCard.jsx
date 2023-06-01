@@ -108,8 +108,7 @@ function ChallengeCard(props) {
                   style={{ width: "50px" }}
                   type="number"
                   step="25"
-                />{" "}
-                points
+                />{" "}pts
               </span>
             </div>
           </div>
