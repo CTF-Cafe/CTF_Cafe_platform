@@ -213,7 +213,7 @@ function Config(props) {
                       />
                     </td>
                   ) : (
-                    <td contentEditable="true" id={"config-data" + config._id}>
+                    <td contentEditable="true" id={"config-data" + config._id} suppressContentEditableWarning={true}>
                       <pre style={{ color: "white" }}>
                         {JSON.stringify(config.value, null, 2)}
                       </pre>

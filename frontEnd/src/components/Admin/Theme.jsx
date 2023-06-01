@@ -130,25 +130,25 @@ function Config(props) {
           </tr>
           <tr>
             <td>BACKROUND IMAGE</td>
-            <td contenteditable="true" id="theme_img">
+            <td contenteditable="true" id="theme_img" suppressContentEditableWarning={true}>
               {globalData.theme.bg_img}
             </td>
           </tr>
           <tr>
             <td>TOP1 Icon</td>
-            <td contenteditable="true" id="theme_top1">
+            <td contenteditable="true" id="theme_top1" suppressContentEditableWarning={true}>
               {globalData.theme.top1_icon}
             </td>
           </tr>
           <tr>
             <td>TOP2 Icon</td>
-            <td contenteditable="true" id="theme_top2">
+            <td contenteditable="true" id="theme_top2" suppressContentEditableWarning={true}>
               {globalData.theme.top2_icon}
             </td>
           </tr>
           <tr>
             <td>TOP3 Icon</td>
-            <td contenteditable="true" id="theme_top3">
+            <td contenteditable="true" id="theme_top3" suppressContentEditableWarning={true}>
               {globalData.theme.top3_icon}
             </td>
           </tr>

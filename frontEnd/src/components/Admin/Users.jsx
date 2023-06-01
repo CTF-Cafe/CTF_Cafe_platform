@@ -444,6 +444,7 @@ function Users(props) {
                       <span
                         id={user._id + "admin_points"}
                         contentEditable={true}
+                        suppressContentEditableWarning={true}
                       >
                         {user.adminPoints}
                       </span>
@@ -469,7 +470,7 @@ function Users(props) {
                 </td>
                 {editMode && (
                   <td>
-                    <span id={user._id + "new_password"} contentEditable={true}>
+                    <span id={user._id + "new_password"} contentEditable={true} suppressContentEditableWarning={true}>
                       REDACTED
                     </span>
                     <button
