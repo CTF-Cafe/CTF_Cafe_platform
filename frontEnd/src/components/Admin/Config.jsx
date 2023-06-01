@@ -16,6 +16,21 @@ const configsToShow = [
   "userCategories"
 ];
 
+function toDatetimeLocal(date) {
+  let ten = function (i) {
+      return (i < 10 ? '0' : '') + i;
+    },
+    YYYY = date.getFullYear(),
+    MM = ten(date.getMonth() + 1),
+    DD = ten(date.getDate()),
+    HH = ten(date.getHours()),
+    II = ten(date.getMinutes()),
+    SS = ten(date.getSeconds())
+  ;
+  return YYYY + '-' + MM + '-' + DD + 'T' +
+           HH + ':' + II + ':' + SS;
+};
+
 function ArrayEdit(props) {
   const config = props.config;
   const [array, setArray] = useState(config.value);
@@ -184,10 +199,7 @@ function Config(props) {
                       <input
                         type="datetime-local"
                         id={"config-data" + config._id}
-                        defaultValue={new Date(config.value)
-                          .toISOString()
-                          .split(".")[0]
-                          .slice(0, -3)}
+                        defaultValue={toDatetimeLocal(new Date(config.value))}
                       />
                     </td>
                   ) : config.name === "tags" ? (
