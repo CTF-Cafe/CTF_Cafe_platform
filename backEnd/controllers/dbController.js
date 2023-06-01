@@ -42,7 +42,7 @@ exports.resolveTeamsFull = function (match) {
                 firstBloodPoints: "$firstBloodPoints",
                 firstBlood: "$firstBlood",
                 name: "$name",
-                category: "$category",
+                tags: "$tags",
                 timestamp: "$$timestamp",
                 level: "$level"
               },
@@ -472,7 +472,7 @@ exports.resolveUsers = function (match) {
                 },
                 challenge: {
                   name: "$name",
-                  category: "$category",
+                  tags: "$tags",
                   points: "$points",
                   firstBloodPoints: "$firstBloodPoints",
                   firstBlood: "$firstBlood"

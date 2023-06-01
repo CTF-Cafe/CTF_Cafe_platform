@@ -13,6 +13,7 @@ function ChallengeCard(props) {
   const [challenge, setChallenge] = useState(props.challenge);
   const [openStates, setOpenState] = useState({
     main: false,
+    tags: false,
     hints: false,
     content: false,
     instance: false,
@@ -35,7 +36,7 @@ function ChallengeCard(props) {
           style={{
             borderTop:
               "4px solid " +
-              props.categoryColors.find((x) => x.name === challenge.category)
+              (props.tagColors.find((x) => challenge.tags.includes(x.name)) || {color: "white"})
                 .color,
           }}
           id={"challenge" + challenge._id}
@@ -158,6 +159,89 @@ function ChallengeCard(props) {
                       {challenge.info}
                     </p>
                   </div>
+                </div>
+
+                {/* TAGS TAB */}
+                <div style={{ display: "block" }}>
+                  <span
+                    style={{ cursor: "pointer" }}
+                    onClick={() => {
+                      let newOpenStates = { ...openStates };
+                      newOpenStates.tags = !openStates.tags;
+                      setOpenState(newOpenStates);
+                    }}
+                  >
+                    {openStates.tags ? (
+                      <span className="fa-solid fa-chevron-down" />
+                    ) : (
+                      <span className="fa-solid fa-chevron-right" />
+                    )}{" "}
+                    Tags
+                  </span>
+                </div>
+                <div
+                  style={{
+                    visibility: openStates.tags ? "visible" : "hidden",
+                    position: openStates.tags ? "relative" : "absolute",
+                  }}
+                >
+                  <hr />
+                  {challenge.tags.map((tag, i) => {
+                    return (
+                      <div key={tag}>
+                        <div style={{ display: "block" }}>
+                          <button
+                            className="btn btn-outline-danger mr-2"
+                            type="button"
+                            style={{ fontSize: "10px" }}
+                            onClick={() => {
+                              let updateChallenge = {
+                                ...challenge,
+                                tags: challenge.tags.filter((x) => x != tag),
+                              };
+                              setChallenge(updateChallenge);
+                            }}
+                          >
+                            -
+                          </button>
+                          <label>Tag#{i + 1}:</label>
+                          <p
+                            style={{
+                              backgroundColor: "rgb(30, 32, 55)",
+                              outline: "none",
+                            }}
+                            id={i + "tag" + challenge._id}
+                          >
+                            {tag}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  <select id={"tagNew" + challenge._id}>
+                    {props.tags.map((t) => (
+                      <option value={t}>{t}</option>
+                    ))}
+                  </select>
+                  <br />
+                  <button
+                    className="btn btn-outline-danger"
+                    type="button"
+                    onClick={() => {
+                      const newTag = document.getElementById(
+                        "tagNew" + challenge._id
+                      ).value;
+
+                      if (!challenge.tags.includes(newTag)) {
+                        let updateChallenge = { ...challenge };
+                        updateChallenge.tags.push(newTag);
+                        setChallenge(updateChallenge);
+                      }
+                    }}
+                  >
+                    Add Tag
+                  </button>
+                  <hr />
                 </div>
 
                 {/* HINT TAB */}

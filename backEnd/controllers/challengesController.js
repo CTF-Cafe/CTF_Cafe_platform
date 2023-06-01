@@ -21,7 +21,7 @@ exports.getChallenges = async function (req, res) {
       { hidden: false },
       {
         name: 1,
-        category: 1,
+        tags: 1,
         hints: 1,
         points: 1,
         firstBloodPoints: 1,
@@ -40,7 +40,7 @@ exports.getChallenges = async function (req, res) {
     .sort({ points: 1 });
   const startTime = await ctfConfig.findOne({ name: "startTime" });
   const endTime = await ctfConfig.findOne({ name: "endTime" });
-  let categories = [];
+  let tags = [];
 
   if (parseInt(startTime.value) - Math.floor(new Date().getTime()) >= 0) {
     res.send({
@@ -144,14 +144,15 @@ exports.getChallenges = async function (req, res) {
 
           delete copy.flag;
           delete copy.githubUrl;
-          if (categories.indexOf(copy.category) == -1)
-            categories.push(copy.category);
+          copy.tags.forEach((tag) => {
+            if (tags.indexOf(tag) == -1) tags.push(tag);
+          });
 
           returnedChallenges.push(copy);
         }
 
         res.send({
-          categories: categories,
+          tags: tags,
           challenges: returnedChallenges,
           endTime: endTime.value,
         });
@@ -539,8 +540,7 @@ exports.submitFlag = async function (req, res) {
       state: "success",
     });
 
-    updatedUser.password = undefined;
-    res.send({ state: "success", user: updatedUser });
+    res.send({ state: "success" });
   } catch (err) {
     if (err) {
       res.send({ state: "error", message: err.message });

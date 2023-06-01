@@ -8,8 +8,8 @@ const configsToShow = [
   "rules",
   "sponsors",
   "socialLinks",
-  "categories",
-  "categoryColors",
+  "tags",
+  "tagColors",
   "dynamicScoring",
   "scoreboardHidden",
   "dockerLimit",
@@ -117,7 +117,7 @@ function Config(props) {
             ? new Date(
                 document.getElementById("config-data" + config._id).value
               ).getTime()
-            : config.name === "categories"
+            : config.name === "tags"
             ? document.getElementById("config-data" + config._id).attributes
                 .value.nodeValue
             : config.name === "dockerLimit"
@@ -190,7 +190,7 @@ function Config(props) {
                           .slice(0, -3)}
                       />
                     </td>
-                  ) : config.name === "categories" ? (
+                  ) : config.name === "tags" ? (
                     <ArrayEdit config={config} />
                   ) : ["dynamicScoring", "scoreboardHidden"].includes(
                       config.name

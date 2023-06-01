@@ -11,8 +11,8 @@ var challengeSchema = new Schema({
         type: String,
         required: true
     },
-    category: {
-        type: String,
+    tags: {
+        type: Array,
         required: true
     },
     flag: {

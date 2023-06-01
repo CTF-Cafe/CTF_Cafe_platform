@@ -25,16 +25,11 @@ exports.getStats = async function (req, res) {
     case "challenges":
       res.send(allChallenges);
       break;
-    case "challenges&categories":
-      let categories = [];
-
-      await allChallenges.forEach((challenge) => {
-        if (categories.indexOf(challenge.category) == -1)
-          categories.push(challenge.category);
-      });
+    case "challenges&tags":
+      const tags = (await ctfConfig.findOne({ name: "tags" })).value;
 
       res.send({
-        categories: categories,
+        tags: tags,
         challenges: allChallenges,
         state: "success",
       });
@@ -65,6 +60,7 @@ exports.saveChallenge = async function (req, res) {
       info: { required: true },
       flag: { required: true },
       requirement: { type: "objectId" },
+      tags: { type: "array", itemValidation: {} }
     };
 
     validateRequestBody(req.body, validationObject);
@@ -74,6 +70,7 @@ exports.saveChallenge = async function (req, res) {
     await challenges.findByIdAndUpdate(req.body.id, {
       hidden: req.body.hidden,
       name: req.body.name.trim(),
+      tags: JSON.parse(req.body.tags),
       points: JSON.parse(req.body.points),
       firstBloodPoints: JSON.parse(req.body.firstBloodPoints),
       initialPoints: JSON.parse(req.body.points),
@@ -99,14 +96,14 @@ exports.saveChallenge = async function (req, res) {
 };
 
 exports.createChallenge = async function (req, res) {
-  if (req.body.category.length < 1) {
-    res.send({ state: "error", message: "Category cannot be empty" });
+  if (req.body.tags.length < 1 || req.body.tags[0].length < 1) {
+    res.send({ state: "error", message: "Tags cannot be empty" });
     return;
   }
 
   await challenges.create({
     name: "Challenge_" + Math.random().toString().substr(2, 4),
-    category: req.body.category,
+    tags: req.body.tags,
   });
 
   res.send({ state: "success", message: "Challenge created!" });
