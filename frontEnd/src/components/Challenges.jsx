@@ -45,7 +45,7 @@ function Challenges(props) {
   const [challenges, setChallenges] = useState([]);
   const [currentHint, setCurrentHint] = useState("");
   const [currentSnippet, setCurrentSnippet] = useState({});
-  const [categories, setCategories] = useState([]);
+  const [tags, setTags] = useState([]);
   const [endTime, setEndTime] = useState(0);
   const [loading, setLoading] = useState(true);
   const [counter, setCounter] = useState(0);
@@ -63,6 +63,47 @@ function Challenges(props) {
       }
     };
   }, [counter]);
+
+  // TODO / CLEAN
+  const refreshUser = () => {
+    axios
+      .get(process.env.REACT_APP_BACKEND_URI + "/api/checkSession", {
+        withCredentials: true,
+      })
+      .then((res) => {
+        if (res.data.state === "success") {
+          if (res.data.team) {
+            const clubArray = (arr) => {
+              return arr.reduce((acc, val, ind) => {
+                const index = acc.findIndex(
+                  (el) => el.username === val.username
+                );
+                if (index !== -1) {
+                  acc[index].solved.push(val.solved[0]);
+                  acc[index].score += val.score;
+                } else {
+                  acc.push(val);
+                }
+                return acc;
+              }, []);
+            };
+
+            res.data.team.users = clubArray(res.data.team.users);
+
+            res.data.team.users.forEach((user) => {
+              user.solved.forEach((solved) => {
+                user.score += solved.points;
+              });
+            });
+
+            res.data.user.team = res.data.team;
+          }
+
+          globalData.setUserData(res.data.user);
+        }
+      })
+      .catch(console.log);
+  };
 
   const buyHint = (e, data) => {
     axios
@@ -117,18 +158,18 @@ function Challenges(props) {
           setLoading(false);
         } else {
           response.data.challenges.sort((a, b) => {
-            if (a.level < b.level || a.category.length < b.category.length) {
+            if (a.level < b.level || a.tags.length < b.tags.length) {
               return -1;
             }
 
-            if (a.level > b.level || a.category.length > b.category.length) {
+            if (a.level > b.level || a.tags.length > b.tags.length) {
               return 1;
             }
 
             return 0;
           });
 
-          response.data.categories.sort((a, b) => {
+          response.data.tags.sort((a, b) => {
             if (a === "misc") {
               return 1;
             }
@@ -152,7 +193,7 @@ function Challenges(props) {
           }
 
           setChallenges(response.data.challenges);
-          setCategories(response.data.categories);
+          setTags(response.data.tags);
           setEndTime(response.data.endTime);
           setLoading(false);
         }
@@ -257,9 +298,9 @@ function Challenges(props) {
       )
       .then((response) => {
         if (response.data.state === "success") {
-          globalData.setUserData(response.data.user);
           globalData.alert.success("Correct Flag!");
           getChallenges();
+          refreshUser();
         } else {
           if (response.data.state === "sessionError") {
             globalData.alert.error("Session expired!");
@@ -345,23 +386,25 @@ function Challenges(props) {
             </div>
           ) : null}
 
-          {categories.map((category, index) => {
+          {tags.map((tag, index) => {
             return (
               <div className="row hackerFont" key={index}>
                 <div className="col-md-12">
-                  <h4>{capitalize(category)}</h4>
+                  <h4>{capitalize(tag)}</h4>
                 </div>
                 {challenges.map((challenge, index) => {
-                  if (challenge.category === category) {
+                  if (challenge.tags.includes(tag)) {
                     return (
-                      <div className="col-md-6 mb-3" key={index}>
+                      <div className="col-md-6 mb-3" key={index + tag}>
                         <div
                           className="card"
                           style={{
                             borderTop:
                               "4px solid " +
-                              globalData.categoryColors.find(
-                                (x) => x.name === challenge.category
+                              (
+                                globalData.tagColors.find(
+                                  (x) => tag == x.name
+                                ) || { color: "white" }
                               ).color,
                           }}
                         >
@@ -385,11 +428,11 @@ function Challenges(props) {
                                   : "card-header"
                                 : "card-header"
                             }
-                            data-target={"#problem_id_" + index}
+                            data-target={"#problem_id_" + index + tag}
                             data-toggle="collapse"
                             aria-expanded="false"
                             role="button"
-                            aria-controls={"problem_id_" + index}
+                            aria-controls={"problem_id_" + index + tag}
                             style={{
                               display: "flex",
                               justifyContent: "space-between",
@@ -477,7 +520,10 @@ function Challenges(props) {
                               )}
                             </div>
                           </div>
-                          <div id={"problem_id_" + index} className="collapse">
+                          <div
+                            id={"problem_id_" + index + tag}
+                            className="collapse"
+                          >
                             <div className="card-body">
                               <blockquote className="card-blockquote">
                                 <div style={{ display: "flex" }}>
@@ -636,9 +682,13 @@ function Challenges(props) {
                                     placeholder="Enter Flag"
                                     aria-label="Enter Flag"
                                     aria-describedby="basic-addon2"
-                                    id={"flag_id_" + index}
+                                    id={"flag_id_" + index + tag}
                                     onKeyPress={(e) => {
-                                      handleEnterSubmit(e, index, challenge);
+                                      handleEnterSubmit(
+                                        e,
+                                        index + tag,
+                                        challenge
+                                      );
                                     }}
                                   />
                                   <div className="input-group-append">
@@ -651,7 +701,7 @@ function Challenges(props) {
                                       className="btn btn-outline-danger"
                                       type="button"
                                       onClick={() => {
-                                        submitFlag(index, challenge);
+                                        submitFlag(index + tag, challenge);
                                       }}
                                     >
                                       Go!
@@ -670,7 +720,14 @@ function Challenges(props) {
                                       {challenge.url}
                                     </a>
                                     <span className="btn btn-outline-danger btn-shadow mt-3">
-                                      {formatHours(((new Date(parseInt(challenge.deployTime)).getTime() + 2 * 60 * 60 * 1000) - new Date().getTime()) / 1000)}
+                                      {formatHours(
+                                        (new Date(
+                                          parseInt(challenge.deployTime)
+                                        ).getTime() +
+                                          2 * 60 * 60 * 1000 -
+                                          new Date().getTime()) /
+                                          1000
+                                      )}
                                     </span>
                                   </div>
                                 ) : null}

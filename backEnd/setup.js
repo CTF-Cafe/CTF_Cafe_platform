@@ -108,22 +108,22 @@ exports.setupDB = async function () {
     console.log(`Created default admin. admin:${rawPassword} (DELETE ASAP)`);
   }
 
-  const categoriesConfig = await ctfConfig.findOne({ name: "categories" });
+  const tagsConfig = await ctfConfig.findOne({ name: "tags" });
 
-  if (!categoriesConfig) {
+  if (!tagsConfig) {
     await ctfConfig.create({
-      name: "categories",
+      name: "tags",
       value: ["web", "crypto", "reverse", "pwn", "forensics"],
     });
   }
 
-  const categoryColorsConfig = await ctfConfig.findOne({
-    name: "categoryColors",
+  const tagColorsConfig = await ctfConfig.findOne({
+    name: "tagColors",
   });
 
-  if (!categoryColorsConfig) {
+  if (!tagColorsConfig) {
     await ctfConfig.create({
-      name: "categoryColors",
+      name: "tagColors",
       value: [
         { name: "web", color: "#ef121b94" },
         { name: "osint", color: "#b017a494" },

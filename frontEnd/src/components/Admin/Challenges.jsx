@@ -6,7 +6,7 @@ import ChallengeCard from "./components/ChallengeCard";
 function Challenges(props) {
   const globalData = useContext(AppContext);
   const [challenges, setChallenges] = useState([]);
-  const [categories, setCategories] = useState(globalData.categories);
+  const [tags, setTags] = useState(globalData.tags);
   const [assets, setAssets] = useState([]);
 
   // const importChallenges = () => {
@@ -104,7 +104,7 @@ function Challenges(props) {
       .post(
         process.env.REACT_APP_BACKEND_URI + "/api/admin/getStats",
         {
-          name: "challenges&categories",
+          name: "challenges&tags",
         },
         { withCredentials: true }
       )
@@ -127,7 +127,7 @@ function Challenges(props) {
             return 0;
           });
 
-          response.data.categories.sort((a, b) => {
+          response.data.tags.sort((a, b) => {
             if (a == "misc") {
               return 1;
             }
@@ -237,6 +237,19 @@ function Challenges(props) {
     ).value;
     formData.append("requirement", requirement);
 
+    let tags = [];
+    i = 0;
+    while (document.getElementById(i + "tag" + oldChallenge._id)) {
+      const tag = document.getElementById(
+        i + "tag" + oldChallenge._id
+      ).textContent;
+
+      tags.push(tag);
+      i += 1;
+    }
+
+    formData.append("tags", JSON.stringify(tags));
+
     axios
       .post(
         process.env.REACT_APP_BACKEND_URI + "/api/admin/saveChallenge",
@@ -295,79 +308,13 @@ function Challenges(props) {
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
 
-  const allowDrop = function (ev) {
-    ev.preventDefault();
-  };
-
-  const drag = function (ev) {
-    ev.dataTransfer.setData("text", ev.target.id);
-  };
-
-  const drop = function (ev) {
-    ev.preventDefault();
-
-    var data = ev.dataTransfer.getData("text");
-
-    const challenge = document.getElementById(data).closest(".top");
-    const oldCategory = challenge.closest(".row");
-    let challenge2 = "";
-    let newCategory = "";
-
-    if (!ev.target.classList.value.includes("row")) {
-      newCategory = ev.target.closest(".row");
-
-      challenge2 = challenge.cloneNode();
-      challenge2.display = "none";
-
-      newCategory.appendChild(challenge2);
-    } else {
-      newCategory = ev.target;
-
-      challenge2 = challenge.cloneNode();
-      challenge2.display = "none";
-
-      newCategory.appendChild(challenge2);
-    }
-
-    if (newCategory.children[0].id != oldCategory.children[0].id) {
-      axios
-        .post(
-          process.env.REACT_APP_BACKEND_URI +
-            "/api/admin/updateChallengeCategory",
-          {
-            id: challenge.id.replace("challenge-top", ""),
-            category: newCategory.children[0].id,
-          },
-          { withCredentials: true }
-        )
-        .then((response) => {
-          if (response.data.state == "sessionError") {
-            globalData.alert.error("Session expired!");
-            globalData.setUserData({});
-            globalData.setLoggedIn(false);
-            globalData.navigate("/", { replace: true });
-          } else {
-            if (response.data.state == "success") {
-              globalData.alert.success(response.data.message);
-              getChallenges();
-              challenge2.remove();
-            } else {
-              globalData.alert.error(response.data.message);
-              challenge2.remove();
-            }
-          }
-        })
-        .catch((error) => console.log(error.message));
-    }
-  };
-
-  const createChallenge = (e, category) => {
+  const createChallenge = (e, tag) => {
     e.preventDefault();
     axios
       .post(
         process.env.REACT_APP_BACKEND_URI + "/api/admin/createChallenge",
         {
-          category: category,
+          tags: [tag],
         },
         { withCredentials: true }
       )
@@ -401,27 +348,27 @@ function Challenges(props) {
       >
         CHALLENGES
       </h1>
-      {categories.map((category, index) => {
+      {tags.map((tag, index) => {
         return (
           <div
             className="row hackerFont"
-            key={category}
+            key={tag}
             // onDrop={drop}
             // onDragOver={allowDrop}
           >
             <div
               className="col-md-12"
-              id={category}
+              id={tag}
               style={{ marginBottom: "10px" }}
             >
               <h4 style={{ display: "inline-block" }}>
-                {capitalize(category)}
+                {capitalize(tag)}
               </h4>
               <a
                 href="#"
                 className="btn btn-outline-danger btn-shadow"
                 onClick={(e) => {
-                  createChallenge(e, category);
+                  createChallenge(e, tag);
                 }}
                 title="Create Challenge"
               >
@@ -429,11 +376,11 @@ function Challenges(props) {
               </a>
             </div>
             {challenges.map((challenge, index) => {
-              if (challenge.category === category) {
+              if (challenge.tags.includes(tag)) {
                 return (
                   <ChallengeCard
                     challenge={challenge}
-                    drag={drag}
+                    // drag={drag}
                     saveChallenge={saveChallenge}
                     deleteChallenge={deleteChallenge}
                     key={challenge._id}
@@ -441,7 +388,8 @@ function Challenges(props) {
                     challenges={challenges}
                     setAction={setAction}
                     dynamicScoring={globalData.dynamicScoring}
-                    categoryColors={globalData.categoryColors}
+                    tagColors={globalData.tagColors}
+                    tags={globalData.tags}
                   />
                 );
               }
@@ -460,9 +408,9 @@ function Challenges(props) {
         <div className="col-md-12">
           <br />
           Challenge Types:
-          {globalData.categoryColors.map((category) => (
-            <span className="p-1" style={{ backgroundColor: category.color }} key={category.color}>
-              {category.name}
+          {globalData.tagColors.map((tag) => (
+            <span className="p-1" style={{ backgroundColor: tag.color }} key={tag.color}>
+              {tag.name}
             </span>
           ))}
         </div>

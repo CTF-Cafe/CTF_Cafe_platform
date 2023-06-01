@@ -41,11 +41,11 @@ function App() {
   const [socialLinks, setSocialLinks] = useState(
     JSON.parse(localStorage.getItem("socialLinks")) || []
   );
-  const [categories, setCategories] = useState(
-    JSON.parse(localStorage.getItem("categories")) || []
+  const [tags, setTags] = useState(
+    JSON.parse(localStorage.getItem("tags")) || []
   );
-  const [categoryColors, setCategoryColors] = useState(
-    JSON.parse(localStorage.getItem("categoryColors")) || []
+  const [tagColors, setTagColors] = useState(
+    JSON.parse(localStorage.getItem("tagColors")) || []
   );
   const [sponsors, setSponsors] = useState(
     JSON.parse(localStorage.getItem("sponsors")) || []
@@ -74,8 +74,8 @@ function App() {
     notifications: notifications,
     dynamicScoring: dynamicScoring,
     socialLinks: socialLinks,
-    categories: categories,
-    categoryColors: categoryColors,
+    tags: tags,
+    tagColors: tagColors,
     sponsors: sponsors,
     startTime: startTime,
     endTime: endTime,
@@ -122,19 +122,19 @@ function App() {
                 );
                 setSocialLinks(config.value);
                 break;
-              case "categories":
+              case "tags":
                 localStorage.setItem(
-                  "categories",
+                  "tags",
                   JSON.stringify(config.value)
                 );
-                setCategories(config.value);
+                setTags(config.value);
                 break;
-              case "categoryColors":
+              case "tagColors":
                 localStorage.setItem(
-                  "categoryColors",
+                  "tagColors",
                   JSON.stringify(config.value)
                 );
-                setCategoryColors(config.value);
+                setTagColors(config.value);
                 break;
               case "startTime":
                 localStorage.setItem("startTime", JSON.stringify(config.value));
