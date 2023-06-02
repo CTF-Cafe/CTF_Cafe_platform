@@ -475,7 +475,8 @@ exports.resolveUsers = function (match) {
                   tags: "$tags",
                   points: "$points",
                   firstBloodPoints: "$firstBloodPoints",
-                  firstBlood: "$firstBlood"
+                  firstBlood: "$firstBlood",
+                  level: "$level"
                 }
               },
             },

@@ -304,20 +304,18 @@ function UserTeam(props) {
         user.score += solve.points;
         response.data.score += solve.points;
 
-        solve.tags.forEach((tag) => {
-          let exists = finalDataTags.find((obj) => {
-            return obj.name == tag;
-          });
-
-          if (exists) {
-            exists.value += 1;
-          } else {
-            finalDataTags.push({
-              name: tag,
-              value: 1,
-            });
-          }
+        let exists = finalDataTags.find((obj) => {
+          return obj.name === solve.tags[0];
         });
+
+        if (exists) {
+          exists.value += 1;
+        } else {
+          finalDataTags.push({
+            name: solve.tags[0],
+            value: 1,
+          });
+        }
 
         var difficulty = finalDataDifficulty.find((obj) => {
           return (

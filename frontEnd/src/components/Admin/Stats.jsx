@@ -60,20 +60,18 @@ function Stats(props) {
               tag: data.tags,
             });
 
-            data.tags.forEach((tag) => {
-              var result = finalDataTags.find((obj) => {
-                return obj.name == tag;
-              });
-
-              if (result) {
-                result.value += data.solveCount;
-              } else {
-                finalDataTags.push({
-                  name: tag,
-                  value: data.solveCount,
-                });
-              }
+            var result = finalDataTags.find((obj) => {
+              return obj.name === data.tags[0];
             });
+
+            if (result) {
+              result.value += data.solveCount;
+            } else {
+              finalDataTags.push({
+                name: data.tags[0],
+                value: data.solveCount,
+              });
+            }
 
             var result = finalDataDifficulty.find((obj) => {
               return (

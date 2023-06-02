@@ -363,7 +363,7 @@ function Hackerboard(props) {
                   <button
                     className="btn btn-outline-danger btn-shadow"
                     onClick={() => setLiveReload(!liveReload)}
-                    title={!liveReload}
+                    title={"Live Reload"}
                   >
                     {liveReload ? (
                       <span className="fa-solid fa-rss" />

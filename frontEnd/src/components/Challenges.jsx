@@ -193,7 +193,7 @@ function Challenges(props) {
           }
 
           setChallenges(response.data.challenges);
-          setTags(response.data.tags);
+          setTags(response.data.tags.filter(x => typeof x === 'string'));
           setEndTime(response.data.endTime);
           setLoading(false);
         }
@@ -336,8 +336,10 @@ function Challenges(props) {
     // replace user name
     tmp = tmp.replace("${username}", globalData.userData.username);
 
-    // replace team name
-    tmp = tmp.replace("${teamName}", globalData.userData.team.name);
+    if (globalData.userData.team) {
+      // replace team name
+      tmp = tmp.replace("${teamName}", globalData.userData.team.name);
+    }
 
     return tmp;
   };
@@ -771,7 +773,7 @@ function Challenges(props) {
         <div
           className="modal fade"
           id="modal"
-          tabindex="-1"
+          tabIndex="-1"
           role="dialog"
           aria-labelledby="modal label"
           style={{ display: "none" }}

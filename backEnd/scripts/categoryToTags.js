@@ -17,7 +17,9 @@ db.once("open", async function () {
   console.log("Database Connected successfully");
 
 
-  await challenges.updateMany({}, [
+  await challenges.updateMany({
+    category: { $gt: '' }
+  }, [
 	{
 	  $set: {
 		tags: ["$category"]

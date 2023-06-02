@@ -35,35 +35,35 @@ function User(props) {
             let finalDataDifficulty = [];
 
             response.data.solved.forEach((solve) => {
-              solve.challenge.tags.forEach((tag) => {
-                let exists = finalDataTags.find((obj) => {
-                  return obj.name == tag;
-                });
-
-                if (exists) {
-                  exists.value += 1;
-                } else {
-                  finalDataTags.push({
-                    name: tag,
-                    value: 1,
-                  });
-                }
+              let exists = finalDataTags.find((obj) => {
+                return obj.name === solve.challenge.tags[0];
               });
+
+              if (exists) {
+                exists.value += 1;
+              } else {
+                finalDataTags.push({
+                  name: solve.challenge.tags[0],
+                  value: 1,
+                });
+              }
 
               setChallengeStatsTags(finalDataTags);
 
-              var difficulty = finalDataDifficulty.find((obj) => {
+              let difficulty = finalDataDifficulty.find((obj) => {
                 return (
-                  obj.name ==
-                  (solve.challenge.level == 3
+                  obj.name ===
+                  (solve.challenge.level === 3
                     ? "Ninja"
-                    : solve.challenge.level == 2
+                    : solve.challenge.level === 2
                     ? "Hard"
-                    : solve.challenge.level == 1
+                    : solve.challenge.level === 1
                     ? "Medium"
                     : "Easy")
                 );
               });
+
+              console.log(solve.challenge)
 
               if (difficulty) {
                 finalDataDifficulty[
@@ -72,11 +72,11 @@ function User(props) {
               } else {
                 finalDataDifficulty.push({
                   name:
-                    solve.challenge.level == 3
+                    solve.challenge.level === 3
                       ? "Ninja"
-                      : solve.challenge.level == 2
+                      : solve.challenge.level === 2
                       ? "Hard"
-                      : solve.challenge.level == 1
+                      : solve.challenge.level === 1
                       ? "Medium"
                       : "Easy",
                   value: 1,
