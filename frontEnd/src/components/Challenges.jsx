@@ -648,7 +648,7 @@ function Challenges(props) {
                         </div>
                       </div>
                       <div
-                        id={"problem_id_" + index + challenge._id}
+                        id={"problem_id_" + challenge._id}
                         className="collapse"
                       >
                         <div className="card-body">
