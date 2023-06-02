@@ -50,6 +50,8 @@ function Challenges(props) {
   const [loading, setLoading] = useState(true);
   const [counter, setCounter] = useState(0);
   const [action, setAction] = useState({});
+  const [challSearch, setChallSearch] = useState("");
+  const [selectedTags, setSelectedTags] = useState([]);
 
   useEffect(() => {
     let timer;
@@ -193,7 +195,10 @@ function Challenges(props) {
           }
 
           setChallenges(response.data.challenges);
-          setTags(response.data.tags.filter(x => typeof x === 'string'));
+          setTags(response.data.tags.filter((x) => typeof x === "string"));
+          setSelectedTags(
+            response.data.tags.filter((x) => typeof x === "string")
+          );
           setEndTime(response.data.endTime);
           setLoading(false);
         }
@@ -366,7 +371,7 @@ function Challenges(props) {
           <div className="row">
             <div className="col-xl-12  text-center">
               <h1 className="display-1 bold color_white cool">CHALLENGES</h1>
-              <p className="text-grey text-spacey hackerFont lead mb-5">
+              <p className="text-grey text-spacey hackerFont lead mb-3">
                 Its time to show the world what you can do!
               </p>
             </div>
@@ -388,386 +393,481 @@ function Challenges(props) {
             </div>
           ) : null}
 
-          {tags.map((tag, index) => {
-            return (
-              <div className="row hackerFont" key={index}>
-                <div className="col-md-12">
-                  <h4>{capitalize(tag)}</h4>
-                </div>
-                {challenges
-                  .filter((x) => x.tags[0] === tag)
-                  .map((challenge, index) => {
-                    return (
-                      <div className="col-md-6 mb-3" key={index + tag}>
+          {tags.length > 0 && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <div
+                style={{
+                  backgroundColor: "#151623",
+                  padding: "5px",
+                  borderStartEndRadius: "10px",
+                  borderStartStartRadius: "10px",
+                }}
+              >
+                <input
+                  type="text"
+                  id="searchChalls"
+                  placeholder="Search..."
+                  style={{ marginRight: "5px" }}
+                  onChange={(e) => setChallSearch(e.target.value)}
+                />
+                <i class="fa-solid fa-magnifying-glass"></i>
+              </div>
+            </div>
+          )}
+
+          {tags.length > 0 && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: "25px",
+              }}
+            >
+              <div
+                style={{
+                  backgroundColor: "#151623",
+                  padding: "5px",
+                  borderRadius: "10px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                {tags.map((tag, i) => (
+                  <span
+                    key={tag + "selector" + i}
+                    className="badge color_white align-self-end"
+                    style={{
+                      marginRight: "5px",
+                      backgroundColor: selectedTags.includes(tag)
+                        ? (
+                            globalData.tagColors.find((x) => tag == x.name) || {
+                              color: "black",
+                            }
+                          ).color
+                        : "transparent",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => {
+                      if (selectedTags.includes(tag)) {
+                        setSelectedTags(selectedTags.filter((x) => x !== tag));
+                      } else {
+                        setSelectedTags([...selectedTags, tag]);
+                      }
+                    }}
+                  >
+                    {tag}
+                  </span>
+                ))}
+                <i
+                  className={
+                    selectedTags.length === tags.length
+                      ? "fa-sharp fa-regular fa-circle"
+                      : "fa-solid fa-circle"
+                  }
+                  style={{ cursor: "pointer" }}
+                  onClick={() => {
+                    if (selectedTags.length === tags.length) {
+                      setSelectedTags([]);
+                    } else {
+                      setSelectedTags(tags);
+                    }
+                  }}
+                ></i>
+              </div>
+            </div>
+          )}
+
+          {/* {tags
+            .filter((x) => selectedTags.includes(x))
+            .map((tag, index) => {
+              return ( */}
+          <div className="row hackerFont">
+            {/* <div className="col-md-12">
+                    <h4>{capitalize(tag)}</h4>
+                  </div> */}
+            {challenges
+              .filter((x) =>
+                x.name.toLowerCase().includes(challSearch.toLowerCase())
+              )
+              .filter((x) => x.tags.some((t) => selectedTags.includes(t)))
+              // .filter((x) => x.tags[0] === tag)
+              .map((challenge, index) => {
+                return (
+                  <div className="col-md-6 mb-3 " key={challenge._id}>
+                    <div
+                      className="card"
+                      style={{
+                        borderTop:
+                          "4px solid " +
+                          (
+                            globalData.tagColors.find(
+                              (x) => challenge.tags[0] == x.name
+                            ) || { color: "white" }
+                          ).color,
+                      }}
+                    >
+                      <div
+                        className={
+                          globalData.userData.solved.filter((obj) => {
+                            return obj._id === challenge._id;
+                          }).length > 0
+                            ? "card-header solved"
+                            : globalData.userData.team
+                            ? globalData.userData.team.users.filter((user) => {
+                                return (
+                                  user.solved.filter((obj) => {
+                                    return obj._id === challenge._id;
+                                  }).length > 0
+                                );
+                              }).length > 0
+                              ? "card-header solved"
+                              : "card-header"
+                            : "card-header"
+                        }
+                        data-target={"#problem_id_" + challenge._id}
+                        data-toggle="collapse"
+                        aria-expanded="false"
+                        role="button"
+                        aria-controls={"problem_id_" + challenge._id}
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <div>
+                          {challenge.isInstance && (
+                            <span
+                              className="fa-brands fa-docker"
+                              style={{
+                                fontSize: "22px",
+                                marginRight: "10px",
+                              }}
+                            ></span>
+                          )}
+                          {challenge.firstBlood === globalData.userData._id ? (
+                            <div
+                              style={{
+                                display: "inline-flex",
+                                color: "red",
+                                marginRight: "10px",
+                              }}
+                            >
+                              <span
+                                className="fa-solid fa-droplet"
+                                style={{ fontSize: "22px" }}
+                              ></span>
+                            </div>
+                          ) : null}
+                          {challenge.name}{" "}
+                        </div>
                         <div
-                          className="card"
                           style={{
-                            borderTop:
-                              "4px solid " +
-                              (
-                                globalData.tagColors.find(
-                                  (x) => tag == x.name
-                                ) || { color: "white" }
-                              ).color,
+                            display: "flex",
+                            alignItems: "flex-end",
                           }}
                         >
                           <div
-                            className={
-                              globalData.userData.solved.filter((obj) => {
-                                return obj._id === challenge._id;
-                              }).length > 0
-                                ? "card-header solved"
-                                : globalData.userData.team
-                                ? globalData.userData.team.users.filter(
-                                    (user) => {
-                                      return (
-                                        user.solved.filter((obj) => {
-                                          return obj._id === challenge._id;
-                                        }).length > 0
-                                      );
-                                    }
-                                  ).length > 0
-                                  ? "card-header solved"
-                                  : "card-header"
-                                : "card-header"
-                            }
-                            data-target={"#problem_id_" + index + tag}
-                            data-toggle="collapse"
-                            aria-expanded="false"
-                            role="button"
-                            aria-controls={"problem_id_" + index + tag}
                             style={{
                               display: "flex",
-                              justifyContent: "space-between",
+                              flexDirection: "row-reverse",
                             }}
                           >
-                            <div>
-                              {challenge.isInstance && (
-                                <span
-                                  className="fa-brands fa-docker"
-                                  style={{
-                                    fontSize: "22px",
-                                    marginRight: "10px",
-                                  }}
-                                ></span>
-                              )}
-                              {challenge.firstBlood ===
-                              globalData.userData._id ? (
-                                <div
-                                  style={{
-                                    display: "inline-flex",
-                                    color: "red",
-                                    marginRight: "10px",
-                                  }}
-                                >
-                                  <span
-                                    className="fa-solid fa-droplet"
-                                    style={{ fontSize: "22px" }}
-                                  ></span>
-                                </div>
-                              ) : null}
-                              {challenge.name}{" "}
-                            </div>
-                            <div
-                              style={{
-                                display: "flex",
-                                alignItems: "flex-end",
-                              }}
-                            >
-                              <div
+                            {challenge.tags.map((tag) => (
+                              <span
+                                key={tag + challenge._id}
+                                className="badge color_white align-self-end"
                                 style={{
-                                  display: "flex",
-                                  flexDirection: "row-reverse",
+                                  marginRight: "5px",
+                                  backgroundColor: (
+                                    globalData.tagColors.find(
+                                      (x) => tag == x.name
+                                    ) || { color: "black" }
+                                  ).color,
                                 }}
                               >
-                                {challenge.tags.map((tag) => (
-                                  <span
-                                    key={tag + challenge._id}
-                                    className="badge color_white align-self-end"
-                                    style={{
-                                      marginRight: "5px",
-                                      backgroundColor: (
-                                        globalData.tagColors.find(
-                                          (x) => tag == x.name
-                                        ) || { color: "black" }
-                                      ).color,
-                                    }}
-                                  >
-                                    {tag}
-                                  </span>
-                                ))}
-                              </div>
-                              {/* DIFFICULTY BADGE */}
-                              <span
-                                className={
-                                  challenge.level === 0
-                                    ? "badge color_white color_easy align-self-end"
-                                    : challenge.level === 1
-                                    ? "badge color_white color_medium align-self-end"
-                                    : challenge.level === 2
-                                    ? "badge color_white color_hard align-self-end"
-                                    : "badge color_white color_ninja align-self-end"
-                                }
-                                style={{ marginRight: "5px" }}
-                              >
-                                {challenge.level === 0
-                                  ? "Easy"
-                                  : challenge.level === 1
-                                  ? "Medium"
-                                  : challenge.level === 2
-                                  ? "Hard"
-                                  : "Ninja"}
+                                {tag}
                               </span>
-                              <span
-                                className="badge align-self-end"
-                                style={{ marginRight: "5px" }}
-                              >
-                                {challenge.points}pts
-                              </span>
-                              {challenge.firstBloodPoints > 0 && (
-                                <span className="badge align-self-end">
-                                  (+{challenge.firstBloodPoints}){" "}
-                                  <span
-                                    className="fa-solid fa-droplet"
-                                    style={{ fontSize: "11px", color: "red" }}
-                                  ></span>
-                                </span>
-                              )}
-                              {globalData.userData.solved.filter((obj) => {
-                                return obj._id === challenge._id;
-                              }).length > 0 ? (
-                                <>
-                                  <span
-                                    className="badge"
-                                    style={{ marginRight: "5px" }}
-                                  >
-                                    solved
-                                  </span>{" "}
-                                </>
-                              ) : null}
-                            </div>
+                            ))}
                           </div>
-                          <div
-                            id={"problem_id_" + index + tag}
-                            className="collapse"
+                          {/* DIFFICULTY BADGE */}
+                          <span
+                            className={
+                              challenge.level === 0
+                                ? "badge color_white color_easy align-self-end"
+                                : challenge.level === 1
+                                ? "badge color_white color_medium align-self-end"
+                                : challenge.level === 2
+                                ? "badge color_white color_hard align-self-end"
+                                : "badge color_white color_ninja align-self-end"
+                            }
+                            style={{ marginRight: "5px" }}
                           >
-                            <div className="card-body">
-                              <blockquote className="card-blockquote">
-                                <div style={{ display: "flex" }}>
-                                  <h6 className="solvers">
-                                    Solves:{" "}
-                                    <span className="solver_num">
-                                      {challenge.solveCount}
-                                    </span>{" "}
-                                    &nbsp;
-                                    <span
-                                      className={
-                                        challenge.level === 0
-                                          ? "color_white color_easy"
-                                          : challenge.level === 1
-                                          ? "color_white color_medium"
-                                          : challenge.level === 2
-                                          ? "color_white color_hard"
-                                          : "color_white color_ninja"
-                                      }
-                                    >
-                                      {challenge.level === 0
-                                        ? "Easy"
-                                        : challenge.level === 1
-                                        ? "Medium"
-                                        : challenge.level === 2
-                                        ? "Hard"
-                                        : "Ninja"}
-                                    </span>
-                                  </h6>
-                                </div>
-                                <ReactMarkdown
-                                  children={templateParse(challenge.info)}
-                                />
-
-                                {challenge.isInstance && (
-                                  <button
-                                    className="btn btn-outline-danger btn-shadow"
-                                    onClick={(e) => {
-                                      if (!challenge.progress)
-                                        createDocker(challenge);
-                                      if (challenge.progress === "finished")
-                                        shutdownDocker(challenge);
-                                    }}
-                                    title={
-                                      !challenge.progress
-                                        ? "Start Docker"
-                                        : challenge.progress === "finished"
-                                        ? "Stop Docker"
-                                        : challenge.progress === "stopping"
-                                        ? "Stopping Docker..."
-                                        : "Building Docker..."
-                                    }
-                                  >
-                                    {!challenge.progress ? (
-                                      <>
-                                        <span className="fa-solid fa-circle-play"></span>
-                                      </>
-                                    ) : challenge.progress === "finished" ? (
-                                      <>
-                                        <span className="fa-solid fa-power-off"></span>
-                                      </>
-                                    ) : challenge.progress === "stopping" ? (
-                                      <>
-                                        <span className="fa-solid fa-spinner fa-spin"></span>
-                                      </>
-                                    ) : (
-                                      <>
-                                        <span className="fa-solid fa-spinner fa-spin"></span>
-                                      </>
-                                    )}
-                                  </button>
-                                )}
-
-                                {challenge.file ? (
-                                  challenge.file.length > 0 ? (
-                                    <button
-                                      className="btn btn-outline-danger btn-shadow"
-                                      onClick={() => {
-                                        downloadFile(
-                                          challenge.file,
-                                          challenge.name
-                                        );
-                                      }}
-                                      title="Download File"
-                                    >
-                                      <span className="fa-solid fa-download" />
-                                    </button>
-                                  ) : null
-                                ) : null}
-
-                                {challenge.codeSnippet ? (
-                                  challenge.codeSnippet.trim().length > 0 ? (
-                                    <a
-                                      onClick={() => {
-                                        setCurrentHint("");
-                                        setCurrentSnippet({
-                                          code: challenge.codeSnippet,
-                                          language: challenge.codeLanguage,
-                                        });
-                                      }}
-                                      href="#modal"
-                                      data-toggle="modal"
-                                      data-target="#modal"
-                                      className="btn btn-outline-danger btn-shadow"
-                                      title="Code Snippet"
-                                    >
-                                      <span className="fa-solid fa-laptop-code" />
-                                    </a>
-                                  ) : null
-                                ) : null}
-
-                                {challenge.hints.map((hint, i) =>
-                                  hint.cost === 0 ? (
-                                    hint.content.trim().length > 0 && (
-                                      <a
-                                        onClick={() => {
-                                          setCurrentHint(hint.content);
-                                        }}
-                                        href="#modal"
-                                        data-toggle="modal"
-                                        data-target="#modal"
-                                        className="btn btn-outline-danger btn-shadow"
-                                        title={"Hint#" + (i + 1)}
-                                      >
-                                        <span className="fa-solid fa-lightbulb" />
-                                      </a>
-                                    )
-                                  ) : (
-                                    <a
-                                      onClick={(e) => {
-                                        setAction({
-                                          function: buyHint,
-                                          e: e,
-                                          data: {
-                                            challId: challenge._id,
-                                            hintId: hint.id,
-                                          },
-                                        });
-                                      }}
-                                      href="#confirmModal"
-                                      data-toggle="modal"
-                                      data-target="#confirmModal"
-                                      className="btn btn-outline-danger btn-shadow"
-                                      title={"Buy Hint#" + (i + 1)}
-                                    >
-                                      <span className="fa-solid fa-lightbulb mr-2"></span>
-                                      (-{hint.cost.toString()}pts)
-                                    </a>
-                                  )
-                                )}
-
-                                <div className="input-group mt-3">
-                                  <input
-                                    type="text"
-                                    className="form-control"
-                                    placeholder="Enter Flag"
-                                    aria-label="Enter Flag"
-                                    aria-describedby="basic-addon2"
-                                    id={"flag_id_" + index + tag}
-                                    onKeyPress={(e) => {
-                                      handleEnterSubmit(
-                                        e,
-                                        index + tag,
-                                        challenge
-                                      );
-                                    }}
-                                  />
-                                  <div className="input-group-append">
-                                    <button
-                                      style={{
-                                        borderTopRightRadius: "6px",
-                                        borderBottomRightRadius: "6px",
-                                      }}
-                                      id="submit_p2"
-                                      className="btn btn-outline-danger"
-                                      type="button"
-                                      onClick={() => {
-                                        submitFlag(index + tag, challenge);
-                                      }}
-                                    >
-                                      Go!
-                                    </button>
-                                  </div>
-                                </div>
-
-                                {challenge.url ? (
-                                  <div>
-                                    <a
-                                      href={`${challenge.url}`}
-                                      target="_blank"
-                                      className="btn btn-outline-danger btn-shadow mt-3"
-                                      rel="noreferrer"
-                                    >
-                                      {challenge.url}
-                                    </a>
-                                    <span className="btn btn-outline-danger btn-shadow mt-3">
-                                      {formatHours(
-                                        (new Date(
-                                          parseInt(challenge.deployTime)
-                                        ).getTime() +
-                                          2 * 60 * 60 * 1000 -
-                                          new Date().getTime()) /
-                                          1000
-                                      )}
-                                    </span>
-                                  </div>
-                                ) : null}
-                              </blockquote>
-                            </div>
-                          </div>
+                            {challenge.level === 0
+                              ? "Easy"
+                              : challenge.level === 1
+                              ? "Medium"
+                              : challenge.level === 2
+                              ? "Hard"
+                              : "Ninja"}
+                          </span>
+                          <span
+                            className="badge align-self-end"
+                            style={{ marginRight: "5px" }}
+                          >
+                            {challenge.points}pts
+                          </span>
+                          {challenge.firstBloodPoints > 0 && (
+                            <span className="badge align-self-end">
+                              (+{challenge.firstBloodPoints}){" "}
+                              <span
+                                className="fa-solid fa-droplet"
+                                style={{ fontSize: "11px", color: "red" }}
+                              ></span>
+                            </span>
+                          )}
+                          {globalData.userData.solved.filter((obj) => {
+                            return obj._id === challenge._id;
+                          }).length > 0 ? (
+                            <>
+                              <span
+                                className="badge"
+                                style={{ marginRight: "5px" }}
+                              >
+                                solved
+                              </span>{" "}
+                            </>
+                          ) : null}
                         </div>
                       </div>
-                    );
-                  })}
-              </div>
-            );
-          })}
+                      <div
+                        id={"problem_id_" + index + challenge._id}
+                        className="collapse"
+                      >
+                        <div className="card-body">
+                          <blockquote className="card-blockquote">
+                            <div style={{ display: "flex" }}>
+                              <h6 className="solvers">
+                                Solves:{" "}
+                                <span className="solver_num">
+                                  {challenge.solveCount}
+                                </span>{" "}
+                                &nbsp;
+                                <span
+                                  className={
+                                    challenge.level === 0
+                                      ? "color_white color_easy"
+                                      : challenge.level === 1
+                                      ? "color_white color_medium"
+                                      : challenge.level === 2
+                                      ? "color_white color_hard"
+                                      : "color_white color_ninja"
+                                  }
+                                >
+                                  {challenge.level === 0
+                                    ? "Easy"
+                                    : challenge.level === 1
+                                    ? "Medium"
+                                    : challenge.level === 2
+                                    ? "Hard"
+                                    : "Ninja"}
+                                </span>
+                              </h6>
+                            </div>
+                            <ReactMarkdown
+                              children={templateParse(challenge.info)}
+                            />
+
+                            {challenge.isInstance && (
+                              <button
+                                className="btn btn-outline-danger btn-shadow"
+                                onClick={(e) => {
+                                  if (!challenge.progress)
+                                    createDocker(challenge);
+                                  if (challenge.progress === "finished")
+                                    shutdownDocker(challenge);
+                                }}
+                                title={
+                                  !challenge.progress
+                                    ? "Start Docker"
+                                    : challenge.progress === "finished"
+                                    ? "Stop Docker"
+                                    : challenge.progress === "stopping"
+                                    ? "Stopping Docker..."
+                                    : "Building Docker..."
+                                }
+                              >
+                                {!challenge.progress ? (
+                                  <>
+                                    <span className="fa-solid fa-circle-play"></span>
+                                  </>
+                                ) : challenge.progress === "finished" ? (
+                                  <>
+                                    <span className="fa-solid fa-power-off"></span>
+                                  </>
+                                ) : challenge.progress === "stopping" ? (
+                                  <>
+                                    <span className="fa-solid fa-spinner fa-spin"></span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <span className="fa-solid fa-spinner fa-spin"></span>
+                                  </>
+                                )}
+                              </button>
+                            )}
+
+                            {challenge.file ? (
+                              challenge.file.length > 0 ? (
+                                <button
+                                  className="btn btn-outline-danger btn-shadow"
+                                  onClick={() => {
+                                    downloadFile(
+                                      challenge.file,
+                                      challenge.name
+                                    );
+                                  }}
+                                  title="Download File"
+                                >
+                                  <span className="fa-solid fa-download" />
+                                </button>
+                              ) : null
+                            ) : null}
+
+                            {challenge.codeSnippet ? (
+                              challenge.codeSnippet.trim().length > 0 ? (
+                                <a
+                                  onClick={() => {
+                                    setCurrentHint("");
+                                    setCurrentSnippet({
+                                      code: challenge.codeSnippet,
+                                      language: challenge.codeLanguage,
+                                    });
+                                  }}
+                                  href="#modal"
+                                  data-toggle="modal"
+                                  data-target="#modal"
+                                  className="btn btn-outline-danger btn-shadow"
+                                  title="Code Snippet"
+                                >
+                                  <span className="fa-solid fa-laptop-code" />
+                                </a>
+                              ) : null
+                            ) : null}
+
+                            {challenge.hints.map((hint, i) =>
+                              hint.cost === 0 ? (
+                                hint.content.trim().length > 0 && (
+                                  <a
+                                    onClick={() => {
+                                      setCurrentHint(hint.content);
+                                    }}
+                                    href="#modal"
+                                    data-toggle="modal"
+                                    data-target="#modal"
+                                    className="btn btn-outline-danger btn-shadow"
+                                    title={"Hint#" + (i + 1)}
+                                  >
+                                    <span className="fa-solid fa-lightbulb" />
+                                  </a>
+                                )
+                              ) : (
+                                <a
+                                  onClick={(e) => {
+                                    setAction({
+                                      function: buyHint,
+                                      e: e,
+                                      data: {
+                                        challId: challenge._id,
+                                        hintId: hint.id,
+                                      },
+                                    });
+                                  }}
+                                  href="#confirmModal"
+                                  data-toggle="modal"
+                                  data-target="#confirmModal"
+                                  className="btn btn-outline-danger btn-shadow"
+                                  title={"Buy Hint#" + (i + 1)}
+                                >
+                                  <span className="fa-solid fa-lightbulb mr-2"></span>
+                                  (-{hint.cost.toString()}pts)
+                                </a>
+                              )
+                            )}
+
+                            <div className="input-group mt-3">
+                              <input
+                                type="text"
+                                className="form-control"
+                                placeholder="Enter Flag"
+                                aria-label="Enter Flag"
+                                aria-describedby="basic-addon2"
+                                id={"flag_id_" + challenge._id}
+                                onKeyPress={(e) => {
+                                  handleEnterSubmit(
+                                    e,
+                                    challenge._id,
+                                    challenge
+                                  );
+                                }}
+                              />
+                              <div className="input-group-append">
+                                <button
+                                  style={{
+                                    borderTopRightRadius: "6px",
+                                    borderBottomRightRadius: "6px",
+                                  }}
+                                  id="submit_p2"
+                                  className="btn btn-outline-danger"
+                                  type="button"
+                                  onClick={() => {
+                                    submitFlag(challenge._id, challenge);
+                                  }}
+                                >
+                                  Go!
+                                </button>
+                              </div>
+                            </div>
+
+                            {challenge.url ? (
+                              <div>
+                                <a
+                                  href={`${challenge.url}`}
+                                  target="_blank"
+                                  className="btn btn-outline-danger btn-shadow mt-3"
+                                  rel="noreferrer"
+                                >
+                                  {challenge.url}
+                                </a>
+                                <span className="btn btn-outline-danger btn-shadow mt-3">
+                                  {formatHours(
+                                    (new Date(
+                                      parseInt(challenge.deployTime)
+                                    ).getTime() +
+                                      2 * 60 * 60 * 1000 -
+                                      new Date().getTime()) /
+                                      1000
+                                  )}
+                                </span>
+                              </div>
+                            ) : null}
+                          </blockquote>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+          {/* );
+            })} */}
         </div>
         <ConfirmModal action={action} />
         <div
