@@ -839,16 +839,10 @@ function Challenges(props) {
                             </div>
 
                             {challenge.url ? (
-                              <div>
-                                <a
-                                  href={`${challenge.url}`}
-                                  target="_blank"
-                                  className="btn btn-outline-danger btn-shadow mt-3"
-                                  rel="noreferrer"
-                                >
-                                  {challenge.url}
-                                </a>
-                                <span className="btn btn-outline-danger btn-shadow mt-3">
+                              <div className="mt-3">
+                                <span>{challenge.url}</span>
+                                <br />
+                                <span>
                                   {formatHours(
                                     (new Date(
                                       parseInt(challenge.deployTime)
