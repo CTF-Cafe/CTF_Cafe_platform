@@ -159,9 +159,9 @@ exports.deployDocker = async function (req, res) {
       let port = "none";
 
       while (
-        (containers.data.services[i] &&
-          containers.data.services[i].ports.length == 0) ||
-        !containers.data.services[i].ports[0].hasOwnProperty("mapped")
+        containers.data.services[i] &&
+        (containers.data.services[i].ports.length == 0 ||
+          !containers.data.services[i].ports[0].hasOwnProperty("mapped"))
       ) {
         console.log(containers.data.services[i].ports);
         i += 1;
