@@ -164,8 +164,10 @@ exports.getChallenges = async function (req, res) {
   }
 };
 
-let deploying = [];
+let currentlyDeployingUsers = [];
+let currentlyDeployingTeams = [];
 exports.deployDocker = async function (req, res) {
+  let teamId = undefined;
   try {
     const result = validationResult(req);
 
@@ -177,7 +179,22 @@ exports.deployDocker = async function (req, res) {
 
     const user = await users.findById(req.session.userId);
     if (!user) throw new Error("User not found");
+
+    // Check if user is currently submitting flag
+    if (currentlyDeployingUsers.includes(req.session.userId))
+      throw new Error("Submiting to fast!");
+
+    currentlyDeployingUsers.push(req.session.userId);
+
     if (!ObjectId.isValid(user.teamId)) throw new Error("Not in a team!");
+
+    // Check if team is currently submitting
+    if (currentlyDeployingTeams.includes(user.teamId)) {
+      throw new Error("Submiting too fast!");
+    }
+
+    currentlyDeployingTeams.push(user.teamId);
+    teamId = user.teamId;
 
     const team = await teams.findById(user.teamId);
     if (!team) throw new Error("Not in a team!");
@@ -244,6 +261,16 @@ exports.deployDocker = async function (req, res) {
   } catch (error) {
     if (error) {
       res.send({ state: "error", message: error.message });
+    }
+  } finally {
+    currentlyDeployingUsers = currentlyDeployingUsers.filter(
+      (item) => item !== req.session.userId
+    );
+
+    if (teamId) {
+      currentlyDeployingTeams = currentlyDeployingTeams.filter(
+        (item) => item !== teamId
+      );
     }
   }
 };
@@ -329,7 +356,6 @@ async function getDocker(teamId) {
   }
 }
 
-// TODO : DONT HANDLE SENDING FLAG TO USER
 let currentlySubmittingUsers = [];
 let currentlySubmittingTeams = [];
 exports.submitFlag = async function (req, res) {
