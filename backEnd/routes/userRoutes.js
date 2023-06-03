@@ -110,9 +110,10 @@ router.get("/getNotifications", async (req, res) => {
       );
     }
 
-    const notificationsNeeded = editedNotifications.filter(
+    const notificationsNeeded = notifications.value.filter(
       (notification) => !notification.seenBy.includes(req.session.userId)
     );
+
     res.send({ state: "success", notifications: notificationsNeeded });
   } else {
     res.send({ state: "error", notifications: [] });
