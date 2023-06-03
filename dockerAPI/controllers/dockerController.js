@@ -195,6 +195,8 @@ exports.deployDocker = async function (req, res) {
       });
 
       progress.delete(challengeId + "_" + ownerId);
+
+      console.log(err);
       throw new Error("Error launching docker!");
     }
 
