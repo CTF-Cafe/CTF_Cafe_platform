@@ -260,7 +260,7 @@ exports.getUsers = async function (req, res) {
       let allUsers = [];
       try {
         allUsers = await users
-          .find({ username: new RegExp(search, "i") })
+          .find({ username: new RegExp(search, "i") }, { password: 0, key: 0 })
           .sort({ score: -1, _id: 1 })
           .skip((page - 1) * 100)
           .limit(100);
