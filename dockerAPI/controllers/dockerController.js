@@ -156,15 +156,23 @@ exports.deployDocker = async function (req, res) {
 
     let i = 0;
     try {
+      let port = "none";
+
       while (
-        containers.data.services[i].ports.length == 0 ||
+        (containers.data.services[i] &&
+          containers.data.services[i].ports.length == 0) ||
         !containers.data.services[i].ports[0].hasOwnProperty("mapped")
       ) {
         console.log(containers.data.services[i].ports);
         i += 1;
       }
 
-      const port = containers.data.services[i].ports[0].mapped.port;
+      if (containers.data.services[i]) {
+        port = containers.data.services[i].ports[0].mapped.port;
+      } else {
+        port = containers.out.split("0.0.0.0:")[1].split("->")[0];
+      }
+
       await dockers.create({
         dockerId: challengeId + "_" + ownerId,
         challengeId: challengeId,
