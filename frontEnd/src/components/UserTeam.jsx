@@ -522,10 +522,7 @@ function UserTeam(props) {
           globalData.navigate("/", { replace: true });
         } else if (response.data.state == "success") {
           globalData.alert.success("Kicked user!");
-
-          globalData.userData.team = response.data.team;
-          setUserTeam(response.data.team);
-          globalData.setUserData(globalData.userData);
+          getTeam();
         } else {
           globalData.alert.error(response.data.message);
         }

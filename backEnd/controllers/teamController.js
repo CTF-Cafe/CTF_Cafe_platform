@@ -463,8 +463,6 @@ exports.kickUser = async function (req, res) {
             res.send({
               state: "success",
               message: "User kicked!",
-              user: user,
-              team: team,
             });
           });
       });
