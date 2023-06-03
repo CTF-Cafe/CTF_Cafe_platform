@@ -8,7 +8,7 @@ exports.username = (id = "username") =>
     .trim()
     .isLength({ min: 4, max: 32 })
     .withMessage("must be >4 and <32")
-    .matches(/^[^"$\n]+$/)
+    .matches(/^[^"$\n@]+$/)
     .withMessage("dont use any sus characters");
 
 exports.password = (id = "password") =>
