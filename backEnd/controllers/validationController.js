@@ -6,8 +6,8 @@ exports.username = (id = "username") =>
     .notEmpty()
     .withMessage("must not be empty")
     .trim()
-    .isLength({ min: 4, max: 32 })
-    .withMessage("must be >4 and <32")
+    .isLength({ min: 1, max: 32 })
+    .withMessage("must be >1 and <32")
     .matches(/^[^"$\n@]+$/)
     .withMessage("dont use any sus characters");
 
@@ -59,8 +59,8 @@ exports.teamName = (id = "teamName") =>
     .notEmpty()
     .withMessage("must not be empty")
     .trim()
-    .isLength({ min: 4, max: 32 })
-    .withMessage("must be >4 and <32")
+    .isLength({ min: 1, max: 32 })
+    .withMessage("must be >1 and <32")
     .matches(/^[^"$\n]+$/)
     .withMessage("dont use any sus characters");
 
