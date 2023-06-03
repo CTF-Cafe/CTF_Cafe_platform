@@ -67,8 +67,6 @@ exports.registerTeam = async function (req, res) {
             res.send({
               state: "success",
               message: "Registered team!",
-              user: user,
-              team: team,
             });
           });
       })
@@ -206,8 +204,6 @@ exports.joinTeam = async function (req, res) {
             res.send({
               state: "success",
               message: "Joined team!",
-              user: user,
-              team: team,
             });
           });
       })
@@ -356,8 +352,6 @@ exports.leaveTeam = async function (req, res) {
             res.send({
               state: "success",
               message: "Left team!",
-              user: user,
-              team: team,
             });
           });
       });

@@ -411,7 +411,6 @@ function UserTeam(props) {
           globalData.navigate("/", { replace: true });
         } else if (response.data.state === "success") {
           globalData.alert.success("Team registered!");
-          globalData.userData.teamId = response.data.team._id;
           getTeam();
         } else {
           globalData.alert.error(response.data.message);
@@ -441,7 +440,6 @@ function UserTeam(props) {
           globalData.navigate("/", { replace: true });
         } else if (response.data.state === "success") {
           globalData.alert.success("Team joined!");
-          globalData.userData.teamId = response.data.team._id;
           getTeam();
         } else {
           globalData.alert.error(response.data.message);
