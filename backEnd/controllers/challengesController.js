@@ -15,6 +15,14 @@ if ("WEBHOOK" in process.env) {
   hook.setAvatar(IMAGE_URL);
 }
 
+let hook_2;
+if ("WEBHOOK_2" in process.env) {
+  hook_2 = new Webhook(process.env.WEBHOOK_2);
+  const IMAGE_URL = "https://cdn-icons-png.flaticon.com/512/205/205916.png";
+  hook_2.setUsername("First Blood");
+  hook_2.setAvatar(IMAGE_URL);
+}
+
 exports.getChallenges = async function (req, res) {
   let allChallenges = await challenges
     .find(
@@ -531,6 +539,13 @@ exports.submitFlag = async function (req, res) {
       if ("WEBHOOK" in process.env) {
         // DISCORD WEBHOOK FIRST BLOOD
         hook.send(
+          `:drop_of_blood: ${user.username}@${team.name} has firstBlood ${challenge.name}`
+        );
+      }
+
+      if ("WEBHOOK_2" in process.env) {
+        // DISCORD WEBHOOK FIRST BLOOD
+        hook_2.send(
           `:drop_of_blood: ${user.username}@${team.name} has firstBlood ${challenge.name}`
         );
       }
