@@ -34,6 +34,15 @@ router.post(
   }
 );
 
+router.post(
+  "/updatePassword",
+  [validation.password("newPassword")],
+  [validation.password("oldPassword")],
+  (req, res) => {
+    userController.updatePassword(req, res);
+  }
+);
+
 router.post("/getTeamCode", [validation.teamName()], (req, res) => {
   teamController.getCode(req, res);
 });

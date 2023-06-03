@@ -197,7 +197,7 @@ exports.verifyMail = async function (req, res) {
 
     await Users.updateOne({ _id: user._id }, { verified: true, token: "" });
 
-    res.send("Email verified!");
+    res.send("Email verified! You can now Login!");
   } catch (err) {
     if (err) {
       res.send(err.message);
@@ -205,7 +205,6 @@ exports.verifyMail = async function (req, res) {
   }
 };
 
-// TODO : DONT HANDLE SENDING USER, TEAM
 exports.updateUsername = async function (req, res) {
   try {
     const result = validationResult(req);
@@ -235,56 +234,35 @@ exports.updateUsername = async function (req, res) {
     )
       .then(async function (user) {
         if (ObjectId.isValid(user.teamId)) {
-          userTeamExists = await teams.findById(user.teamId);
+          let userTeamExists = await teams.findById(user.teamId);
 
           if (userTeamExists) {
             let newUsers = userTeamExists.users;
-            let captain = userTeamExists.teamCaptain;
+
             newUsers.forEach((userInTeam) => {
               if (userInTeam._id.equals(user._id)) {
                 userInTeam.username = username;
               }
             });
 
-            if (captain == req.session.userId) {
-              await teams
-                .findByIdAndUpdate(
-                  user.teamId,
-                  { users: newUsers, teamCaptain: req.session.userId },
-                  { returnOriginal: false }
-                )
-                .then(async function (team) {
-                  user.password = undefined;
-                  res.send({
-                    state: "success",
-                    message: "Username updated!",
-                    user: user,
-                    team: team,
-                  });
+            await teams
+              .findByIdAndUpdate(
+                user.teamId,
+                { users: newUsers },
+                { returnOriginal: false }
+              )
+              .then(async function (team) {
+                user.password = undefined;
+                res.send({
+                  state: "success",
+                  message: "Username updated!",
                 });
-            } else {
-              await teams
-                .findByIdAndUpdate(
-                  user.teamId,
-                  { users: newUsers },
-                  { returnOriginal: false }
-                )
-                .then(async function (team) {
-                  user.password = undefined;
-                  res.send({
-                    state: "success",
-                    message: "Username updated!",
-                    user: user,
-                    team: team,
-                  });
-                });
-            }
+              });
           }
         } else {
           res.send({
             state: "success",
             message: "Username updated!",
-            user: user,
           });
         }
       })
@@ -292,6 +270,49 @@ exports.updateUsername = async function (req, res) {
         console.log(err.message);
         throw new Error("User update failed!");
       });
+  } catch (err) {
+    if (err) {
+      res.send({ state: "error", message: err.message });
+    }
+  }
+};
+
+exports.updatePassword = async function (req, res) {
+  try {
+    const result = validationResult(req);
+
+    if (!result.isEmpty()) {
+      throw new Error(`${result.errors[0].path}: ${result.errors[0].msg}`);
+    }
+
+    const data = matchedData(req);
+
+    const newPassword = data.newPassword;
+    const oldPassword = data.oldPassword;
+
+    const user = await Users.findById(req.session.userId);
+
+    if (!user) {
+      throw new Error("Wrong Credentials");
+    }
+
+    if (!(await encryptionController.compare(oldPassword, user.password))) {
+      throw new Error("Wrong Credentials");
+    }
+
+    await Users.findByIdAndUpdate(
+      req.session.userId,
+      { password: await encryptionController.encrypt(newPassword) },
+      { returnOriginal: false }
+    ).catch(function (err) {
+      console.log(err.message);
+      throw new Error("User update failed!");
+    });
+
+    res.send({
+      state: "success",
+      message: "Password updated!",
+    });
   } catch (err) {
     if (err) {
       res.send({ state: "error", message: err.message });

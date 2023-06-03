@@ -456,7 +456,9 @@ function Challenges(props) {
                       cursor: "pointer",
                     }}
                     onClick={() => {
-                      if (selectedTags.includes(tag)) {
+                      if (selectedTags.length === tags.length) {
+                        setSelectedTags([tag]);
+                      } else if (selectedTags.includes(tag)) {
                         setSelectedTags(selectedTags.filter((x) => x !== tag));
                       } else {
                         setSelectedTags([...selectedTags, tag]);
