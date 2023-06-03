@@ -598,7 +598,7 @@ function Challenges(props) {
                             ))}
                           </div>
                           {/* DIFFICULTY BADGE */}
-                          <span
+                          {/* <span
                             className={
                               challenge.level === 0
                                 ? "badge color_white color_easy align-self-end"
@@ -617,7 +617,7 @@ function Challenges(props) {
                               : challenge.level === 2
                               ? "Hard"
                               : "Ninja"}
-                          </span>
+                          </span> */}
                           <span
                             className="badge align-self-end"
                             style={{ marginRight: "5px" }}
@@ -660,7 +660,7 @@ function Challenges(props) {
                                   {challenge.solveCount}
                                 </span>{" "}
                                 &nbsp;
-                                <span
+                                {/* <span
                                   className={
                                     challenge.level === 0
                                       ? "color_white color_easy"
@@ -678,7 +678,7 @@ function Challenges(props) {
                                     : challenge.level === 2
                                     ? "Hard"
                                     : "Ninja"}
-                                </span>
+                                </span> */}
                               </h6>
                             </div>
                             <ReactMarkdown
