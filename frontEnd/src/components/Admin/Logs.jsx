@@ -113,7 +113,7 @@ function Stats() {
             return (
               <tr key={log._id}>
                 <th scope="row" style={{ textAlign: "center" }}>
-                  {index}
+                  {index + ((page - 1)* 100)}
                 </th>
                 <td>{log.authorIp}</td>
                 <td>{log.authorId.substring(0, 8)}</td>
