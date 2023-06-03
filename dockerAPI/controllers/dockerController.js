@@ -12,21 +12,23 @@ const progress = new Map();
 
 // Cron Job to check if docker containers should be stopped after 2 hours
 cron.schedule("*/5 * * * *", () => {
-  dockers.find({ deployTime: { $gt: new Date(Date.now() - 2 * 60 * 60 * 1000) } }).then(async (allDockers) => {
-    allDockers.forEach(async (docker) => {
-      if (Date.now() - docker.deployTime >= 1000 * 60 * 60 * 2) {
-        // stop docker
-        await compose.stop({
-          cwd: docker.path,
-          composeOptions: [["-p", docker.dockerId]],
-        });
-        await compose.rm({
-          cwd: docker.path,
-          composeOptions: [["-p", docker.dockerId]],
-        });
-      }
+  dockers
+    .find({ deployTime: { $gt: new Date(Date.now() - 2 * 60 * 60 * 1000) } })
+    .then(async (allDockers) => {
+      allDockers.forEach(async (docker) => {
+        if (Date.now() - docker.deployTime >= 1000 * 60 * 60 * 2) {
+          // stop docker
+          await compose.stop({
+            cwd: docker.path,
+            composeOptions: [["-p", docker.dockerId]],
+          });
+          await compose.rm({
+            cwd: docker.path,
+            composeOptions: [["-p", docker.dockerId]],
+          });
+        }
+      });
     });
-  });
 });
 
 async function getInfosfromUrl(url) {
@@ -58,7 +60,9 @@ async function checkDockerExists(githubUrl) {
   let res = await fs.mkdirSync(dockerPath, { recursive: true });
 
   // Setup github module from infos
-  const git = simpleGit(dockerPath, { config: ["core.sparsecheckout=true"] });
+  const git = simpleGit(dockerPath, {
+    config: ["core.sparsecheckout=true"],
+  });
 
   if (res) {
     await git.init();
@@ -101,7 +105,12 @@ exports.deployDocker = async function (req, res) {
       throw new Error("Owner already has a docker running!");
     }
 
-    const dockerPath = await checkDockerExists(req.body.githubUrl);
+    const dockerPath = await checkDockerExists(req.body.githubUrl).catch(
+      (e) => {
+        console.log(e);
+        throw Error("Failed!");
+      }
+    );
 
     if (
       !fs.existsSync(`${dockerPath}/docker-compose.yaml`) &&
@@ -151,7 +160,7 @@ exports.deployDocker = async function (req, res) {
         containers.data.services[i].ports.length == 0 ||
         !containers.data.services[i].ports[0].hasOwnProperty("mapped")
       ) {
-        console.log(containers.data.services[i].ports)
+        console.log(containers.data.services[i].ports);
         i += 1;
       }
 
@@ -164,7 +173,9 @@ exports.deployDocker = async function (req, res) {
         deployTime: new Date().getTime(),
         githubUrl: req.body.githubUrl,
         path: dockerPath,
-        randomFlag: req.body.randomFlag ? process.env.RANDOM_FLAG_FORMAT.replace("RAND", randomFlag) : "false"
+        randomFlag: req.body.randomFlag
+          ? process.env.RANDOM_FLAG_FORMAT.replace("RAND", randomFlag)
+          : "false",
       });
     } catch (err) {
       await dockers.deleteOne({
@@ -192,6 +203,7 @@ exports.deployDocker = async function (req, res) {
     if (req.body.randomFlag) res.send({ state: "success", flag: randomFlag });
     else res.send({ state: "success" });
   } catch (err) {
+    console.log(err);
     if (err) {
       res.send({ state: "error", message: err.message });
     }
