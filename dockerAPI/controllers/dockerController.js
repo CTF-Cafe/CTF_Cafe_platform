@@ -11,7 +11,7 @@ require("dotenv").config();
 const progress = new Map();
 
 // Cron Job to check if docker containers should be stopped after 2 hours
-cron.schedule("*/5 * * * *", () => {
+cron.schedule("* * * * *", () => {
   dockers
     .find({ deployTime: { $lt: new Date(Date.now() - 2 * 60 * 60 * 1000) } })
     .then(async (allDockers) => {
@@ -26,7 +26,7 @@ cron.schedule("*/5 * * * *", () => {
             cwd: docker.path,
             composeOptions: [["-p", docker.dockerId]],
           });
-          await dockers.findByIdAndDelete(docker.dockerId);
+          await dockers.findByIdAndDelete(docker._id);
         }
       });
     });
