@@ -13,7 +13,7 @@ const progress = new Map();
 // Cron Job to check if docker containers should be stopped after 2 hours
 cron.schedule("*/5 * * * *", () => {
   dockers
-    .find({ deployTime: { $gt: new Date(Date.now() - 2 * 60 * 60 * 1000) } })
+    .find({ deployTime: { $lt: new Date(Date.now() - 2 * 60 * 60 * 1000) } })
     .then(async (allDockers) => {
       allDockers.forEach(async (docker) => {
         if (Date.now() - docker.deployTime >= 1000 * 60 * 60 * 2) {
@@ -26,6 +26,7 @@ cron.schedule("*/5 * * * *", () => {
             cwd: docker.path,
             composeOptions: [["-p", docker.dockerId]],
           });
+          await dockers.findByIdAndDelete(docker.dockerId);
         }
       });
     });

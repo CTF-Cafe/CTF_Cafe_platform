@@ -612,8 +612,8 @@ exports.getDockers = async function (req, res) {
 
     dockers = await Promise.all(
       dockers.map(async (x) => {
-        x.team = await teams.findById(x.ownerId, { name: 1 });
-        x.challenge = await challenges.findById(x.challengeId, { name: 1 });
+        x.team = await teams.findById(x.ownerId, { name: 1 }) || { name: "Team Deleted" };
+        x.challenge = await challenges.findById(x.challengeId, { name: 1 }) || { name: "Challenge Deleted" };
         if (
           new RegExp(search).test(x.team.name) ||
           new RegExp(search).test(x.challenge.name) ||

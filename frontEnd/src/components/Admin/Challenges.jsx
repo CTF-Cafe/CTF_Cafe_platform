@@ -178,7 +178,7 @@ function Challenges(props) {
     const level = document.getElementById("level" + oldChallenge._id).value;
     formData.append("level", level);
 
-    const info = document.getElementById("info" + oldChallenge._id).innerText;
+    const info = document.getElementById("info" + oldChallenge._id).innerHTML.replaceAll("<br>", "\n");
     formData.append("info", info);
 
     let hints = [];
