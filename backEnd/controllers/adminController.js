@@ -9,6 +9,7 @@ const fs = require("fs");
 const ObjectId = require("mongoose").Types.ObjectId;
 const { validateRequestBody } = require("./inputController");
 const encryptionController = require("./encryptionController");
+const { v4 } = require("uuid");
 
 exports.getStats = async function (req, res) {
   let allChallenges = await challenges.find({}).sort({ points: 1 });
@@ -60,7 +61,7 @@ exports.saveChallenge = async function (req, res) {
       info: { required: true },
       flag: { required: true },
       requirement: { type: "objectId" },
-      tags: { type: "array", itemValidation: {} }
+      tags: { type: "array", itemValidation: {} },
     };
 
     validateRequestBody(req.body, validationObject);
@@ -446,10 +447,6 @@ exports.changeUserPassword = async function (req, res) {
   const user = await users.findById(req.body.user._id);
 
   if (user) {
-    if (req.body.password_old.trim() != req.body.password.trim()) {
-      throw new Error("Please dont use any 'sus' character's");
-    }
-
     // Check password length
     if (req.body.password.trim().length < 8)
       throw new Error("Password is to short 8 characters minimum!!");
@@ -458,8 +455,10 @@ exports.changeUserPassword = async function (req, res) {
       req.body.password.trim()
     );
 
+    const newKey = v4();
+
     await users.findByIdAndUpdate(req.body.user._id, {
-      $set: { password: password },
+      $set: { password: password, key: newKey.toString() },
     });
 
     res.send({ state: "success" });
@@ -612,8 +611,12 @@ exports.getDockers = async function (req, res) {
 
     dockers = await Promise.all(
       dockers.map(async (x) => {
-        x.team = await teams.findById(x.ownerId, { name: 1 }) || { name: "Team Deleted" };
-        x.challenge = await challenges.findById(x.challengeId, { name: 1 }) || { name: "Challenge Deleted" };
+        x.team = (await teams.findById(x.ownerId, { name: 1 })) || {
+          name: "Team Deleted",
+        };
+        x.challenge = (await challenges.findById(x.challengeId, {
+          name: 1,
+        })) || { name: "Challenge Deleted" };
         if (
           new RegExp(search).test(x.team.name) ||
           new RegExp(search).test(x.challenge.name) ||
