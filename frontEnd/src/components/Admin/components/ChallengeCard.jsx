@@ -108,7 +108,8 @@ function ChallengeCard(props) {
                   style={{ width: "50px" }}
                   type="number"
                   step="25"
-                />{" "}pts
+                />{" "}
+                pts
               </span>
             </div>
           </div>
@@ -178,7 +179,18 @@ function ChallengeCard(props) {
                   <hr />
                   <div style={{ display: "block" }}>
                     <label>Info:</label>
-                    <p
+                    <div
+                      onPaste={(e) => {
+                        setTimeout(() => {
+                          e.target.innerHTML = e.target.innerText;
+                        }, 10);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && e.shiftKey === false) {
+                          e.preventDefault();
+                          document.execCommand("insertLineBreak");
+                        }
+                      }}
                       contentEditable="true"
                       suppressContentEditableWarning={true}
                       style={{
@@ -189,7 +201,7 @@ function ChallengeCard(props) {
                       id={"info" + challenge._id}
                     >
                       {challenge.info}
-                    </p>
+                    </div>
                   </div>
                 </div>
 
