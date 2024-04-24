@@ -637,6 +637,8 @@ exports.buyHint = async function (req, res) {
     if (!hint) throw new Error("Hint does not exist!");
     if (hint.cost <= 0) throw new Error("Challenge hint is free!");
 
+    const user = await users.findOne({ _id: req.session.userId, verified: true });
+
     // Check user already bought hint
     if (
       user.hintsBought.find(
