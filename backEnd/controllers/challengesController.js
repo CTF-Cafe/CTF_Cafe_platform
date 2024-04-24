@@ -68,7 +68,6 @@ exports.getChallenges = async function (req, res) {
           let copy = { ...challenge._doc, id: challenge.id };
 
           let team = false;
-          let teamHasBought = false;
 
           // Check teamId is valid
           if (ObjectId.isValid(user.teamId)) {
@@ -95,13 +94,14 @@ exports.getChallenges = async function (req, res) {
               !user.solved.find((x) =>
                 new ObjectId(x._id).equals(challenge.requirement)
               ) &&
-              teamHasBought == false
+              teamHasUnlocked == false
             ) {
               continue;
             }
           }
 
           copy.hints = challenge.hints.map((hint) => {
+            let teamHasBought = false;
             hintCopy = { ...hint };
             // Check Team Exists
             if (team) {
@@ -637,7 +637,10 @@ exports.buyHint = async function (req, res) {
     if (!hint) throw new Error("Hint does not exist!");
     if (hint.cost <= 0) throw new Error("Challenge hint is free!");
 
-    const user = await users.findOne({ _id: req.session.userId, verified: true });
+    const user = await users.findOne({
+      _id: req.session.userId,
+      verified: true,
+    });
 
     // Check user already bought hint
     if (
