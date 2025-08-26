@@ -30,7 +30,7 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [userData, setUserData] = useState(false);
   const [theme, setTheme] = useState(
-    JSON.parse(localStorage.getItem("theme")) || []
+    localStorage.setItem("theme", "dark") || []
   );
   const [rules, setRules] = useState(
     JSON.parse(localStorage.getItem("rules")) || []
@@ -87,7 +87,7 @@ function App() {
     alert,
     navigate,
   };
-
+ 
   const getConfigs = () => {
     axios
       .get(process.env.REACT_APP_BACKEND_URI + "/api/getConfigs")

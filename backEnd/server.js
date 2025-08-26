@@ -54,10 +54,14 @@ if (process.env.NODE_ENV === "production") {
 
 app.use(session(sess));
 
+const allowedOrigins = ['http://localhost:3000', 'http://10.10.10.6:3000', "http://192.168.102.173:3000"];
 // Add headers before the routes are defined
 app.use(function (req, res, next) {
-  // Website you wish to allow to connect
-  res.setHeader("Access-Control-Allow-Origin", process.env.FRONTEND_URI);
+
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
 
   // Request methods you wish to allow
   res.setHeader(

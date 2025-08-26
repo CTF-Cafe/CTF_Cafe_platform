@@ -22,10 +22,18 @@ db.once("open", async function () {
 app.use(bodyparser.urlencoded({ extended: false }));
 app.use(bodyparser.json());
 
+const allowedOrigins = ['http://localhost:3000', 'http://10.10.10.6:3000'];
 // Add headers before the routes are defined
 app.use(function (req, res, next) {
-  // Website you wish to allow to connect
-  res.setHeader("Access-Control-Allow-Origin", process.env.BACKEND_URI);
+
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+
+
+  // // Website you wish to allow to connect
+  // res.setHeader("Access-Control-Allow-Origin", process.env.BACKEND_URI);
 
   // Request methods you wish to allow
   res.setHeader(
